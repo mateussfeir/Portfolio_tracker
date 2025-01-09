@@ -7,6 +7,14 @@
 </head>
 <body>
     <h1>Welcome, {{ username }}!</h1>
+     <!-- Bitcoin Price -->
+    <h2>The current Bitcoin price is:
+        {% if bitcoin_price %}
+            ${{ bitcoin_price }}
+        {% else %}
+            Could not fetch the price. Please try again later.
+        {% endif %}
+    </h2>
 
     <h2>Your Crypto Positions:</h2>
     {% if assets %}

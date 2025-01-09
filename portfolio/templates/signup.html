@@ -8,6 +8,7 @@
 <body>
     <h1>Sign Up</h1>
     <form method="post">
+        {# Cross-Site Request Forgery (CSRF) token for security. This protects your form from malicious attacks.#}
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Sign up</button>

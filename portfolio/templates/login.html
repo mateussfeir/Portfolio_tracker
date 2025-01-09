@@ -8,7 +8,9 @@
 <body>
     <h1>Login</h1>
     <form method="post" action="">
+{#      Cross-Site Request Forgery (CSRF) token for security. This protects your form from malicious attacks.#}
         {% csrf_token %}
+{#      {{ form.as_p }} renders the login and password fields as HTML, wrapping each field in a <p> tag for basic layout.#}
         {{ form.as_p }}
         <button type="submit">Login</button>
     </form>

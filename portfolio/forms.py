@@ -6,7 +6,7 @@ from .models import Asset
 class SignUpForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ('username', 'password1', 'password2')  # Removed the email field
+        fields = ('username', 'password1', 'password2')  # we have 2 passwords because we ask the user to input twice to be sure it was written correctly
 
 class AddAssetForm(forms.ModelForm):
     class Meta:

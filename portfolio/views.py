@@ -3,6 +3,18 @@ from django.shortcuts import render, redirect
 from .forms import AddAssetForm, SignUpForm
 from .models import Asset
 from django.contrib.auth import login, authenticate
+import requests
+from django.shortcuts import render
+
+def get_bitcoin_price():
+    url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return data['bitcoin']['usd']
+    except requests.exceptions.RequestException:
+        return None
 
 def signup(request):
     if request.method == 'POST':
@@ -20,6 +32,9 @@ def signup(request):
 
 @login_required
 def home(request):
+    # Fetch Bitcoin price
+    bitcoin_price = get_bitcoin_price()
+
     # Handle form submission
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
@@ -33,4 +48,9 @@ def home(request):
 
     # Fetch all crypto positions for the logged-in user
     user_assets = Asset.objects.filter(owner=request.user)
-    return render(request, 'home.html', {'username': request.user.username, 'assets': user_assets, 'form': form})
+    return render(request, 'home.html', {
+        'username': request.user.username,
+        'assets': user_assets,
+        'form': form,
+        'bitcoin_price': bitcoin_price,  # Pass Bitcoin price to the template
+    })
