@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome, {{ username }}!</h1>
+
+    <h2>Your Crypto Positions:</h2>
+    {% if assets %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr>
+                <td>{{ asset.ticker }}</td>
+                <td>{{ asset.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You have no crypto positions yet.</p>
+    {% endif %}
+
+    <h2>Add a New Position</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Position</button>
+    </form>
+
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>
