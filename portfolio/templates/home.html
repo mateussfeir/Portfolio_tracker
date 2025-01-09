@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
 </head>
+{% load humanize %}
 <body>
     <h1>Welcome, {{ username }}!</h1>
-     <!-- Bitcoin Price -->
+
+    <!-- Bitcoin Price -->
     <h2>The current Bitcoin price is:
         {% if bitcoin_price %}
-            ${{ bitcoin_price }}
+            ${{ bitcoin_price|floatformat:2|intcomma }}
         {% else %}
             Could not fetch the price. Please try again later.
         {% endif %}
     </h2>
 
+    <!-- User's Crypto Positions -->
     <h2>Your Crypto Positions:</h2>
     {% if assets %}
     <table border="1">
@@ -23,6 +26,7 @@
             <tr>
                 <th>Ticker</th>
                 <th>Amount</th>
+                <th>Value (USD)</th>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +34,13 @@
             <tr>
                 <td>{{ asset.ticker }}</td>
                 <td>{{ asset.amount }}</td>
+                <td>
+                    {% if asset.value %}
+                        ${{ asset.value|floatformat:2|intcomma }}
+                    {% else %}
+                        Could not fetch price
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -38,6 +49,7 @@
     <p>You have no crypto positions yet.</p>
     {% endif %}
 
+    <!-- Form to Add New Positions -->
     <h2>Add a New Position</h2>
     <form method="post">
         {% csrf_token %}

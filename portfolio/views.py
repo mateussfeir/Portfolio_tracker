@@ -4,17 +4,30 @@ from .forms import AddAssetForm, SignUpForm
 from .models import Asset
 from django.contrib.auth import login, authenticate
 import requests
-from django.shortcuts import render
+from decimal import Decimal
 
-def get_bitcoin_price():
-    url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+# Function to fetch the current price of a specific asset
+def get_asset_price(ticker):
+    url = f"https://api.coingecko.com/api/v3/simple/price?ids={ticker}&vs_currencies=usd"
     try:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        return data['bitcoin']['usd']
-    except requests.exceptions.RequestException:
+        return data.get(ticker, {}).get('usd', None)
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching price for {ticker}: {e}")  # Debugging output
         return None
+
+def get_multiple_asset_prices(tickers):
+    ids = ','.join(tickers)
+    url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()  # Returns a dictionary with prices
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching prices: {e}")
+        return {}
 
 def signup(request):
     if request.method == 'POST':
@@ -32,15 +45,12 @@ def signup(request):
 
 @login_required
 def home(request):
-    # Fetch Bitcoin price
-    bitcoin_price = get_bitcoin_price()
-
-    # Handle form submission
+    # Handle form submission for adding assets
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
             asset = form.save(commit=False)
-            asset.owner = request.user  # Link the asset to the logged-in user
+            asset.owner = request.user
             asset.save()
             return redirect('home')  # Refresh the page after adding the asset
     else:
@@ -48,9 +58,38 @@ def home(request):
 
     # Fetch all crypto positions for the logged-in user
     user_assets = Asset.objects.filter(owner=request.user)
+
+    # Map user tickers to CoinGecko identifiers
+    tickers = [COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()) for asset in user_assets]
+    prices = get_multiple_asset_prices(tickers)  # Fetch prices for all mapped tickers
+
+    # Calculate the worth for each asset
+    assets_with_value = []
+    for asset in user_assets:
+        coin_id = COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower())
+        price = prices.get(coin_id, {}).get('usd')  # Fetch price from API response
+        if price:
+            price = Decimal(str(price))  # Convert price to Decimal for compatibility
+        value = price * asset.amount if price else None
+        assets_with_value.append({
+            'ticker': asset.ticker,
+            'amount': asset.amount,
+            'value': value
+        })
+
+    # Fetch Bitcoin price for display (optional)
+    bitcoin_price = prices.get('bitcoin', {}).get('usd')
+
     return render(request, 'home.html', {
         'username': request.user.username,
-        'assets': user_assets,
+        'assets': assets_with_value,
         'form': form,
         'bitcoin_price': bitcoin_price,  # Pass Bitcoin price to the template
     })
+
+COINGECKO_TICKER_MAPPING = {
+    'btc': 'bitcoin',
+    'eth': 'ethereum',
+    'sol': 'solana',
+    # Add more mappings as needed
+}

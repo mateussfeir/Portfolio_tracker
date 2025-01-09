@@ -31,18 +31,16 @@ ALLOWED_HOSTS = []
 LOGIN_REDIRECT_URL = '/home/'  # Redirect after successful login
 LOGOUT_REDIRECT_URL = '/login/'  # Optional: Redirect after logout
 
-
-# Application definition
-
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "portfolio",	
-]
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.humanize',  # Add this line for humanize filters
+    'portfolio',  # Your custom app
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
