@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Plotly JS -->
 </head>
 {% load humanize %}
 <body>
@@ -27,6 +28,7 @@
                 <th>Ticker</th>
                 <th>Amount</th>
                 <th>Value (USD)</th>
+                <th>Allocation (%)</th>
             </tr>
         </thead>
         <tbody>
@@ -41,21 +43,35 @@
                         Could not fetch price
                     {% endif %}
                 </td>
+                <td>
+                    {% if asset.percentage %}
+                        {{ asset.percentage|floatformat:2 }}%
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <h3>Total Net Worth: ${{ total_net_worth|floatformat:2|intcomma }}</h3>
     {% else %}
     <p>You have no crypto positions yet.</p>
     {% endif %}
 
-    <!-- Form to Add New Positions -->
+    <!-- Add a New Position -->
     <h2>Add a New Position</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Add Position</button>
     </form>
+
+    <!-- Pie Chart -->
+    <h2>Your Portfolio Distribution</h2>
+    <div>
+        {{ chart|safe }}
+    </div>
 
     <a href="{% url 'logout' %}">Logout</a>
 </body>

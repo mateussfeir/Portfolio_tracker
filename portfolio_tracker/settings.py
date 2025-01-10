@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',  # Add this line for humanize filters
     'portfolio',  # Your custom app
-
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

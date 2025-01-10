@@ -5,19 +5,17 @@ from .models import Asset
 from django.contrib.auth import login, authenticate
 import requests
 from decimal import Decimal
+import plotly.graph_objects as go
 
-# Function to fetch the current price of a specific asset
-def get_asset_price(ticker):
-    url = f"https://api.coingecko.com/api/v3/simple/price?ids={ticker}&vs_currencies=usd"
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        return data.get(ticker, {}).get('usd', None)
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching price for {ticker}: {e}")  # Debugging output
-        return None
+# Mapping user-friendly tickers to CoinGecko identifiers
+COINGECKO_TICKER_MAPPING = {
+    'btc': 'bitcoin',
+    'eth': 'ethereum',
+    'sol': 'solana',
+    # Add more mappings as needed
+}
 
+# Function to fetch prices for multiple tickers in one API call
 def get_multiple_asset_prices(tickers):
     ids = ','.join(tickers)
     url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd"
@@ -29,6 +27,7 @@ def get_multiple_asset_prices(tickers):
         print(f"Error fetching prices: {e}")
         return {}
 
+# Signup view
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -43,6 +42,7 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
+# Home view
 @login_required
 def home(request):
     # Handle form submission for adding assets
@@ -59,37 +59,48 @@ def home(request):
     # Fetch all crypto positions for the logged-in user
     user_assets = Asset.objects.filter(owner=request.user)
 
-    # Map user tickers to CoinGecko identifiers
+    # Collect tickers for API call
     tickers = [COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()) for asset in user_assets]
-    prices = get_multiple_asset_prices(tickers)  # Fetch prices for all mapped tickers
+    prices = get_multiple_asset_prices(tickers)  # Fetch prices for all tickers at once
 
-    # Calculate the worth for each asset
+    # Calculate the worth for each asset and total net worth
+    total_net_worth = Decimal(0)
     assets_with_value = []
+    labels = []  # For pie chart labels
+    values = []  # For pie chart values (percentages)
     for asset in user_assets:
         coin_id = COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower())
-        price = prices.get(coin_id, {}).get('usd')  # Fetch price from API response
-        if price:
-            price = Decimal(str(price))  # Convert price to Decimal for compatibility
+        price = prices.get(coin_id, {}).get('usd')
+        if price is not None:
+            price = Decimal(str(price))
         value = price * asset.amount if price else None
+        total_net_worth += value if value else Decimal(0)
         assets_with_value.append({
             'ticker': asset.ticker,
             'amount': asset.amount,
-            'value': value
+            'value': value,
         })
 
-    # Fetch Bitcoin price for display (optional)
-    bitcoin_price = prices.get('bitcoin', {}).get('usd')
+    # Calculate percentage allocation for pie chart
+    for asset in assets_with_value:
+        if total_net_worth > 0 and asset['value']:
+            percentage = (asset['value'] / total_net_worth) * 100
+            asset['percentage'] = percentage
+            labels.append(asset['ticker'])
+            values.append(percentage)
+        else:
+            asset['percentage'] = None
+
+    # Generate Pie Chart with Plotly
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
+    fig.update_layout(title="Crypto Portfolio Distribution", margin=dict(t=50, b=50, l=25, r=25))
+    chart_html = fig.to_html(full_html=False)  # Generate HTML snippet for the chart
 
     return render(request, 'home.html', {
         'username': request.user.username,
         'assets': assets_with_value,
         'form': form,
-        'bitcoin_price': bitcoin_price,  # Pass Bitcoin price to the template
+        'bitcoin_price': prices.get('bitcoin', {}).get('usd'),
+        'total_net_worth': total_net_worth,
+        'chart': chart_html,  # Pass the chart HTML to the template
     })
-
-COINGECKO_TICKER_MAPPING = {
-    'btc': 'bitcoin',
-    'eth': 'ethereum',
-    'sol': 'solana',
-    # Add more mappings as needed
-}
