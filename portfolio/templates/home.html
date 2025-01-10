@@ -129,6 +129,12 @@
             {% else %}
             <p>You have no crypto positions yet.</p>
             {% endif %}
+            <h2>Add a New Position</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Add Position</button>
+            </form>
         </div>
 
         <!-- Pie Chart -->
