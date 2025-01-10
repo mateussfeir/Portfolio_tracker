@@ -5,74 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Plotly JS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
+        }
+        header {
+            background-color: #1f1f1f; /* Dark header */
+            color: #fff; /* White text */
+            padding: 1rem;
+            text-align: center;
+        }
+        .container {
+            margin: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            background: #1e1e1e; /* Dark card background */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            flex: 1 1 45%;
+            color: #e0e0e0; /* Light text */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #333; /* Darker border */
+            text-align: left;
+        }
+        th {
+            background-color: #2a2a2a; /* Slightly lighter background for headers */
+        }
+        td {
+            background-color: #1e1e1e; /* Match the card background */
+        }
+        a {
+            color: #4caf50; /* Green links */
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .pie-chart-container {
+            text-align: center;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #aaa; /* Light gray for footer */
+        }
+    </style>
 </head>
 {% load humanize %}
 <body>
-    <h1>Welcome, {{ username }}!</h1>
+    <header>
+        <h1>Welcome, {{ username }}!</h1>
+    </header>
 
-    <!-- Bitcoin Price -->
-    <h2>The current Bitcoin price is:
-        {% if bitcoin_price %}
-            ${{ bitcoin_price|floatformat:2|intcomma }}
-        {% else %}
-            Could not fetch the price. Please try again later.
-        {% endif %}
-    </h2>
+    <div class="container">
+        <!-- Bitcoin Price -->
+        <div class="card">
+            <h2>Bitcoin Price</h2>
+            <p>
+                {% if bitcoin_price %}
+                    Current price: ${{ bitcoin_price|floatformat:2|intcomma }}
+                {% else %}
+                    Could not fetch the price. Please try again later.
+                {% endif %}
+            </p>
+        </div>
 
-    <!-- User's Crypto Positions -->
-    <h2>Your Crypto Positions:</h2>
-    {% if assets %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Ticker</th>
-                <th>Amount</th>
-                <th>Value (USD)</th>
-                <th>Allocation (%)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for asset in assets %}
-            <tr>
-                <td>{{ asset.ticker }}</td>
-                <td>{{ asset.amount }}</td>
-                <td>
-                    {% if asset.value %}
-                        ${{ asset.value|floatformat:2|intcomma }}
-                    {% else %}
-                        Could not fetch price
-                    {% endif %}
-                </td>
-                <td>
-                    {% if asset.percentage %}
-                        {{ asset.percentage|floatformat:2 }}%
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <h3>Total Net Worth: ${{ total_net_worth|floatformat:2|intcomma }}</h3>
-    {% else %}
-    <p>You have no crypto positions yet.</p>
-    {% endif %}
+        <!-- Total Net Worth -->
+        <div class="card">
+            <h2>Total Net Worth</h2>
+            <p>${{ total_net_worth|floatformat:2|intcomma }}</p>
+        </div>
 
-    <!-- Add a New Position -->
-    <h2>Add a New Position</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Position</button>
-    </form>
+        <!-- Crypto Positions -->
+        <div class="card">
+            <h2>Your Crypto Positions</h2>
+            {% if assets %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Amount</th>
+                        <th>Value (USD)</th>
+                        <th>Allocation (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}
+                    <tr>
+                        <td>{{ asset.ticker }}</td>
+                        <td>{{ asset.amount }}</td>
+                        <td>
+                            {% if asset.value %}
+                                ${{ asset.value|floatformat:2|intcomma }}
+                            {% else %}
+                                Could not fetch price
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if asset.percentage %}
+                                {{ asset.percentage|floatformat:2 }}%
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>You have no crypto positions yet.</p>
+            {% endif %}
+        </div>
 
-    <!-- Pie Chart -->
-    <h2>Your Portfolio Distribution</h2>
-    <div>
-        {{ chart|safe }}
+        <!-- Pie Chart -->
+        <div class="card pie-chart-container">
+            <h2>Portfolio Distribution</h2>
+            <div>
+                {{ chart|safe }}
+            </div>
+        </div>
     </div>
 
-    <a href="{% url 'logout' %}">Logout</a>
+    <footer>
+        <p>
+            <a href="{% url 'logout' %}">Logout</a>
+        </p>
+    </footer>
 </body>
 </html>

@@ -41,8 +41,6 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
-
-# Home view
 @login_required
 def home(request):
     # Handle form submission for adding assets
@@ -93,7 +91,13 @@ def home(request):
 
     # Generate Pie Chart with Plotly
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-    fig.update_layout(title="Crypto Portfolio Distribution", margin=dict(t=50, b=50, l=25, r=25))
+    fig.update_layout(
+        title="Crypto Portfolio Distribution",
+        margin=dict(t=50, b=50, l=25, r=25),
+        paper_bgcolor="#121212",  # Dark background for the entire chart
+        plot_bgcolor="#121212",  # Dark background for the plot area
+        font=dict(color="#e0e0e0")  # Light text color
+    )
     chart_html = fig.to_html(full_html=False)  # Generate HTML snippet for the chart
 
     return render(request, 'home.html', {
