@@ -121,7 +121,7 @@ COINGECKO_TICKER_MAPPING = {
     'shiba': 'shiba-inu',
     'wbtc': 'wrapped-bitcoin',
     'xlm': 'stellar',
-    'hbar': 'hedera-hashgraph',  # Updated from 'hedera'
+    'hbar': 'hedera-hashgraph',
     'dot': 'polkadot',
     'weth': 'weth',
     'bch': 'bitcoin-cash',
@@ -147,6 +147,9 @@ COINGECKO_TICKER_MAPPING = {
     'dai': 'dai',
     'virtual': 'virtuals-protocol',
     'arb': 'arbitrum',
-    'xrp': 'ripple',  # Added entry for XRP
-    'icp': 'internet-computer',  # Added entry for ICP
+    'xrp': 'ripple',
+    'icp': 'internet-computer',
+    'stg': 'stargate-finance',  # Added entry for STG
+    'matic': 'polygon',         # Added entry for MATIC (Note: 'pol' already points to 'polygon')
+    'algo': 'algorand',
 }
