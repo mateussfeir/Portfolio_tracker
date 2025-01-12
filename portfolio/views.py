@@ -7,14 +7,6 @@ import requests
 from decimal import Decimal
 import plotly.graph_objects as go
 
-# Mapping user-friendly tickers to CoinGecko identifiers
-COINGECKO_TICKER_MAPPING = {
-    'btc': 'bitcoin',
-    'eth': 'ethereum',
-    'sol': 'solana',
-    # Add more mappings as needed
-}
-
 # Function to fetch prices for multiple tickers in one API call
 def get_multiple_asset_prices(tickers):
     ids = ','.join(tickers)
@@ -108,3 +100,53 @@ def home(request):
         'total_net_worth': total_net_worth,
         'chart': chart_html,  # Pass the chart HTML to the template
     })
+
+# Mapping user-friendly tickers to CoinGecko identifiers
+
+COINGECKO_TICKER_MAPPING = {
+    'btc': 'bitcoin',
+    'eth': 'ethereum',
+    'usdt': 'tether',
+    'bnb': 'binancecoin',
+    'sol': 'solana',
+    'doge': 'dogecoin',
+    'usdc': 'usd-coin',
+    'ada': 'cardano',
+    'steth': 'staked-ether',
+    'trx': 'tron',
+    'wsteth': 'wrapped-steth',
+    'sui': 'sui',
+    'ton': 'toncoin',
+    'link': 'chainlink',
+    'shiba': 'shiba-inu',
+    'wbtc': 'wrapped-bitcoin',
+    'xlm': 'stellar',
+    'hbar': 'hedera-hashgraph',  # Updated from 'hedera'
+    'dot': 'polkadot',
+    'weth': 'weth',
+    'bch': 'bitcoin-cash',
+    'leo': 'leo-token',
+    'ltc': 'litecoin',
+    'uni': 'uniswap',
+    'bgb': 'bitget-token',
+    'pepe': 'pepecoin',
+    'avax': 'avalanche-2',
+    'apt': 'aptos',
+    'aave': 'aave',
+    'mnt': 'mantlenetwork',
+    'pol': 'polygon',
+    'cro': 'cronos',
+    'etc': 'ethereum-classic',
+    'render': 'render-token',
+    'tao': 'bittensor',
+    'om': 'mantra-dao',
+    'vet': 'vechain',
+    'xmr': 'monero',
+    'tkx': 'tokenize-xchange',
+    'fet': 'fetch-ai',
+    'dai': 'dai',
+    'virtual': 'virtuals-protocol',
+    'arb': 'arbitrum',
+    'xrp': 'ripple',  # Added entry for XRP
+    'icp': 'internet-computer',  # Added entry for ICP
+}
