@@ -13,6 +13,6 @@ class AddAssetForm(forms.ModelForm):
         model = Asset
         fields = ['ticker', 'amount']
         widgets = {
-            'ticker': forms.TextInput(attrs={'placeholder': 'e.g. BTC'}),
+            'ticker': forms.TextInput(attrs={'placeholder': 'e.g. BTC or Cash for USD'}),
             'amount': forms.NumberInput(attrs={'placeholder': 'e.g. 1.5'}),
         }

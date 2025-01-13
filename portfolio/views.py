@@ -152,4 +152,5 @@ COINGECKO_TICKER_MAPPING = {
     'stg': 'stargate-finance',  # Added entry for STG
     'matic': 'polygon',         # Added entry for MATIC (Note: 'pol' already points to 'polygon')
     'algo': 'algorand',
+    'cash' : 'tether',
 }
