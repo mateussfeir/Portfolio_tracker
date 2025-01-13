@@ -101,6 +101,7 @@
                         <th>Amount</th>
                         <th>Value (USD)</th>
                         <th>Allocation (%)</th>
+                        <th>Action</th> <!-- Added for deletion -->
                     </tr>
                 </thead>
                 <tbody>
@@ -121,6 +122,12 @@
                             {% else %}
                                 -
                             {% endif %}
+                        </td>
+                        <td>
+                            <form action="{% url 'delete_holding' asset.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">Delete</button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}

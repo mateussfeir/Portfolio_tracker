@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, authenticate
+from django.contrib import messages
 from .forms import AddAssetForm, SignUpForm
 from .models import Asset
-from django.contrib.auth import login, authenticate
 import requests
 from decimal import Decimal
 import plotly.graph_objects as go
@@ -33,9 +34,9 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
 @login_required
 def home(request):
-    # Handle form submission for adding assets
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -46,18 +47,14 @@ def home(request):
     else:
         form = AddAssetForm()
 
-    # Fetch all crypto positions for the logged-in user
     user_assets = Asset.objects.filter(owner=request.user)
-
-    # Collect tickers for API call
     tickers = [COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()) for asset in user_assets]
-    prices = get_multiple_asset_prices(tickers)  # Fetch prices for all tickers at once
+    prices = get_multiple_asset_prices(tickers)
 
-    # Calculate the worth for each asset and total net worth
     total_net_worth = Decimal(0)
     assets_with_value = []
-    labels = []  # For pie chart labels
-    values = []  # For pie chart values (percentages)
+    labels = []
+    values = []
     for asset in user_assets:
         coin_id = COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower())
         price = prices.get(coin_id, {}).get('usd')
@@ -65,32 +62,31 @@ def home(request):
             price = Decimal(str(price))
         value = price * asset.amount if price else None
         total_net_worth += value if value else Decimal(0)
-        assets_with_value.append({
+        asset_dict = {
+            'id': asset.id,  # Ensure the 'id' is explicitly included
             'ticker': asset.ticker,
             'amount': asset.amount,
-            'value': value,
-        })
-
-    # Calculate percentage allocation for pie chart
-    for asset in assets_with_value:
-        if total_net_worth > 0 and asset['value']:
-            percentage = (asset['value'] / total_net_worth) * 100
-            asset['percentage'] = percentage
-            labels.append(asset['ticker'])
-            values.append(percentage)
+            'value': value if value else '-',
+        }
+        if total_net_worth > 0 and value:
+            percentage = (value / total_net_worth) * 100
+            asset_dict['percentage'] = f"{percentage:.2f}%"
         else:
-            asset['percentage'] = None
+            asset_dict['percentage'] = '-'
+        assets_with_value.append(asset_dict)
+        if value and total_net_worth > 0:
+            labels.append(asset.ticker)
+            values.append(percentage)
 
-    # Generate Pie Chart with Plotly
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
     fig.update_layout(
         title="Crypto Portfolio Distribution",
         margin=dict(t=50, b=50, l=25, r=25),
-        paper_bgcolor="#121212",  # Dark background for the entire chart
-        plot_bgcolor="#121212",  # Dark background for the plot area
-        font=dict(color="#e0e0e0")  # Light text color
+        paper_bgcolor="#121212",
+        plot_bgcolor="#121212",
+        font=dict(color="#e0e0e0")
     )
-    chart_html = fig.to_html(full_html=False)  # Generate HTML snippet for the chart
+    chart_html = fig.to_html(full_html=False)
 
     return render(request, 'home.html', {
         'username': request.user.username,
@@ -98,8 +94,16 @@ def home(request):
         'form': form,
         'bitcoin_price': prices.get('bitcoin', {}).get('usd'),
         'total_net_worth': total_net_worth,
-        'chart': chart_html,  # Pass the chart HTML to the template
+        'chart': chart_html,
     })
+
+
+@login_required
+def delete_holding(request, pk):
+    asset = get_object_or_404(Asset, pk=pk, owner=request.user)  # Ensures that only the asset owner can delete it
+    asset.delete()
+    messages.success(request, "Asset deleted successfully.")
+    return redirect('home')  # Redirect back to the homepage after deletion
 
 # Mapping user-friendly tickers to CoinGecko identifiers
 
