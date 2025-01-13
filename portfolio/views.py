@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import AddAssetForm, SignUpForm
 from .models import Asset
@@ -105,8 +106,13 @@ def delete_holding(request, pk):
     messages.success(request, "Asset deleted successfully.")
     return redirect('home')  # Redirect back to the homepage after deletion
 
-# Mapping user-friendly tickers to CoinGecko identifiers
+def root_redirect(request):
+    if request.user.is_authenticated:
+        return redirect('home')  # Redirect to 'home' if the user is logged in
+    else:
+        return redirect('login')  # Redirect to 'login' if the user is not logged in
 
+# Mapping user-friendly tickers to CoinGecko identifiers
 COINGECKO_TICKER_MAPPING = {
     'btc': 'bitcoin',
     'eth': 'ethereum',
