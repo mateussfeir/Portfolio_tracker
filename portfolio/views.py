@@ -78,7 +78,7 @@ def home(request):
         }
         if total_net_worth > 0 and value:
             percentage = (value / total_net_worth) * 100
-            asset_dict['percentage'] = f"{percentage:.2f}%"
+            asset_dict['percentage'] = percentage
         else:
             asset_dict['percentage'] = '-'
         assets_with_value.append(asset_dict)
