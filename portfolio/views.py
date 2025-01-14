@@ -52,7 +52,14 @@ def home(request):
     tickers = [COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()) for asset in user_assets]
     prices = get_multiple_asset_prices(tickers)
 
-    total_net_worth = Decimal(0)
+    # Calculate total net worth first
+    total_net_worth = sum(
+        (Decimal(str(prices.get(COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()), {}).get('usd', 0))) * asset.amount
+        for asset in user_assets),
+        Decimal(0)
+    )
+
+    # Populate assets and chart data
     assets_with_value = []
     labels = []
     values = []
@@ -62,22 +69,21 @@ def home(request):
         if price is not None:
             price = Decimal(str(price))
         value = price * asset.amount if price else None
-        total_net_worth += value if value else Decimal(0)
         asset_dict = {
-            'id': asset.id,  # Ensure the 'id' is explicitly included
+            'id': asset.id,
             'ticker': asset.ticker,
             'amount': asset.amount,
             'value': value if value else '-',
         }
         if total_net_worth > 0 and value:
             percentage = (value / total_net_worth) * 100
-            asset_dict['percentage'] = f"{percentage:.2f}%"
+            # asset_dict['percentage'] = f"{percentage:.2f}%"  # Format for table
+            asset_dict['percentage'] = percentage  # Format for table
+            labels.append(asset.ticker)
+            values.append(float(percentage))  # Limit precision for chart
         else:
             asset_dict['percentage'] = '-'
         assets_with_value.append(asset_dict)
-        if value and total_net_worth > 0:
-            labels.append(asset.ticker)
-            values.append(percentage)
 
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
     fig.update_layout(
