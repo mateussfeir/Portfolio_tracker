@@ -100,7 +100,7 @@
                         <th>Ticker</th>
                         <th>Amount</th>
                         <th>Value (USD)</th>
-                        <th>Allocation (%)</th>
+                        <th>Asset (%)</th>
                         <th>Action</th> <!-- Added for deletion -->
                     </tr>
                 </thead>
@@ -126,7 +126,7 @@
                         <td>
                             <form action="{% url 'delete_holding' asset.id %}" method="post">
                                 {% csrf_token %}
-                                <button type="submit">Delete</button>
+                                <button type="submit">X</button>
                             </form>
                         </td>
                     </tr>
