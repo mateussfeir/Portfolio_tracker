@@ -58,7 +58,7 @@
 
         button {
             cursor: pointer; /* Changes the cursor to a hand on hover */
-            background-color: whitesmoke; /* Red background for the button */
+            background-color: whitesmoke; /* Button background */
             color: black; /* Button text color */
             border: none; /* Remove border */
             border-radius: 4px; /* Add rounded corners */
@@ -121,7 +121,8 @@
                     <tr>
                         <th>Ticker</th>
                         <th>Amount</th>
-                        <th>Value (USD)</th>
+                        <th>Price</th> <!-- New column -->
+                        <th>Value</th>
                         <th>Asset (%)</th>
                         <th>Action</th>
                     </tr>
@@ -131,6 +132,13 @@
                     <tr>
                         <td>{{ asset.ticker }}</td>
                         <td>{{ asset.amount }}</td>
+                        <td>
+                            {% if asset.price %}
+                                ${{ asset.price|floatformat:2|intcomma }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                         <td>
                             {% if asset.value %}
                                 ${{ asset.value|floatformat:2|intcomma }}

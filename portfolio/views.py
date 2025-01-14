@@ -65,7 +65,7 @@ def home(request):
     values = []
     for asset in user_assets:
         coin_id = COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower())
-        price = prices.get(coin_id, {}).get('usd')
+        price = prices.get(coin_id, {}).get('usd')  # Get price per token
         if price is not None:
             price = Decimal(str(price))
         value = price * asset.amount if price else None
@@ -73,18 +73,22 @@ def home(request):
             'id': asset.id,
             'ticker': asset.ticker,
             'amount': asset.amount,
+            'price': price if price else '-',  # Add price per token
             'value': value if value else '-',
         }
         if total_net_worth > 0 and value:
             percentage = (value / total_net_worth) * 100
-            # asset_dict['percentage'] = f"{percentage:.2f}%"  # Format for table
-            asset_dict['percentage'] = percentage  # Format for table
-            labels.append(asset.ticker)
-            values.append(float(percentage))  # Limit precision for chart
+            asset_dict['percentage'] = f"{percentage:.2f}%"
         else:
             asset_dict['percentage'] = '-'
         assets_with_value.append(asset_dict)
 
+        # Prepare chart data
+        if value and total_net_worth > 0:
+            labels.append(asset.ticker)
+            values.append(float(value / total_net_worth * 100))
+
+    # Prepare pie chart
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
     fig.update_layout(
         title="Crypto Portfolio Distribution",
@@ -95,6 +99,7 @@ def home(request):
     )
     chart_html = fig.to_html(full_html=False)
 
+    # Render the page
     return render(request, 'home.html', {
         'username': request.user.username,
         'assets': assets_with_value,
@@ -103,7 +108,6 @@ def home(request):
         'total_net_worth': total_net_worth,
         'chart': chart_html,
     })
-
 
 @login_required
 def delete_holding(request, pk):
@@ -165,8 +169,8 @@ COINGECKO_TICKER_MAPPING = {
     'arb': 'arbitrum',
     'xrp': 'ripple',
     'icp': 'internet-computer',
-    'stg': 'stargate-finance',  # Added entry for STG
-    'matic': 'polygon',         # Added entry for MATIC (Note: 'pol' already points to 'polygon')
+    'stg': 'stargate-finance',
+    'matic': 'polygon',
     'algo': 'algorand',
     'cash' : 'tether',
 }
