@@ -38,9 +38,10 @@
             border-collapse: collapse;
         }
         th, td {
-            padding: 8px 12px;
+            padding: 10px;
             border: 1px solid #333; /* Darker border */
-            text-align: left;
+            text-align: center; /* Center horizontally */
+            vertical-align: middle; /* Center vertically */
         }
         th {
             background-color: #2a2a2a; /* Slightly lighter background for headers */
@@ -48,6 +49,27 @@
         td {
             background-color: #1e1e1e; /* Match the card background */
         }
+
+        /* Target the Action column specifically */
+        th:last-child, td:last-child {
+            width: 50px; /* Set a small width for the Action column */
+            padding: 4px; /* Reduce padding for a "skinny" look */
+        }
+
+        button {
+            cursor: pointer; /* Changes the cursor to a hand on hover */
+            background-color: whitesmoke; /* Red background for the button */
+            color: black; /* Button text color */
+            border: none; /* Remove border */
+            border-radius: 4px; /* Add rounded corners */
+            padding: 4px 8px; /* Adjust padding for usability */
+            transition: background-color 0.2s ease; /* Smooth transition effect */
+        }
+
+        button:hover {
+            background-color: #ff1a1a; /* Darker red on hover */
+        }
+
         a {
             color: #4caf50; /* Green links */
             text-decoration: none;
@@ -101,7 +123,7 @@
                         <th>Amount</th>
                         <th>Value (USD)</th>
                         <th>Asset (%)</th>
-                        <th>Action</th> <!-- Added for deletion -->
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
