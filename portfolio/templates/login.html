@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Bitbalance</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,24 +11,41 @@
             padding: 0;
             background-color: #121212; /* Dark background */
             color: #e0e0e0; /* Light text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Prevents scroll bars if content fits */
+        }
+        nav {
+            background-color: black; /* Darker shade for nav */
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+            position: fixed; /* Makes nav bar stick to the top */
+            top: 0; /* Align top edge of nav with top of viewport */
+            left: 0; /* Align left edge of nav with left of viewport */
+            z-index: 1000; /* Ensures nav is above other content */
+        }
+        nav a {
+            color: #e0e0e0;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+        nav a:hover {
+            text-decoration: underline;
         }
         header {
-            background-color: #1f1f1f; /* Dark header */
-            color: #fff;
-            padding: 1rem;
-            text-align: center;
+            margin-top: 40px; /* Add margin to account for fixed nav */
         }
         .container {
-            margin: 20px auto;
             max-width: 400px;
             padding: 20px;
             background: #1e1e1e;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
+            margin-top: 20px; /* Space after header */
         }
         input[type="text"],
         input[type="password"] {
@@ -60,9 +77,21 @@
         a:hover {
             text-decoration: underline;
         }
+        .intro {
+            color: #cfcfcf;
+            font-size: 0.9em;
+            text-align: justify;
+        }
     </style>
 </head>
 <body>
+    <nav>
+        <a href="https://github.com/yourgithubusername">GitHub</a>
+        <a href="https://www.linkedin.com/in/yourlinkedinprofile">LinkedIn</a>
+        <a href="https://docs.python.org/3/">Python Docs</a>
+        <a href="https://docs.djangoproject.com/en/stable/">Django Docs</a>
+        <a href="{% url 'resume' %}">Resume</a>
+    </nav>
     <header>
         <h1>Login</h1>
     </header>
@@ -75,4 +104,8 @@
         <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>.</p>
     </div>
 </body>
+<footer>
+    <p>© 2025 Mateus Sfeir</p>
+</footer>
+
 </html>

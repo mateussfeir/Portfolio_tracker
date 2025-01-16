@@ -122,6 +122,10 @@ def root_redirect(request):
     else:
         return redirect('login')  # Redirect to 'login' if the user is not logged in
 
+def resume(request):
+    return render(request, 'resume.html')
+
+
 # Mapping user-friendly tickers to CoinGecko identifiers
 COINGECKO_TICKER_MAPPING = {
     'btc': 'bitcoin',
