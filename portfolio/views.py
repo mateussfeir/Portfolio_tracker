@@ -159,7 +159,7 @@ COINGECKO_TICKER_MAPPING = {
     'aave': 'aave',
     'mnt': 'mantlenetwork',
     'pol': 'polygon',
-    'cro': 'cronos',
+    'cro': 'crypto-com-chain',
     'etc': 'ethereum-classic',
     'render': 'render-token',
     'tao': 'bittensor',
