@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Bitbalance</title>
+    {% load static %}
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,7 +16,6 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden; /* Prevents scroll bars if content fits */
         }
         nav {
             background-color: black; /* Darker shade for nav */
@@ -37,7 +37,8 @@
             text-decoration: underline;
         }
         header {
-            margin-top: 40px; /* Add margin to account for fixed nav */
+            margin-top: 50px; /* Increase margin to account for fixed nav */
+            text-align: center; /* Ensure header text is centered */
         }
         .container {
             max-width: 400px;
@@ -46,6 +47,9 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
             margin-top: 20px; /* Space after header */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content vertically within the container */
         }
         input[type="text"],
         input[type="password"] {
@@ -82,6 +86,11 @@
             font-size: 0.9em;
             text-align: justify;
         }
+        footer {
+            width: 100%; /* Ensure footer is full width of the viewport */
+            text-align: center; /* Center footer content */
+            margin-top: 20px; /* Space from the last element */
+        }
     </style>
 </head>
 <body>
@@ -103,9 +112,9 @@
         </form>
         <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>.</p>
     </div>
+    <footer>
+        <p>© 2025 Mateus Sfeir</p>
+        <img src="{% static 'images/img1.png' %}" alt="Website Example" style="max-width: 98%; height: auto;">
+    </footer>
 </body>
-<footer>
-    <p>© 2025 Mateus Sfeir</p>
-</footer>
-
 </html>
