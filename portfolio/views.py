@@ -153,7 +153,7 @@ COINGECKO_TICKER_MAPPING = {
     'ltc': 'litecoin',
     'uni': 'uniswap',
     'bgb': 'bitget-token',
-    'pepe': 'pepecoin',
+    'pepe': 'pepe',
     'avax': 'avalanche-2',
     'apt': 'aptos',
     'aave': 'aave',
