@@ -48,11 +48,15 @@ def home(request):
     else:
         form = AddAssetForm()
 
+    # Get user assets
     user_assets = Asset.objects.filter(owner=request.user)
     tickers = [COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()) for asset in user_assets]
     prices = get_multiple_asset_prices(tickers)
 
-    # Calculate total net worth first
+    # Fetch Bitcoin price explicitly
+    bitcoin_price = get_multiple_asset_prices(['bitcoin']).get('bitcoin', {}).get('usd')
+
+    # Calculate total net worth
     total_net_worth = sum(
         (Decimal(str(prices.get(COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()), {}).get('usd', 0))) * asset.amount
         for asset in user_assets),
@@ -104,10 +108,11 @@ def home(request):
         'username': request.user.username,
         'assets': assets_with_value,
         'form': form,
-        'bitcoin_price': prices.get('bitcoin', {}).get('usd'),
+        'bitcoin_price': bitcoin_price,  # Pass the Bitcoin price to the template
         'total_net_worth': total_net_worth,
         'chart': chart_html,
     })
+
 
 @login_required
 def delete_holding(request, pk):
