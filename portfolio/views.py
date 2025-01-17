@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import AddAssetForm, SignUpForm
 from .models import Asset
@@ -20,6 +19,10 @@ def get_multiple_asset_prices(tickers):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching prices: {e}")
         return {}
+
+# Helper function to map user-friendly tickers to CoinGecko identifiers
+def map_ticker(ticker):
+    return COINGECKO_TICKER_MAPPING.get(ticker.lower(), ticker.lower())
 
 # Signup view
 def signup(request):
@@ -45,22 +48,23 @@ def home(request):
             asset.owner = request.user
             asset.save()
             return redirect('home')  # Refresh the page after adding the asset
+        else:
+            messages.error(request, "Failed to add asset. Please check your inputs.")
     else:
         form = AddAssetForm()
 
     # Get user assets
     user_assets = Asset.objects.filter(owner=request.user)
-    tickers = [COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()) for asset in user_assets]
+    tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in user_assets]
     prices = get_multiple_asset_prices(tickers)
 
     # Fetch Bitcoin price explicitly
-    bitcoin_price = get_multiple_asset_prices(['bitcoin']).get('bitcoin', {}).get('usd')
+    bitcoin_price = prices.get('bitcoin', {}).get('usd', 'N/A')
 
     # Calculate total net worth
     total_net_worth = sum(
-        (Decimal(str(prices.get(COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower()), {}).get('usd', 0))) * asset.amount
-        for asset in user_assets),
-        Decimal(0)
+        (Decimal(str(prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        for asset in user_assets
     )
 
     # Populate assets and chart data
@@ -68,7 +72,7 @@ def home(request):
     labels = []
     values = []
     for asset in user_assets:
-        coin_id = COINGECKO_TICKER_MAPPING.get(asset.ticker.lower(), asset.ticker.lower())
+        coin_id = map_ticker(asset.ticker)
         price = prices.get(coin_id, {}).get('usd')  # Get price per token
         if price is not None:
             price = Decimal(str(price))
@@ -93,15 +97,18 @@ def home(request):
             values.append(float(value / total_net_worth * 100))
 
     # Prepare pie chart
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-    fig.update_layout(
-        title="Crypto Portfolio Distribution",
-        margin=dict(t=50, b=50, l=25, r=25),
-        paper_bgcolor="#121212",
-        plot_bgcolor="#121212",
-        font=dict(color="#e0e0e0")
-    )
-    chart_html = fig.to_html(full_html=False)
+    if labels and values:
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
+        fig.update_layout(
+            title="Crypto Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        chart_html = fig.to_html(full_html=False)
+    else:
+        chart_html = None
 
     # Render the page
     return render(request, 'home.html', {
@@ -112,7 +119,6 @@ def home(request):
         'total_net_worth': total_net_worth,
         'chart': chart_html,
     })
-
 
 @login_required
 def delete_holding(request, pk):
