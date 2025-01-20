@@ -194,7 +194,7 @@ COINGECKO_TICKER_MAPPING = {
     'ray': 'raydium',
     'daddy': 'daddy-tate',
     'kas': 'kaspa',
-    'egld': 'multiversx',
+    'egld': 'elrond-erd-2',
     'mina': 'mina-protocol',
     'croge': 'crogecoin',
     'brett' : 'based-brett',
