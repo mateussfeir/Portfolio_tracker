@@ -189,4 +189,12 @@ COINGECKO_TICKER_MAPPING = {
     'algo': 'algorand',
     'cash' : 'tether',
     'trump' : 'official-trump',
+    'opul' : 'opulous',
+    'memag': 'meta-masters-guild-games',
+    'ray': 'raydium',
+    'daddy': 'daddy-tate',
+    'kas': 'kaspa',
+    'egld': 'multiversx',
+    'mina': 'mina-protocol',
+    'croge': 'crogecoin',
 }
