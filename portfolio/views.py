@@ -188,4 +188,5 @@ COINGECKO_TICKER_MAPPING = {
     'matic': 'polygon',
     'algo': 'algorand',
     'cash' : 'tether',
+    'trump' : 'trump-coin',
 }
