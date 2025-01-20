@@ -197,4 +197,5 @@ COINGECKO_TICKER_MAPPING = {
     'egld': 'multiversx',
     'mina': 'mina-protocol',
     'croge': 'crogecoin',
+    'brett' : 'brett-2',
 }
