@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Bitbalance{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="https://github.com/mateussfeir">GitHub</a>
+        <a href="https://www.linkedin.com/in/mateus-sfeir-b65393152/">LinkedIn</a>
+        <a href="https://docs.python.org/3/">Python Docs</a>
+        <a href="https://docs.djangoproject.com/en/stable/">Django Docs</a>
+        <a href="{% url 'resume' %}">Resume</a>
+        <a href="{% url 'bio' %}">Bio</a>
+        <a href="{% url 'projects' %}">Projects</a>
+    </nav>
+
+    <div>
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

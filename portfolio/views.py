@@ -7,6 +7,7 @@ from .models import Asset
 import requests
 from decimal import Decimal
 import plotly.graph_objects as go
+from django.shortcuts import render
 
 # Function to fetch prices for multiple tickers in one API call
 def get_multiple_asset_prices(tickers):
@@ -136,6 +137,11 @@ def root_redirect(request):
 def resume(request):
     return render(request, 'resume.html')
 
+def bio(request):
+    return render(request, 'bio.html')
+
+def projects(request):
+    return render(request, 'projects.html')
 
 # Mapping user-friendly tickers to CoinGecko identifiers
 COINGECKO_TICKER_MAPPING = {
