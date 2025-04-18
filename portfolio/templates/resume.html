@@ -1,72 +1,121 @@
+{% extends 'base.html'%}
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume - Mateus Sfeir</title>
+
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-            color: #333;
-            line-height: 1.6;
-        }
-        .container {
-            width: 90%;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-        }
-        header, .contact-info {
-            text-align: center;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        header h1 {
-            margin: 0;
-            color: #333;
-        }
-        .contact-info p {
-            margin: 5px 0;
-        }
-        .section {
-            padding: 20px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ccc;
-        }
-        .section:last-child {
-            border-bottom: none;
-        }
-        h2 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        ul {
-            list-style: none; /* Removes default bullets */
-            padding-left: 0;
-        }
-        ul li {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 10px; /* Adds space between items */
-        }
-        ul li:before {
-            content: '•'; /* Custom bullet */
-            position: absolute;
-            left: 0;
-            color: #333; /* Bullet color */
-            font-size: 1.2em; /* Bullet size */
-        }
-        a {
-            color: #06c;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+    /* Reset box model and spacing */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+        font-family: 'Segoe UI', sans-serif;
+        line-height: 1.6;
+    }
+
+    /* Nav (identical to bio/projects) */
+    nav {
+        background-color: #000;
+        padding: 1rem;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    nav a {
+        color: #e0e0e0;
+        margin: 0 10px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    nav a:hover {
+        text-decoration: underline;
+    }
+
+    /* Resume-specific layout */
+    .container {
+        width: 90%;
+        max-width: 800px;
+        margin: 60px auto 40px auto; /* Adjust for nav height */
+        padding: 20px;
+        background-color: #1e1e1e;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    header, .contact-info {
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    header h1 {
+        margin: 0;
+        color: #f5f5f5;
+    }
+
+    .contact-info p {
+        margin: 5px 0;
+    }
+
+    .section {
+        padding: 20px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #444;
+    }
+
+    .section:last-child {
+        border-bottom: none;
+    }
+
+    h2 {
+        margin-bottom: 10px;
+        color: #e0e0e0;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    ul li {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }
+
+    ul li:before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #e0e0e0;
+        font-size: 1.2em;
+    }
+
+    a {
+        color: #cccccc;
+        text-decoration: none;
+    }
+
+    a:hover {
+        color: #ffffff;
+    }
     </style>
+
+
+
 
 </head>
 <body>
@@ -149,3 +198,4 @@
     </div>
 </body>
 </html>
+{% endblock %}
