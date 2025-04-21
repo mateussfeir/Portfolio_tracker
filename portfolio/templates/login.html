@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Bitbalance</title>
     {% load static %}
+    <!-- Favicons for different sizes -->
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon_16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon_32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'images/favicon_48x48.png' %}">
+    <!-- ICO format for broader compatibility -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/bitbalance_favicon.ico' %}">
+    <!-- Windows Tile -->
+    <meta name="msapplication-TileImage" content="{% static 'images/favicon_32x32.png' %}">
+    <meta name="msapplication-TileColor" content="#000000">
     <style>
         body {
             font-family: Arial, sans-serif;
