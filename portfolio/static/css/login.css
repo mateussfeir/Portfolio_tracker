@@ -1,48 +1,28 @@
+/* Login page specific styles */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #121212; /* Dark background */
-    color: #e0e0e0; /* Light text */
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
 }
-nav {
-    background-color: black; /* Darker shade for nav */
-    padding: 10px 0;
-    text-align: center;
-    width: 100%;
-    position: fixed; /* Makes nav bar stick to the top */
-    top: 0; /* Align top edge of nav with top of viewport */
-    left: 0; /* Align left edge of nav with left of viewport */
-    z-index: 1000; /* Ensures nav is above other content */
-}
-nav a {
-    color: #e0e0e0;
-    margin: 0 10px;
-    text-decoration: none;
-    font-size: 1rem;
-}
-nav a:hover {
-    text-decoration: underline;
-}
+
 header {
-    margin-top: 50px; /* Increase margin to account for fixed nav */
-    text-align: center; /* Ensure header text is centered */
+    margin-top: 50px;
+    text-align: center;
 }
+
 .container {
     max-width: 400px;
     padding: 20px;
     background: #1e1e1e;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-    margin-top: 20px; /* Space after header */
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center content vertically within the container */
+    align-items: center;
 }
+
 input[type="text"],
 input[type="password"] {
     width: 100%;
@@ -53,6 +33,7 @@ input[type="password"] {
     background-color: #2a2a2a;
     color: #e0e0e0;
 }
+
 button {
     width: 100%;
     padding: 10px;
@@ -63,21 +44,17 @@ button {
     font-weight: bold;
     cursor: pointer;
 }
+
 button:hover {
     background-color: #45a049;
 }
-a {
-    color: #4caf50;
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
-}
+
 .intro {
     color: #cfcfcf;
     font-size: 0.9em;
     text-align: justify;
 }
+
 footer {
     width: 100%; /* Ensure footer is full width of the viewport */
     text-align: center; /* Center footer content */

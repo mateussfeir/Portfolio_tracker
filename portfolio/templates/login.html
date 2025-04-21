@@ -1,48 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Bitbalance</title>
-    {% load static %}
-    <!-- css -->
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <!-- Favicons for different sizes -->
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon_16x16.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon_32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'images/favicon_48x48.png' %}">
-    <!-- ICO format for broader compatibility -->
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/bitbalance_favicon.ico' %}">
-    <!-- Windows Tile -->
-    <meta name="msapplication-TileImage" content="{% static 'images/favicon_32x32.png' %}">
-    <meta name="msapplication-TileColor" content="#000000">
-   
-</head>
-<body>
-    <nav>
-        <a href="{% url 'login' %}">Home</a>
-        <a href="{% url 'resume' %}">Resume</a>
-        <a href="{% url 'bio' %}">Bio</a>
-        <a href="{% url 'projects' %}">Projects</a>
-        <a href="https://github.com/mateussfeir" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.linkedin.com/in/mateus-sfeir-b65393152/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://docs.python.org/3/" target="_blank" rel="noopener noreferrer">Python Docs</a>
-        <a href="https://docs.djangoproject.com/en/stable/" target="_blank" rel="noopener noreferrer">Django Docs</a>
-    </nav>
-    <header>
-        <h1>Login</h1>
-        <p style="color: #cfcfcf; font-size: 1rem;">Welcome to Bitbalance - Your Personal Portfolio Tracker</p>
-    </header>
-    <div class="container">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>.</p>
-    </div>
-    <footer>
-        <p>© 2025 Mateus Sfeir</p>
-    </footer>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Bitbalance{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Login</h1>
+    <p style="color: #cfcfcf; font-size: 1rem;">Welcome to Bitbalance - Your Personal Portfolio Tracker</p>
+</header>
+<div class="container">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>.</p>
+</div>
+<footer>
+    <p>© 2025 Mateus Sfeir</p>
+</footer>
+{% endblock %}
