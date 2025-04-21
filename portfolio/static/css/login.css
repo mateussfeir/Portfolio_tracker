@@ -4,23 +4,37 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 header {
     margin-top: 50px;
     text-align: center;
+    width: 100%;
 }
 
 .container {
+    width: 100%;
     max-width: 400px;
     padding: 20px;
     background: #1e1e1e;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-    margin-top: 20px;
+    margin: 20px auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.login-form form {
+    width: 100%;
 }
 
 input[type="text"],
@@ -32,9 +46,10 @@ input[type="password"] {
     border-radius: 4px;
     background-color: #2a2a2a;
     color: #e0e0e0;
+    box-sizing: border-box;
 }
 
-button {
+button[type="submit"] {
     width: 100%;
     padding: 10px;
     background-color: #4caf50;
@@ -43,20 +58,24 @@ button {
     color: white;
     font-weight: bold;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
-button:hover {
+button[type="submit"]:hover {
     background-color: #45a049;
 }
 
 .intro {
     color: #cfcfcf;
     font-size: 0.9em;
-    text-align: justify;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 footer {
-    width: 100%; /* Ensure footer is full width of the viewport */
-    text-align: center; /* Center footer content */
-    margin-top: 20px; /* Space from the last element */
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+    bottom: 0;
 }

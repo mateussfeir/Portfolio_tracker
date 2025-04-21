@@ -10,15 +10,17 @@
 {% block content %}
 <header>
     <h1>Login</h1>
-    <p style="color: #cfcfcf; font-size: 1rem;">Welcome to Bitbalance - Your Personal Portfolio Tracker</p>
+    <p class="intro">Welcome to Bitbalance - Your Personal Portfolio Tracker</p>
 </header>
 <div class="container">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>.</p>
+    <div class="login-form">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+        <p style="text-align: center; margin-top: 15px;">Don't have an account? <a href="{% url 'signup' %}">Sign up here</a>.</p>
+    </div>
 </div>
 <footer>
     <p>© 2025 Mateus Sfeir</p>
