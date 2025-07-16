@@ -1,4 +1,4 @@
-Django==4.2.11
+Django==5.0.2
 python-dotenv==1.0.1
 psycopg2-binary==2.9.9
 django-crispy-forms==2.1
@@ -7,6 +7,7 @@ whitenoise==6.6.0
 gunicorn==21.2.0
 django-environ==0.11.2
 requests==2.32.3
+plotly==6.0.1
 yfinance==0.2.65
-pandas==2.2.2
-numpy==1.26.4
+pandas==2.3.1
+numpy==2.3.1
