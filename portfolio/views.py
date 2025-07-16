@@ -50,6 +50,8 @@ def home(request):
         if form.is_valid():
             asset = form.save(commit=False)
             asset.owner = request.user
+            # Ensure new assets added from home are crypto
+            asset.type = 'crypto'
             asset.save()
             return redirect('home')  # Refresh the page after adding the asset
         else:
@@ -57,8 +59,8 @@ def home(request):
     else:
         form = AddAssetForm()
 
-    # Get user assets
-    user_assets = Asset.objects.filter(owner=request.user)
+    # Get user crypto assets only
+    user_assets = Asset.objects.filter(owner=request.user, type='crypto')
     tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in user_assets]
     prices = get_multiple_asset_prices(tickers)
 
@@ -151,6 +153,7 @@ def edit_holding(request, pk):
         form = AddAssetForm(instance=asset)
     return render(request, 'edit_holding.html', {'form': form, 'asset': asset})
 
+
 @login_required
 def stocks(request):
     if request.method == 'POST':
@@ -159,6 +162,7 @@ def stocks(request):
             asset = form.save(commit=False)
             asset.owner = request.user
             asset.type = 'stock'
+            asset.ticker = asset.ticker.upper()  # Ensure ticker is uppercase
             asset.save()
             return redirect('stocks')
         else:
@@ -173,19 +177,36 @@ def stocks(request):
     # Fetch stock prices using yfinance
     prices = {}
     if tickers:
-        data = yf.download(tickers=tickers, period='1d', interval='1d', group_by='ticker', threads=True, progress=False)
-        for asset in user_assets:
-            ticker = asset.ticker.upper()
+        if len(tickers) == 1:
+            # Handle single ticker separately
+            ticker = tickers[0]
             try:
-                if len(tickers) == 1:
-                    price = data['Close'][-1]
+                data = yf.Ticker(ticker).history(period='1d')
+                if not data.empty:
+                    prices[ticker] = float(data['Close'].iloc[-1])
                 else:
-                    price = data[ticker]['Close'][-1]
-                prices[ticker] = float(price)
+                    prices[ticker] = None
             except Exception:
                 prices[ticker] = None
+        else:
+            try:
+                data = yf.download(
+                    tickers=tickers,
+                    period='1d',
+                    interval='1d',
+                    group_by='ticker',
+                    threads=True,
+                    progress=False
+                )
+                for ticker in tickers:
+                    try:
+                        prices[ticker] = float(data[ticker]['Close'].iloc[-1])
+                    except Exception:
+                        prices[ticker] = None
+            except Exception:
+                prices = {ticker: None for ticker in tickers}
 
-    # Calculate total net worth for stocks
+    # Calculate total net worth
     total_net_worth = 0
     for asset in user_assets:
         price = prices.get(asset.ticker.upper())

@@ -119,14 +119,14 @@
                             <td>{{ asset.amount }}</td>
                             <td>
                                 {% if asset.price %}
-                                    ${{ asset.price|floatformat:2|intcomma }}
+                                    ${{ asset.price|intcomma|floatformat:2 }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
                             <td>
                                 {% if asset.value %}
-                                    ${{ asset.value|floatformat:2|intcomma }}
+                                    ${{ asset.value|intcomma|floatformat:2 }}
                                 {% else %}
                                     Could not fetch price
                                 {% endif %}
