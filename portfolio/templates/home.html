@@ -185,7 +185,10 @@
 
     <footer>
         <p>
-            <a href="{% url 'logout' %}">Logout</a>
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" style="background:none; border:none; color:inherit; cursor:pointer; padding:0;">Logout</button>
+            </form>
         </p>
     </footer>
 </body>
