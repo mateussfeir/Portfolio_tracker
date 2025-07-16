@@ -8,6 +8,9 @@ import requests
 from decimal import Decimal
 import plotly.graph_objects as go
 from django.shortcuts import render
+import yfinance as yf
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 # Function to fetch prices for multiple tickers in one API call
 def get_multiple_asset_prices(tickers):
@@ -123,10 +126,127 @@ def home(request):
 
 @login_required
 def delete_holding(request, pk):
-    asset = get_object_or_404(Asset, pk=pk, owner=request.user)  # Ensures that only the asset owner can delete it
+    asset = get_object_or_404(Asset, pk=pk, owner=request.user)
     asset.delete()
     messages.success(request, "Asset deleted successfully.")
-    return redirect('home')  # Redirect back to the homepage after deletion
+    # Redirect back to the referring page
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    return redirect('home')
+
+@login_required
+def edit_holding(request, pk):
+    asset = get_object_or_404(Asset, pk=pk, owner=request.user)
+    if request.method == 'POST':
+        form = AddAssetForm(request.POST, instance=asset)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Asset updated successfully.")
+            if asset.type == 'stock':
+                return redirect('stocks')
+            else:
+                return redirect('home')
+    else:
+        form = AddAssetForm(instance=asset)
+    return render(request, 'edit_holding.html', {'form': form, 'asset': asset})
+
+@login_required
+def stocks(request):
+    if request.method == 'POST':
+        form = AddAssetForm(request.POST)
+        if form.is_valid():
+            asset = form.save(commit=False)
+            asset.owner = request.user
+            asset.type = 'stock'
+            asset.save()
+            return redirect('stocks')
+        else:
+            messages.error(request, "Failed to add asset. Please check your inputs.")
+    else:
+        form = AddAssetForm()
+
+    # Get user stock assets
+    user_assets = Asset.objects.filter(owner=request.user, type='stock')
+    tickers = [asset.ticker.upper() for asset in user_assets]
+
+    # Fetch stock prices using yfinance
+    prices = {}
+    if tickers:
+        data = yf.download(tickers=tickers, period='1d', interval='1d', group_by='ticker', threads=True, progress=False)
+        for asset in user_assets:
+            ticker = asset.ticker.upper()
+            try:
+                if len(tickers) == 1:
+                    price = data['Close'][-1]
+                else:
+                    price = data[ticker]['Close'][-1]
+                prices[ticker] = float(price)
+            except Exception:
+                prices[ticker] = None
+
+    # Calculate total net worth for stocks
+    total_net_worth = 0
+    for asset in user_assets:
+        price = prices.get(asset.ticker.upper())
+        try:
+            price_decimal = Decimal(str(price)) if price is not None else Decimal('0')
+        except Exception:
+            price_decimal = Decimal('0')
+        total_net_worth += price_decimal * asset.amount
+
+    # Populate assets and chart data
+    assets_with_value = []
+    labels = []
+    values = []
+    for asset in user_assets:
+        ticker = asset.ticker.upper()
+        price = prices.get(ticker)
+        try:
+            price_decimal = Decimal(str(price)) if price is not None else Decimal('0')
+        except Exception:
+            price_decimal = Decimal('0')
+        value = price_decimal * asset.amount if price_decimal else None
+        asset_dict = {
+            'id': asset.id,
+            'ticker': asset.ticker,
+            'amount': asset.amount,
+            'price': price_decimal if price_decimal else '-',
+            'value': value if value else '-',
+        }
+        if total_net_worth > 0 and value:
+            percentage = (value / total_net_worth) * 100
+            asset_dict['percentage'] = percentage
+        else:
+            asset_dict['percentage'] = '-'
+        assets_with_value.append(asset_dict)
+
+        # Prepare chart data
+        if value and total_net_worth > 0:
+            labels.append(asset.ticker)
+            values.append(float(value / total_net_worth * 100))
+
+    # Prepare pie chart
+    if labels and values:
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
+        fig.update_layout(
+            title="Stock Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        chart_html = fig.to_html(full_html=False)
+    else:
+        chart_html = None
+
+    return render(request, 'stocks.html', {
+        'username': request.user.username,
+        'assets': assets_with_value,
+        'form': form,
+        'total_net_worth': total_net_worth,
+        'chart': chart_html,
+    })
 
 def root_redirect(request):
     if request.user.is_authenticated:

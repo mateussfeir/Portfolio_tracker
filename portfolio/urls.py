@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import signup, home, delete_holding, root_redirect, resume, bio, projects  # Include the root_redirect view
+from .views import signup, home, delete_holding, root_redirect, resume, bio, projects, stocks, edit_holding  # Include the root_redirect view
 
 urlpatterns = [
     path('', root_redirect, name='root'),  # Redirect based on user authentication status
@@ -9,7 +9,9 @@ urlpatterns = [
     path('home/', home, name='home'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('delete/<int:pk>/', delete_holding, name='delete_holding'),  # Handling deletion of a holding
+    path('edit/<int:pk>/', edit_holding, name='edit_holding'),
     path('resume/', resume, name='resume'),
     path('bio/', bio, name='bio'),
     path('projects/', projects, name='projects'),
+    path('stocks/', stocks, name='stocks'),
 ]
