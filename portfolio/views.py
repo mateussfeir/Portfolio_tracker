@@ -365,14 +365,14 @@ def real_estate(request):
         if name and amount and currency:
             Asset.objects.create(
                 owner=request.user,
-                type='other',
+                type='real_estate',
                 ticker=name,
                 amount=Decimal(amount),
                 currency=currency
             )
             return redirect(f"{request.path}?currency={selected_currency}")
     # Get all real estate assets
-    assets = Asset.objects.filter(owner=request.user, type='other')
+    assets = Asset.objects.filter(owner=request.user, type='real_estate')
     # Calculate values in selected currency
     total_net_worth = Decimal('0')
     assets_with_value = []
