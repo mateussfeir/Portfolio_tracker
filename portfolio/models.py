@@ -8,7 +8,7 @@ class Asset(models.Model):
     ]
 
     ticker = models.CharField(max_length=10)
-    amount = models.DecimalField(max_digits=19, decimal_places=2)
+    amount = models.DecimalField(max_digits=19, decimal_places=3)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.CharField(max_length=10, choices=ASSET_TYPE_CHOICES, default='crypto')
 
