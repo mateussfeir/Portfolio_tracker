@@ -87,7 +87,7 @@
     <header>
         <h1>Welcome, {{ username }}!</h1>
         <div style="margin-top: 10px; font-size: 1.5em; font-weight: bold; color: #4caf50;">
-            Total Net Worth (Stocks): <span id="net-worth-display">${{ total_net_worth|floatformat:2|intcomma }}</span>
+            Total Net Worth (Stocks): <span id="net-worth-display">${{ total_net_worth|floatformat:2 }}</span>
             <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">                {% for code, name in available_currencies.items %}
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
                 {% endfor %}
