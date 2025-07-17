@@ -1,93 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-    {% load humanize %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stocks</title>
+    <title>Real Estate</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        header {
-            background-color: #1f1f1f;
-            color: #fff;
-            padding: 1rem;
-            text-align: center;
-        }
-        .container {
-            margin: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .card {
-            background: #1e1e1e;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            flex: 1 1 45%;
-            color: #e0e0e0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #333;
-            text-align: center;
-            vertical-align: middle;
-        }
-        th {
-            background-color: #2a2a2a;
-        }
-        td {
-            background-color: #1e1e1e;
-        }
-        th:last-child, td:last-child {
-            width: 50px;
-            padding: 4px;
-        }
-        button {
-            cursor: pointer;
-            background-color: whitesmoke;
-            color: black;
-            border: none;
-            border-radius: 4px;
-            padding: 4px 8px;
-            transition: background-color 0.2s ease;
-        }
-        button:hover {
-            background-color: #ff1a1a;
-        }
-        a {
-            color: #4caf50;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .pie-chart-container {
-            text-align: center;
-        }
-        footer {
-            margin-top: 20px;
-            text-align: center;
-            color: #aaa;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
+        header { background-color: #1f1f1f; color: #fff; padding: 1rem; text-align: center; }
+        .container { margin: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        .card { background: #1e1e1e; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); padding: 20px; flex: 1 1 45%; color: #e0e0e0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #333; text-align: center; vertical-align: middle; }
+        th { background-color: #2a2a2a; }
+        td { background-color: #1e1e1e; }
+        th:last-child, td:last-child { width: 50px; padding: 4px; }
+        button { cursor: pointer; background-color: whitesmoke; color: black; border: none; border-radius: 4px; padding: 4px 8px; transition: background-color 0.2s ease; }
+        button:hover { background-color: #ff1a1a; }
+        a { color: #4caf50; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .pie-chart-container { text-align: center; }
+        footer { margin-top: 20px; text-align: center; color: #aaa; }
     </style>
 </head>
+{% load humanize %}
 <body>
     <header>
         <h1>Welcome, {{ username }}!</h1>
         <div style="margin-top: 10px; font-size: 1.5em; font-weight: bold; color: #4caf50;">
-            Total Net Worth (Stocks): <span id="net-worth-display">${{ total_net_worth|floatformat:2 }}</span>
+            Total Net Worth (Real Estate): <span id="net-worth-display">${{ total_net_worth|floatformat:2 }}</span>
             <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">                {% for code, name in available_currencies.items %}
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
                 {% endfor %}
@@ -104,18 +45,17 @@
 
     <div class="container" style="flex-direction: column; align-items: center; padding-top: 20px;">
         <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 100%; justify-content: center; align-items: flex-start;">
-            <!-- Stock Positions -->
+            <!-- Real Estate Positions -->
             <div class="card" style="flex: 1 1 45%; min-width: 350px;">
-                <h2>Your Stock Positions</h2>
+                <h2>Your Real Estate Positions</h2>
                 {% if assets %}
                 <table>
                     <thead>
                         <tr>
-                            <th>Ticker</th>
+                            <th>Name</th>
                             <th>Amount</th>
-                            <th>Price</th>
-                            <th>Value</th>
-                            <th>Asset (%)</th>
+                            <th>Currency (added)</th>
+                            <th>Value (USD)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -123,30 +63,11 @@
                         {% for asset in assets %}
                         <tr>
                             <td>{{ asset.ticker }}</td>
-                            <td>{{ asset.amount }}</td>
-                            <td>
-                                {% if asset.price %}
-                                    ${{ asset.price|floatformat:2 }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if asset.value %}
-                                    ${{ asset.value|floatformat:2 }}
-                                {% else %}
-                                    Could not fetch price
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if asset.percentage %}
-                                    {{ asset.percentage|floatformat:2 }}%
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
+                            <td>{{ asset.amount|floatformat:2 }}</td>
+                            <td>{{ asset.currency }}</td>
+                            <td>${{ asset.value|floatformat:2 }}</td>
                             <td style="white-space: nowrap;">
-                                <a href="{% url 'edit_holding' asset.id %}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
+                                <a href="{% url 'edit_holding' asset.id %}?next={% url 'real_estate' %}?currency={{ selected_currency }}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
                                 <form action="{% url 'delete_holding' asset.id %}" method="post" style="display:inline;">
                                     {% csrf_token %}
                                     <button type="submit">X</button>
@@ -157,19 +78,28 @@
                     </tbody>
                 </table>
                 {% else %}
-                <p>You have no stock positions yet.</p>
+                <p>You have no real estate positions yet.</p>
                 {% endif %}
-                <h2>Add a New Stock Position</h2>
+                <h2>Add a New Real Estate Position</h2>
                 <form method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit">Add Position</button>
+                    <label for="name">Name:</label>
+                    <input type="text" name="name" required style="margin: 0 10px;">
+                    <label for="amount">Amount:</label>
+                    <input type="number" step="0.01" min="0" name="amount" required style="margin: 0 10px;">
+                    <label for="currency">Currency:</label>
+                    <select name="currency" required>
+                        {% for code, name in available_currencies.items %}
+                            <option value="{{ code }}">{{ code }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" style="background: #4caf50; color: white; border: none; border-radius: 4px; padding: 4px 12px; margin-left: 10px;">Add Position</button>
                 </form>
             </div>
 
             <!-- Pie Chart -->
             <div class="card pie-chart-container" style="flex: 1 1 45%; min-width: 350px;">
-                <h2>Stock Portfolio Distribution</h2>
+                <h2>Real Estate Portfolio Distribution</h2>
                 <div>
                     {% if chart %}
                         {{ chart|safe }}

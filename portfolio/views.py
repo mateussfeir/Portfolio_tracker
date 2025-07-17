@@ -355,12 +355,180 @@ def stocks(request):
         'available_currencies': available_currencies,
     })
 
+@login_required
+def real_estate(request):
+    selected_currency = request.GET.get('currency', 'USD')
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        amount = request.POST.get('amount')
+        currency = request.POST.get('currency')
+        if name and amount and currency:
+            Asset.objects.create(
+                owner=request.user,
+                type='other',
+                ticker=name,
+                amount=Decimal(amount),
+                currency=currency
+            )
+            return redirect(f"{request.path}?currency={selected_currency}")
+    # Get all real estate assets
+    assets = Asset.objects.filter(owner=request.user, type='other')
+    # Calculate values in selected currency
+    total_net_worth = Decimal('0')
+    assets_with_value = []
+    for asset in assets:
+        value = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
+        total_net_worth += value
+        assets_with_value.append({
+            'id': asset.id,
+            'ticker': asset.ticker,
+            'amount': asset.amount,
+            'currency': asset.currency,
+            'value': value,
+        })
+    # Pie chart
+    labels = [a['ticker'] for a in assets_with_value]
+    values = [float(a['value']) for a in assets_with_value]
+    if labels and values:
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
+        fig.update_layout(
+            title="Real Estate Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        chart_html = fig.to_html(full_html=False)
+    else:
+        chart_html = None
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
+    return render(request, 'real_estate.html', {
+        'username': request.user.username,
+        'assets': assets_with_value,
+        'total_net_worth': total_net_worth,
+        'chart': chart_html,
+        'selected_currency': selected_currency,
+        'available_currencies': available_currencies,
+    })
+
+@login_required
+def cash(request):
+    selected_currency = request.GET.get('currency', 'USD')
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        amount = request.POST.get('amount')
+        currency = request.POST.get('currency')
+        if name and amount and currency:
+            Asset.objects.create(
+                owner=request.user,
+                type='cash',
+                ticker=name,
+                amount=Decimal(amount),
+                currency=currency
+            )
+            return redirect(f"{request.path}?currency={selected_currency}")
+    # Get all cash assets
+    assets = Asset.objects.filter(owner=request.user, type='cash')
+    # Calculate values in selected currency
+    total_net_worth = Decimal('0')
+    assets_with_value = []
+    for asset in assets:
+        value = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
+        total_net_worth += value
+        assets_with_value.append({
+            'id': asset.id,
+            'ticker': asset.ticker,
+            'amount': asset.amount,
+            'currency': asset.currency,
+            'value': value,
+        })
+    # Pie chart
+    labels = [a['ticker'] for a in assets_with_value]
+    values = [float(a['value']) for a in assets_with_value]
+    if labels and values:
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
+        fig.update_layout(
+            title="Cash Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        chart_html = fig.to_html(full_html=False)
+    else:
+        chart_html = None
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
+    return render(request, 'cash.html', {
+        'username': request.user.username,
+        'assets': assets_with_value,
+        'total_net_worth': total_net_worth,
+        'chart': chart_html,
+        'selected_currency': selected_currency,
+        'available_currencies': available_currencies,
+    })
+
 def general(request):
     selected_currency = request.GET.get('currency', 'USD')
+    show_cash_form = request.GET.get('show_cash_form') == '1'
+    show_other_form = request.GET.get('show_other_form') == '1'
+    cash_currencies = ['USD', 'CAD', 'BRL', 'KRW', 'INR', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF']
+
+    # Handle cash form submission
+    if request.method == 'POST' and request.POST.get('form_type') == 'add_cash':
+        amount = request.POST.get('amount')
+        currency = request.POST.get('currency')
+        if amount and currency:
+            Asset.objects.create(
+                owner=request.user,
+                type='cash',
+                ticker='CASH',
+                amount=Decimal(amount),
+                currency=currency
+            )
+            return redirect(f"{request.path}?currency={selected_currency}")
+
+    # Handle other asset form submission
+    if request.method == 'POST' and request.POST.get('form_type') == 'add_other':
+        name = request.POST.get('name')
+        amount = request.POST.get('amount')
+        currency = request.POST.get('currency')
+        if name and amount and currency:
+            Asset.objects.create(
+                owner=request.user,
+                type='other',
+                ticker=name,
+                amount=Decimal(amount),
+                currency=currency
+            )
+            return redirect(f"{request.path}?currency={selected_currency}")
 
     # Get all user assets by type
     crypto_assets = Asset.objects.filter(owner=request.user, type='crypto')
     stock_assets = Asset.objects.filter(owner=request.user, type='stock')
+    cash_assets = Asset.objects.filter(owner=request.user, type='cash')
+    other_assets = Asset.objects.filter(owner=request.user, type='other')
 
     # Get prices for crypto
     crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
@@ -419,6 +587,18 @@ def general(request):
     # Convert to selected currency
     total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
 
+    # Calculate total cash in selected currency
+    total_cash = Decimal('0')
+    for cash in cash_assets:
+        cash_value = convert_currency(cash.amount, cash.currency or 'USD', selected_currency)
+        total_cash += cash_value
+
+    # Calculate total other in selected currency
+    total_other = Decimal('0')
+    for other in other_assets:
+        other_value = convert_currency(other.amount, other.currency or 'USD', selected_currency)
+        total_other += other_value
+
     # Pie chart data
     labels = []
     values = []
@@ -428,6 +608,12 @@ def general(request):
     if total_stocks > 0:
         labels.append('Stocks')
         values.append(float(total_stocks))
+    if total_cash > 0:
+        labels.append('Cash')
+        values.append(float(total_cash))
+    if total_other > 0:
+        labels.append('Real Estate')
+        values.append(float(total_other))
     if labels and values:
         fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
         fig.update_layout(
@@ -455,24 +641,38 @@ def general(request):
     }
 
     # After calculating total_crypto and total_stocks
-    total_net_worth = total_crypto + total_stocks
+    total_net_worth = total_crypto + total_stocks + total_cash + total_other
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
         stocks_percent = (total_stocks / total_net_worth) * 100
+        cash_percent = (total_cash / total_net_worth) * 100
+        other_percent = (total_other / total_net_worth) * 100
     else:
         crypto_percent = 0
         stocks_percent = 0
+        cash_percent = 0
+        other_percent = 0
 
     return render(request, 'general.html', {
         'username': request.user.username,
         'total_crypto': total_crypto,
         'total_stocks': total_stocks,
+        'total_cash': total_cash,
+        'total_other': total_other,
+        'other_percent': other_percent,
         'total_net_worth': total_net_worth,
         'crypto_percent': crypto_percent,
         'stocks_percent': stocks_percent,
+        'cash_percent': cash_percent,
+        'other_percent': other_percent,
         'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
+        'show_cash_form': show_cash_form,
+        'show_other_form': show_other_form,
+        'cash_currencies': cash_currencies,
+        'total_real_estate': total_other,
+        'real_estate_percent': other_percent,
     })
 
 def root_redirect(request):
