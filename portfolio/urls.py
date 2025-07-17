@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import signup, home, delete_holding, root_redirect, resume, bio, projects, stocks, edit_holding  # Include the root_redirect view
+from .views import signup, home, delete_holding, root_redirect, resume, bio, projects, stocks, edit_holding, general  # Include the general view
 
 urlpatterns = [
     path('', root_redirect, name='root'),  # Redirect based on user authentication status
@@ -14,4 +14,5 @@ urlpatterns = [
     path('bio/', bio, name='bio'),
     path('projects/', projects, name='projects'),
     path('stocks/', stocks, name='stocks'),
+    path('general/', general, name='general'),  # New general tab
 ]

@@ -355,6 +355,126 @@ def stocks(request):
         'available_currencies': available_currencies,
     })
 
+def general(request):
+    selected_currency = request.GET.get('currency', 'USD')
+
+    # Get all user assets by type
+    crypto_assets = Asset.objects.filter(owner=request.user, type='crypto')
+    stock_assets = Asset.objects.filter(owner=request.user, type='stock')
+
+    # Get prices for crypto
+    crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
+    crypto_prices = get_multiple_asset_prices(crypto_tickers)
+
+    # Calculate total crypto net worth in USD
+    total_crypto_usd = sum(
+        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        for asset in crypto_assets
+    )
+    # Convert to selected currency
+    total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
+
+    # Get prices for stocks
+    stock_tickers = [asset.ticker.upper() for asset in stock_assets]
+    stock_prices = {}
+    if stock_tickers:
+        import yfinance as yf
+        if len(stock_tickers) == 1:
+            ticker = stock_tickers[0]
+            try:
+                data = yf.Ticker(ticker).history(period='1d')
+                if not data.empty:
+                    stock_prices[ticker] = float(data['Close'].iloc[-1])
+                else:
+                    stock_prices[ticker] = None
+            except Exception:
+                stock_prices[ticker] = None
+        else:
+            try:
+                data = yf.download(
+                    tickers=stock_tickers,
+                    period='1d',
+                    interval='1d',
+                    group_by='ticker',
+                    threads=True,
+                    progress=False
+                )
+                for ticker in stock_tickers:
+                    try:
+                        stock_prices[ticker] = float(data[ticker]['Close'].iloc[-1])
+                    except Exception:
+                        stock_prices[ticker] = None
+            except Exception:
+                stock_prices = {ticker: None for ticker in stock_tickers}
+
+    # Calculate total stock net worth in USD
+    total_stocks_usd = 0
+    for asset in stock_assets:
+        price = stock_prices.get(asset.ticker.upper())
+        try:
+            price_decimal = Decimal(str(price)) if price is not None else Decimal('0')
+        except Exception:
+            price_decimal = Decimal('0')
+        total_stocks_usd += price_decimal * asset.amount
+    # Convert to selected currency
+    total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
+
+    # Pie chart data
+    labels = []
+    values = []
+    if total_crypto > 0:
+        labels.append('Crypto')
+        values.append(float(total_crypto))
+    if total_stocks > 0:
+        labels.append('Stocks')
+        values.append(float(total_stocks))
+    if labels and values:
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
+        fig.update_layout(
+            title="Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        chart_html = fig.to_html(full_html=False)
+    else:
+        chart_html = None
+
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
+
+    # After calculating total_crypto and total_stocks
+    total_net_worth = total_crypto + total_stocks
+    if total_net_worth > 0:
+        crypto_percent = (total_crypto / total_net_worth) * 100
+        stocks_percent = (total_stocks / total_net_worth) * 100
+    else:
+        crypto_percent = 0
+        stocks_percent = 0
+
+    return render(request, 'general.html', {
+        'username': request.user.username,
+        'total_crypto': total_crypto,
+        'total_stocks': total_stocks,
+        'total_net_worth': total_net_worth,
+        'crypto_percent': crypto_percent,
+        'stocks_percent': stocks_percent,
+        'chart': chart_html,
+        'selected_currency': selected_currency,
+        'available_currencies': available_currencies,
+    })
+
 def root_redirect(request):
     if request.user.is_authenticated:
         return redirect('home')  # Redirect to 'home' if the user is logged in
