@@ -12,6 +12,44 @@ import yfinance as yf
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 
+# Currency conversion function
+def get_exchange_rates(base_currency='USD'):
+    """Get exchange rates from USD to other currencies using a free API"""
+    try:
+        # Using exchangerate-api.com (free tier)
+        url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('rates', {})
+    except Exception as e:
+        print(f"Error fetching exchange rates: {e}")
+        # Fallback rates (approximate)
+        return {
+            'USD': 1,
+            'CAD': 1.35,
+            'BRL': 52,
+            'KRW': 1300,
+            'INR': 83,
+            'EUR': 0.92,
+            'GBP': 0.79,
+            'JPY': 150,
+            'AUD': 10.52,
+            'CHF': 0.88
+        }
+
+def convert_currency(amount, from_currency='USD', to_currency='USD'):
+    """Convert amount from one currency to another"""
+    if from_currency == to_currency:
+        return amount
+    
+    rates = get_exchange_rates(from_currency)
+    if to_currency in rates:
+        # Convert the rate to Decimal to avoid type mismatch
+        rate = Decimal(str(rates[to_currency]))
+        return amount * rate
+    return amount
+
 # Function to fetch prices for multiple tickers in one API call
 def get_multiple_asset_prices(tickers):
     ids = ','.join(tickers)
@@ -45,6 +83,8 @@ def signup(request):
 
 @login_required
 def home(request):
+    # Get selected currency from request, default to USD
+    selected_currency = request.GET.get('currency', 'USD')
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -67,11 +107,14 @@ def home(request):
     # Fetch Bitcoin price explicitly
     bitcoin_price = prices.get('bitcoin', {}).get('usd', 'N/A')
 
-    # Calculate total net worth
-    total_net_worth = sum(
+    # Calculate total net worth in USD first
+    total_net_worth_usd = sum(
         (Decimal(str(prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
         for asset in user_assets
     )
+    
+    # Convert to selected currency
+    total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
 
     # Populate assets and chart data
     assets_with_value = []
@@ -79,9 +122,13 @@ def home(request):
     values = []
     for asset in user_assets:
         coin_id = map_ticker(asset.ticker)
-        price = prices.get(coin_id, {}).get('usd')  # Get price per token
-        if price is not None:
-            price = Decimal(str(price))
+        price_usd = prices.get(coin_id, {}).get('usd')  # Get price per token in USD
+        if price_usd is not None:
+            price_usd = Decimal(str(price_usd))
+            # Convert price to selected currency
+            price = convert_currency(price_usd, 'USD', selected_currency)
+        else:
+            price = None
         value = price * asset.amount if price else None
         asset_dict = {
             'id': asset.id,
@@ -116,6 +163,20 @@ def home(request):
     else:
         chart_html = None
 
+    # Get available currencies for dropdown
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
+
     # Render the page
     return render(request, 'home.html', {
         'username': request.user.username,
@@ -124,6 +185,8 @@ def home(request):
         'bitcoin_price': bitcoin_price,  # Pass the Bitcoin price to the template
         'total_net_worth': total_net_worth,
         'chart': chart_html,
+        'selected_currency': selected_currency,
+        'available_currencies': available_currencies,
     })
 
 @login_required
@@ -156,6 +219,8 @@ def edit_holding(request, pk):
 
 @login_required
 def stocks(request):
+    # Get selected currency from request, default to USD
+    selected_currency = request.GET.get('currency', 'USD')
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -206,15 +271,18 @@ def stocks(request):
             except Exception:
                 prices = {ticker: None for ticker in tickers}
 
-    # Calculate total net worth
-    total_net_worth = 0
+    # Calculate total net worth in USD first
+    total_net_worth_usd = 0
     for asset in user_assets:
         price = prices.get(asset.ticker.upper())
         try:
             price_decimal = Decimal(str(price)) if price is not None else Decimal('0')
         except Exception:
             price_decimal = Decimal('0')
-        total_net_worth += price_decimal * asset.amount
+        total_net_worth_usd += price_decimal * asset.amount
+    
+    # Convert to selected currency
+    total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
 
     # Populate assets and chart data
     assets_with_value = []
@@ -222,17 +290,19 @@ def stocks(request):
     values = []
     for asset in user_assets:
         ticker = asset.ticker.upper()
-        price = prices.get(ticker)
+        price_usd = prices.get(ticker)
         try:
-            price_decimal = Decimal(str(price)) if price is not None else Decimal('0')
+            price_usd_decimal = Decimal(str(price_usd)) if price_usd is not None else Decimal('0')
+            # Convert price to selected currency
+            price = convert_currency(price_usd_decimal, 'USD', selected_currency)
         except Exception:
-            price_decimal = Decimal('0')
-        value = price_decimal * asset.amount if price_decimal else None
+            price = Decimal('0')
+        value = price * asset.amount if price else None
         asset_dict = {
             'id': asset.id,
             'ticker': asset.ticker,
             'amount': asset.amount,
-            'price': price_decimal if price_decimal else '-',
+            'price': price if price else '-',
             'value': value if value else '-',
         }
         if total_net_worth > 0 and value:
@@ -261,12 +331,28 @@ def stocks(request):
     else:
         chart_html = None
 
+    # Get available currencies for dropdown
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
+
     return render(request, 'stocks.html', {
         'username': request.user.username,
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
         'chart': chart_html,
+        'selected_currency': selected_currency,
+        'available_currencies': available_currencies,
     })
 
 def root_redirect(request):
