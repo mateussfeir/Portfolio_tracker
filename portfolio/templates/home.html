@@ -92,7 +92,7 @@
     <header>
         <h1>Welcome, {{ username }}!</h1>
         <div style="margin-top: 10px; font-size: 1.5em; font-weight: bold; color: #4caf50;">
-            Total Net Worth (Crypto): ${{ total_net_worth|floatformat:2|intcomma }}
+            Total Net Worth (Crypto): ${{ total_net_worth|floatformat:2 }}
         </div>
         <nav style="margin-top: 20px; text-align: center;">
             <a href="{% url 'home' %}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Crypto</a>
@@ -124,14 +124,14 @@
                             <td>{{ asset.amount }}</td>
                             <td>
                                 {% if asset.price %}
-                                    ${{ asset.price|floatformat:2|intcomma }}
+                                    ${{ asset.price|floatformat:2 }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
                             <td>
                                 {% if asset.value %}
-                                    ${{ asset.value|floatformat:2|intcomma }}
+                                    ${{ asset.value|floatformat:2 }}
                                 {% else %}
                                     Could not fetch price
                                 {% endif %}
