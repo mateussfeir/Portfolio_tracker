@@ -489,6 +489,73 @@ def cash(request):
         'available_currencies': available_currencies,
     })
 
+@login_required
+def other(request):
+    selected_currency = request.GET.get('currency', 'USD')
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        amount = request.POST.get('amount')
+        currency = request.POST.get('currency')
+        if name and amount and currency:
+            Asset.objects.create(
+                owner=request.user,
+                type='other',
+                ticker=name,
+                amount=Decimal(amount),
+                currency=currency
+            )
+            return redirect(f"{request.path}?currency={selected_currency}")
+    # Get all other assets
+    assets = Asset.objects.filter(owner=request.user, type='other')
+    # Calculate values in selected currency
+    total_net_worth = Decimal('0')
+    assets_with_value = []
+    for asset in assets:
+        value = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
+        total_net_worth += value
+        assets_with_value.append({
+            'id': asset.id,
+            'ticker': asset.ticker,
+            'amount': asset.amount,
+            'currency': asset.currency,
+            'value': value,
+        })
+    # Pie chart
+    labels = [a['ticker'] for a in assets_with_value]
+    values = [float(a['value']) for a in assets_with_value]
+    if labels and values:
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
+        fig.update_layout(
+            title="Others Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        chart_html = fig.to_html(full_html=False)
+    else:
+        chart_html = None
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
+    return render(request, 'other.html', {
+        'username': request.user.username,
+        'assets': assets_with_value,
+        'total_net_worth': total_net_worth,
+        'chart': chart_html,
+        'selected_currency': selected_currency,
+        'available_currencies': available_currencies,
+    })
+
 def general(request):
     selected_currency = request.GET.get('currency', 'USD')
     show_cash_form = request.GET.get('show_cash_form') == '1'
