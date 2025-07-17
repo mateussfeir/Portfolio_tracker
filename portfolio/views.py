@@ -76,7 +76,7 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('home')  # Redirect to the homepage after signup
+            return redirect('general')  # Redirect to the General tab after signup
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
@@ -595,6 +595,7 @@ def general(request):
     crypto_assets = Asset.objects.filter(owner=request.user, type='crypto')
     stock_assets = Asset.objects.filter(owner=request.user, type='stock')
     cash_assets = Asset.objects.filter(owner=request.user, type='cash')
+    real_estate_assets = Asset.objects.filter(owner=request.user, type='real_estate')
     other_assets = Asset.objects.filter(owner=request.user, type='other')
 
     # Get prices for crypto
@@ -660,6 +661,12 @@ def general(request):
         cash_value = convert_currency(cash.amount, cash.currency or 'USD', selected_currency)
         total_cash += cash_value
 
+    # Calculate total real estate in selected currency
+    total_real_estate = Decimal('0')
+    for real_estate in real_estate_assets:
+        real_estate_value = convert_currency(real_estate.amount, real_estate.currency or 'USD', selected_currency)
+        total_real_estate += real_estate_value
+
     # Calculate total other in selected currency
     total_other = Decimal('0')
     for other in other_assets:
@@ -675,11 +682,14 @@ def general(request):
     if total_stocks > 0:
         labels.append('Stocks')
         values.append(float(total_stocks))
+    if total_real_estate > 0:
+        labels.append('Real Estate')
+        values.append(float(total_real_estate))
     if total_cash > 0:
         labels.append('Cash')
         values.append(float(total_cash))
     if total_other > 0:
-        labels.append('Real Estate')
+        labels.append('Others')
         values.append(float(total_other))
     if labels and values:
         fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
@@ -708,15 +718,17 @@ def general(request):
     }
 
     # After calculating total_crypto and total_stocks
-    total_net_worth = total_crypto + total_stocks + total_cash + total_other
+    total_net_worth = total_crypto + total_stocks + total_real_estate + total_cash + total_other
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
         stocks_percent = (total_stocks / total_net_worth) * 100
+        real_estate_percent = (total_real_estate / total_net_worth) * 100
         cash_percent = (total_cash / total_net_worth) * 100
         other_percent = (total_other / total_net_worth) * 100
     else:
         crypto_percent = 0
         stocks_percent = 0
+        real_estate_percent = 0
         cash_percent = 0
         other_percent = 0
 
@@ -724,27 +736,26 @@ def general(request):
         'username': request.user.username,
         'total_crypto': total_crypto,
         'total_stocks': total_stocks,
+        'total_real_estate': total_real_estate,
         'total_cash': total_cash,
         'total_other': total_other,
-        'other_percent': other_percent,
-        'total_net_worth': total_net_worth,
         'crypto_percent': crypto_percent,
         'stocks_percent': stocks_percent,
+        'real_estate_percent': real_estate_percent,
         'cash_percent': cash_percent,
         'other_percent': other_percent,
+        'total_net_worth': total_net_worth,
         'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'show_cash_form': show_cash_form,
         'show_other_form': show_other_form,
         'cash_currencies': cash_currencies,
-        'total_real_estate': total_other,
-        'real_estate_percent': other_percent,
     })
 
 def root_redirect(request):
     if request.user.is_authenticated:
-        return redirect('home')  # Redirect to 'home' if the user is logged in
+        return redirect('general')  # Redirect to 'general' if the user is logged in
     else:
         return redirect('login')  # Redirect to 'login' if the user is not logged in
 

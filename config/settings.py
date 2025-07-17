@@ -29,7 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['mateussfeir.pythonanywhere.com', 'bitbalance.ca', 'www.bitbalance.ca', '127.0.0.1', 'localhost']
 
 # Authentication settings
-LOGIN_REDIRECT_URL = '/home/'  # Redirect after successful login
+LOGIN_REDIRECT_URL = '/general/'  # Redirect after successful login
 LOGOUT_REDIRECT_URL = '/login/'  # Optional: Redirect after logout
 
 INSTALLED_APPS = [
