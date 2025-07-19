@@ -11,6 +11,7 @@ from django.shortcuts import render
 import yfinance as yf
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+# test
 
 # Currency conversion function
 def get_exchange_rates(base_currency='USD'):
