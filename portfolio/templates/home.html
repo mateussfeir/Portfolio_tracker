@@ -178,9 +178,9 @@
         <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 100%; justify-content: center; align-items: flex-start;">
             <!-- Crypto Positions -->
             <div class="card" style="flex: 1 1 45%; min-width: 350px;">
-                <h2>Your Crypto Positions</h2>
-                <div style="margin-bottom: 1em; text-align: right;">
-                    <form method="get" style="display: inline;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1em;">
+                    <h2 style="margin: 0;">Your Crypto Positions</h2>
+                    <form method="get" style="display: flex; gap: 8px; align-items: center;">
                         <input type="hidden" name="currency" value="{{ selected_currency }}">
                         <button type="submit" name="percent" value="section" {% if percent_mode == 'section' %}style="background:#4caf50;color:#fff;"{% endif %}>% of Crypto</button>
                         <button type="submit" name="percent" value="total" {% if percent_mode == 'total' %}style="background:#4caf50;color:#fff;"{% endif %}>% of Total Net Worth</button>
