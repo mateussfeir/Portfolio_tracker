@@ -162,12 +162,20 @@
 
             <!-- Pie Chart -->
             <div class="card pie-chart-container" style="flex: 1 1 45%; min-width: 350px;">
-                <h2>Real Estate Portfolio Distribution</h2>
-                <div>
-                    {% if chart %}
-                        {{ chart|safe }}
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <h2 style="margin: 0;">Real Estate Portfolio Distribution</h2>
+                    <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em;">Show Pie Chart</button>
+                </div>
+                <div id="pie-chart-div" style="display: none;">
+                    {% if pie_chart %}
+                        {{ pie_chart|safe }}
                     {% else %}
                         <p style="color: #aaa;">No chart data available.</p>
+                    {% endif %}
+                </div>
+                <div id="bar-chart-div" style="display: block;">
+                    {% if bar_chart %}
+                        {{ bar_chart|safe }}
                     {% endif %}
                 </div>
             </div>
@@ -228,6 +236,24 @@
             privacyBtn.addEventListener('click', function() {
                 const isOn = localStorage.getItem('privacyMode') === 'on';
                 setPrivacyMode(!isOn);
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('toggle-chart-btn');
+            const pieDiv = document.getElementById('pie-chart-div');
+            const barDiv = document.getElementById('bar-chart-div');
+            let showingPie = false;
+            toggleBtn.addEventListener('click', function() {
+                showingPie = !showingPie;
+                if (showingPie) {
+                    pieDiv.style.display = 'block';
+                    barDiv.style.display = 'none';
+                    toggleBtn.textContent = 'Show Bar Chart';
+                } else {
+                    pieDiv.style.display = 'none';
+                    barDiv.style.display = 'block';
+                    toggleBtn.textContent = 'Show Pie Chart';
+                }
             });
         });
     </script>

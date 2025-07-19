@@ -150,19 +150,51 @@ def home(request):
             labels.append(asset.ticker)
             values.append(float(value / total_net_worth * 100))
 
-    # Prepare pie chart
+    # Prepare pie and bar charts for crypto
     if labels and values:
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-        fig.update_layout(
+        total = sum(values)
+        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+        # Pie chart
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
             title="Crypto Portfolio Distribution",
             margin=dict(t=50, b=50, l=25, r=25),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
         )
-        chart_html = fig.to_html(full_html=False)
+        pie_chart_html = fig_pie.to_html(full_html=False)
+        # Stacked bar chart
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(labels, percentages)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent:.2f}%"],
+                textposition='inside',
+                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Crypto Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
     else:
-        chart_html = None
+        pie_chart_html = None
+        bar_chart_html = None
 
     # Get available currencies for dropdown
     available_currencies = {
@@ -193,10 +225,11 @@ def home(request):
         'form': form,
         'bitcoin_price': bitcoin_price,  # Pass the Bitcoin price to the template
         'total_net_worth': total_net_worth,
-        'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
     })
 
 @login_required
@@ -348,19 +381,51 @@ def stocks(request):
             labels.append(asset.ticker)
             values.append(float(value / total_net_worth * 100))
 
-    # Prepare pie chart
+    # Prepare pie and bar charts for stocks
     if labels and values:
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-        fig.update_layout(
+        total = sum(values)
+        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+        # Pie chart
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
             title="Stock Portfolio Distribution",
             margin=dict(t=50, b=50, l=25, r=25),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
         )
-        chart_html = fig.to_html(full_html=False)
+        pie_chart_html = fig_pie.to_html(full_html=False)
+        # Stacked bar chart
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(labels, percentages)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent:.2f}%"],
+                textposition='inside',
+                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Stock Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
     else:
-        chart_html = None
+        pie_chart_html = None
+        bar_chart_html = None
 
     # Get available currencies for dropdown
     available_currencies = {
@@ -393,6 +458,8 @@ def stocks(request):
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
     })
 
 @login_required
@@ -444,6 +511,51 @@ def real_estate(request):
         chart_html = fig.to_html(full_html=False)
     else:
         chart_html = None
+    # Prepare pie and bar charts for real estate
+    if labels and values:
+        total = sum(values)
+        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+        # Pie chart
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
+            title="Real Estate Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        pie_chart_html = fig_pie.to_html(full_html=False)
+        # Stacked bar chart
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(labels, percentages)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent:.2f}%"],
+                textposition='inside',
+                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Real Estate Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
+    else:
+        pie_chart_html = None
+        bar_chart_html = None
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -464,6 +576,8 @@ def real_estate(request):
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
     })
 
 @login_required
@@ -515,6 +629,51 @@ def cash(request):
         chart_html = fig.to_html(full_html=False)
     else:
         chart_html = None
+    # Prepare pie and bar charts for cash
+    if labels and values:
+        total = sum(values)
+        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+        # Pie chart
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
+            title="Cash Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        pie_chart_html = fig_pie.to_html(full_html=False)
+        # Stacked bar chart
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(labels, percentages)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent:.2f}%"],
+                textposition='inside',
+                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Cash Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
+    else:
+        pie_chart_html = None
+        bar_chart_html = None
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -535,6 +694,8 @@ def cash(request):
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
     })
 
 @login_required
@@ -586,6 +747,51 @@ def other(request):
         chart_html = fig.to_html(full_html=False)
     else:
         chart_html = None
+    # Prepare pie and bar charts for other
+    if labels and values:
+        total = sum(values)
+        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+        # Pie chart
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
+            title="Others Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        pie_chart_html = fig_pie.to_html(full_html=False)
+        # Stacked bar chart
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(labels, percentages)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent:.2f}%"],
+                textposition='inside',
+                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Others Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
+    else:
+        pie_chart_html = None
+        bar_chart_html = None
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -606,6 +812,8 @@ def other(request):
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
     })
 
 def general(request):
@@ -745,17 +953,50 @@ def general(request):
         labels.append('Others')
         values.append(float(total_other))
     if labels and values:
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-        fig.update_layout(
+        # Calculate percentages
+        total = sum(values)
+        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+        # Pie chart (percent only)
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
             title="Portfolio Distribution",
             margin=dict(t=50, b=50, l=25, r=25),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
         )
-        chart_html = fig.to_html(full_html=False)
+        pie_chart_html = fig_pie.to_html(full_html=False)
+        # Stacked bar chart (single bar, 5 segments)
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(labels, percentages)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent:.2f}%"],
+                textposition='inside',
+                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
     else:
-        chart_html = None
+        pie_chart_html = None
+        bar_chart_html = None
 
     available_currencies = {
         'USD': 'US Dollar',
@@ -799,7 +1040,8 @@ def general(request):
         'username': request.user.username,
         'totals': totals,
         'total_net_worth': total_net_worth,
-        'chart': chart_html,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'show_cash_form': show_cash_form,
