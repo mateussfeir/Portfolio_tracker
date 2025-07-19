@@ -210,8 +210,16 @@ def edit_holding(request, pk):
             messages.success(request, "Asset updated successfully.")
             if asset.type == 'stock':
                 return redirect('stocks')
-            else:
+            elif asset.type == 'crypto':
                 return redirect('home')
+            elif asset.type == 'real_estate':
+                return redirect('real_estate')
+            elif asset.type == 'cash':
+                return redirect('cash')
+            elif asset.type == 'other':
+                return redirect('other')
+            else:
+                return redirect('general')
     else:
         form = AddAssetForm(instance=asset)
     return render(request, 'edit_holding.html', {'form': form, 'asset': asset})
