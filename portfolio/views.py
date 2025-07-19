@@ -177,6 +177,7 @@ def home(request):
                 marker=dict(color=colors[i % len(colors)]),
                 text=[f"{label}\n{percent:.2f}%"],
                 textposition='inside',
+                insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
@@ -408,6 +409,7 @@ def stocks(request):
                 marker=dict(color=colors[i % len(colors)]),
                 text=[f"{label}\n{percent:.2f}%"],
                 textposition='inside',
+                insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
@@ -521,6 +523,7 @@ def real_estate(request):
                 marker=dict(color=colors[i % len(colors)]),
                 text=[f"{label}\n{percent:.2f}%"],
                 textposition='inside',
+                insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
@@ -625,6 +628,7 @@ def cash(request):
                 marker=dict(color=colors[i % len(colors)]),
                 text=[f"{label}\n{percent:.2f}%"],
                 textposition='inside',
+                insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
@@ -729,6 +733,7 @@ def other(request):
                 marker=dict(color=colors[i % len(colors)]),
                 text=[f"{label}\n{percent:.2f}%"],
                 textposition='inside',
+                insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
@@ -866,10 +871,7 @@ def general(request):
     total_stocks_usd = 0
     for asset in stock_assets:
         price = stock_prices.get(asset.ticker.upper())
-        try:
-            price_decimal = safe_decimal(price)
-        except Exception:
-            price_decimal = Decimal('0')
+        price_decimal = safe_decimal(price)
         total_stocks_usd += price_decimal * asset.amount
     # Convert to selected currency
     total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
@@ -936,6 +938,7 @@ def general(request):
                 marker=dict(color=colors[i % len(colors)]),
                 text=[f"{label}\n{percent:.2f}%"],
                 textposition='inside',
+                insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
