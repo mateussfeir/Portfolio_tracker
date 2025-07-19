@@ -114,13 +114,47 @@
             border: 2px solid #4caf50;
             transform: scale(1.08);
         }
+        .privacy-toggle-container {
+            position: fixed;
+            top: 18px;
+            right: 32px;
+            z-index: 1000;
+        }
+        #privacy-toggle-btn {
+            background: #333;
+            color: #fff;
+            border: 1.5px solid #4caf50;
+            border-radius: 6px;
+            padding: 7px 18px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: background 0.18s, color 0.18s, border 0.18s, transform 0.18s;
+        }
+        #privacy-toggle-btn:hover, #privacy-toggle-btn:focus {
+            background: #4caf50;
+            color: #fff;
+            border: 1.5px solid #4caf50;
+            transform: scale(1.08);
+        }
+        .sensitive-value.privacy-hidden {
+            color: #aaa !important;
+            background: #222 !important;
+            border-radius: 4px;
+            padding: 0 8px;
+            letter-spacing: 0.2em;
+        }
     </style>
 </head>
 <body>
+    <div class="privacy-toggle-container">
+        <button id="privacy-toggle-btn" type="button">Privacy Mode: Off</button>
+    </div>
     <header>
         <h1>Welcome, {{ username }}!</h1>
         <div style="margin-top: 10px; font-size: 1.5em; font-weight: bold; color: #4caf50;">
-            Stocks Net Worth: <span id="net-worth-display">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span>
+            Stocks Net Worth: <span id="net-worth-display"><span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span></span>
             <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">                {% for code, name in available_currencies.items %}
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
                 {% endfor %}
@@ -157,7 +191,7 @@
                         {% for asset in assets %}
                         <tr>
                             <td>{{ asset.ticker }}</td>
-                            <td>{{ asset.amount|floatformat:2 }}</td>
+                            <td><span class="sensitive-value">{{ asset.amount|floatformat:2 }}</span></td>
                             <td>
                                 {% if asset.price %}
                                     {{ currency_symbol }}{{ asset.price|intcomma2 }}
@@ -167,7 +201,7 @@
                             </td>
                             <td>
                                 {% if asset.value %}
-                                    {{ currency_symbol }}{{ asset.value|intcomma2 }}
+                                    <span class="sensitive-value">{{ currency_symbol }}{{ asset.value|intcomma2 }}</span>
                                 {% else %}
                                     Could not fetch price
                                 {% endif %}
@@ -250,6 +284,30 @@
                     showBtn.style.display = 'inline-block';
                 });
             }
+        });
+        // Privacy Mode Toggle
+        function setPrivacyMode(on) {
+            const sensitives = document.querySelectorAll('.sensitive-value');
+            sensitives.forEach(el => {
+                if (on) {
+                    el.classList.add('privacy-hidden');
+                    el.textContent = '****';
+                } else {
+                    el.classList.remove('privacy-hidden');
+                    location.reload();
+                }
+            });
+            document.getElementById('privacy-toggle-btn').textContent = 'Privacy Mode: ' + (on ? 'On' : 'Off');
+            localStorage.setItem('privacyMode', on ? 'on' : 'off');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const privacyBtn = document.getElementById('privacy-toggle-btn');
+            const privacyState = localStorage.getItem('privacyMode');
+            if (privacyState === 'on') setPrivacyMode(true);
+            privacyBtn.addEventListener('click', function() {
+                const isOn = localStorage.getItem('privacyMode') === 'on';
+                setPrivacyMode(!isOn);
+            });
         });
     </script>
 </body>
