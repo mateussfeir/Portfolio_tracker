@@ -262,6 +262,35 @@
                     toggleBtn.textContent = 'Show Pie Chart';
                 }
             });
+
+            // Add click event for Plotly bar and pie charts
+            function addPlotlyClickHandler(chartDiv) {
+                if (chartDiv && chartDiv.on) {
+                    chartDiv.on('plotly_click', function(data) {
+                        if (data && data.points && data.points.length > 0) {
+                            var label = data.points[0].data.name || data.points[0].label;
+                            var urlMap = {
+                                'Crypto': "{% url 'home' %}?currency={{ selected_currency }}",
+                                'Stocks': "{% url 'stocks' %}?currency={{ selected_currency }}",
+                                'Real Estate': "{% url 'real_estate' %}?currency={{ selected_currency }}",
+                                'Cash': "{% url 'cash' %}?currency={{ selected_currency }}",
+                                'Cash/Fixed Income': "{% url 'cash' %}?currency={{ selected_currency }}",
+                                'Others': "{% url 'other' %}?currency={{ selected_currency }}"
+                            };
+                            if (urlMap[label]) {
+                                window.location.href = urlMap[label];
+                            }
+                        }
+                    });
+                }
+            }
+            // Wait for Plotly charts to render
+            setTimeout(function() {
+                var barChartDiv = barDiv.querySelector('.js-plotly-plot');
+                var pieChartDiv = pieDiv.querySelector('.js-plotly-plot');
+                addPlotlyClickHandler(barChartDiv);
+                addPlotlyClickHandler(pieChartDiv);
+            }, 500);
         });
     </script>
 </body>

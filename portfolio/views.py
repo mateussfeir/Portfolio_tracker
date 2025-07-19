@@ -454,7 +454,6 @@ def stocks(request):
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
-        'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
