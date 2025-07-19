@@ -666,6 +666,8 @@ def real_estate(request):
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     true_total_net_worth = Decimal('0')
     true_total_net_worth_float = 0.0
+    labels = []
+    values = []
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
