@@ -85,6 +85,7 @@ def signup(request):
 def home(request):
     # Get selected currency from request, default to USD
     selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -187,6 +188,7 @@ def home(request):
         'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
+        'currency_symbol': currency_symbol,
     })
 
 @login_required
@@ -229,6 +231,7 @@ def edit_holding(request, pk):
 def stocks(request):
     # Get selected currency from request, default to USD
     selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -361,11 +364,13 @@ def stocks(request):
         'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
+        'currency_symbol': currency_symbol,
     })
 
 @login_required
 def real_estate(request):
     selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
         name = request.POST.get('name')
         amount = request.POST.get('amount')
@@ -428,11 +433,13 @@ def real_estate(request):
         'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
+        'currency_symbol': currency_symbol,
     })
 
 @login_required
 def cash(request):
     selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
         name = request.POST.get('name')
         amount = request.POST.get('amount')
@@ -495,11 +502,13 @@ def cash(request):
         'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
+        'currency_symbol': currency_symbol,
     })
 
 @login_required
 def other(request):
     selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
         name = request.POST.get('name')
         amount = request.POST.get('amount')
@@ -562,10 +571,12 @@ def other(request):
         'chart': chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
+        'currency_symbol': currency_symbol,
     })
 
 def general(request):
     selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     show_cash_form = request.GET.get('show_cash_form') == '1'
     show_other_form = request.GET.get('show_other_form') == '1'
     cash_currencies = ['USD', 'CAD', 'BRL', 'KRW', 'INR', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF']
@@ -759,6 +770,7 @@ def general(request):
         'show_cash_form': show_cash_form,
         'show_other_form': show_other_form,
         'cash_currencies': cash_currencies,
+        'currency_symbol': currency_symbol,
     })
 
 def root_redirect(request):
@@ -837,4 +849,17 @@ COINGECKO_TICKER_MAPPING = {
     'mina': 'mina-protocol',
     'croge': 'crogecoin',
     'brett' : 'based-brett',
+}
+
+CURRENCY_SYMBOLS = {
+    'USD': '$',
+    'BRL': 'R$',
+    'EUR': '€',
+    'GBP': '£',
+    'CAD': 'C$',
+    'KRW': '₩',
+    'INR': '₹',
+    'JPY': '¥',
+    'AUD': 'A$',
+    'CHF': 'Fr.',
 }
