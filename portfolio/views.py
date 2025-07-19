@@ -5,7 +5,7 @@ from django.contrib import messages
 from .forms import AddAssetForm, SignUpForm
 from .models import Asset
 import requests
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import plotly.graph_objects as go
 from django.shortcuts import render
 import yfinance as yf
@@ -340,7 +340,7 @@ def stocks(request):
     for asset in user_assets:
         price = prices.get(asset.ticker.upper())
         try:
-            price_decimal = Decimal(str(price)) if price is not None else Decimal('0')
+            price_decimal = safe_decimal(price)
         except Exception:
             price_decimal = Decimal('0')
         total_net_worth_usd += price_decimal * asset.amount
@@ -356,7 +356,7 @@ def stocks(request):
         ticker = asset.ticker.upper()
         price_usd = prices.get(ticker)
         try:
-            price_usd_decimal = Decimal(str(price_usd)) if price_usd is not None else Decimal('0')
+            price_usd_decimal = safe_decimal(price_usd)
             # Convert price to selected currency
             price = convert_currency(price_usd_decimal, 'USD', selected_currency)
         except Exception:
@@ -866,7 +866,7 @@ def general(request):
     for asset in stock_assets:
         price = stock_prices.get(asset.ticker.upper())
         try:
-            price_decimal = Decimal(str(price)) if price is not None else Decimal('0')
+            price_decimal = safe_decimal(price)
         except Exception:
             price_decimal = Decimal('0')
         total_stocks_usd += price_decimal * asset.amount
@@ -1097,3 +1097,9 @@ CURRENCY_SYMBOLS = {
     'AUD': 'A$',
     'CHF': 'Fr.',
 }
+
+def safe_decimal(val):
+    try:
+        return Decimal(str(val))
+    except (InvalidOperation, TypeError, ValueError):
+        return Decimal('0')
