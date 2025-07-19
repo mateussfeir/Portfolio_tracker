@@ -24,11 +24,12 @@
     </style>
 </head>
 {% load humanize %}
+{% load custom_filters %}
 <body>
     <header>
         <h1>Welcome, {{ username }}!</h1>
         <div style="margin-top: 10px; font-size: 1.5em; font-weight: bold; color: #4caf50;">
-            Real Estate Net Worth: <span id="net-worth-display">{{ currency_symbol }}{{ total_net_worth|floatformat:2 }}</span>
+            Real Estate Net Worth: <span id="net-worth-display">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span>
             <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">                {% for code, name in available_currencies.items %}
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
                 {% endfor %}
@@ -66,7 +67,7 @@
                             <td>{{ asset.ticker }}</td>
                             <td>{{ asset.amount|floatformat:2 }}</td>
                             <td>{{ asset.currency }}</td>
-                            <td>{{ currency_symbol }}{{ asset.value|floatformat:2 }}</td>
+                            <td>{{ currency_symbol }}{{ asset.value|intcomma2 }}</td>
                             <td style="white-space: nowrap;">
                                 <a href="{% url 'edit_holding' asset.id %}?next={% url 'real_estate' %}?currency={{ selected_currency }}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
                                 <form action="{% url 'delete_holding' asset.id %}" method="post" style="display:inline;">

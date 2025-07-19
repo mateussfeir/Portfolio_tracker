@@ -83,11 +83,12 @@
     </style>
 </head>
 {% load humanize %}
+{% load custom_filters %}
 <body>
     <header>
         <h1>Welcome, {{ username }}!</h1>
         <div style="margin-top: 10px; font-size: 1.5em; font-weight: bold; color: #4caf50;">
-            Total Net Worth: <span id="net-worth-display">${{ total_net_worth|floatformat:2 }}</span>
+            Total Net Worth: <span id="net-worth-display">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span>
             <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">                {% for code, name in available_currencies.items %}
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
                 {% endfor %}
@@ -119,27 +120,27 @@
                     <tbody>
                         <tr>
                             <td>Crypto</td>
-                            <td>${{ total_crypto|floatformat:2 }}</td>
+                            <td>{{ currency_symbol }}{{ total_crypto|intcomma2 }}</td>
                             <td>{{ crypto_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
                             <td>Stocks</td>
-                            <td>${{ total_stocks|floatformat:2 }}</td>
+                            <td>{{ currency_symbol }}{{ total_stocks|intcomma2 }}</td>
                             <td>{{ stocks_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
                             <td>Real Estate</td>
-                            <td>${{ total_real_estate|floatformat:2 }}</td>
+                            <td>{{ currency_symbol }}{{ total_real_estate|intcomma2 }}</td>
                             <td>{{ real_estate_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
                             <td>Cash/Fixed Income</td>
-                            <td>${{ total_cash|floatformat:2 }}</td>
+                            <td>{{ currency_symbol }}{{ total_cash|intcomma2 }}</td>
                             <td>{{ cash_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
                             <td>Others</td>
-                            <td>${{ total_other|floatformat:2 }}</td>
+                            <td>{{ currency_symbol }}{{ total_other|intcomma2 }}</td>
                             <td>{{ other_percent|floatformat:2 }}%</td>
                         </tr>
                     </tbody>
