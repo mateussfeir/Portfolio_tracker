@@ -179,6 +179,13 @@
             <!-- Crypto Positions -->
             <div class="card" style="flex: 1 1 45%; min-width: 350px;">
                 <h2>Your Crypto Positions</h2>
+                <div style="margin-bottom: 1em; text-align: right;">
+                    <form method="get" style="display: inline;">
+                        <input type="hidden" name="currency" value="{{ selected_currency }}">
+                        <button type="submit" name="percent" value="section" {% if percent_mode == 'section' %}style="background:#4caf50;color:#fff;"{% endif %}>% of Crypto</button>
+                        <button type="submit" name="percent" value="total" {% if percent_mode == 'total' %}style="background:#4caf50;color:#fff;"{% endif %}>% of Total Net Worth</button>
+                    </form>
+                </div>
                 {% if assets %}
                 <table>
                     <thead>
@@ -211,10 +218,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if asset.percentage %}
-                                    {{ asset.percentage|floatformat:2 }}%
+                                {% if percent_mode == 'total' %}
+                                    {{ total_percentages|index:forloop.counter0 }}%
                                 {% else %}
-                                    -
+                                    {{ section_percentages|index:forloop.counter0 }}%
                                 {% endif %}
                             </td>
                             <td style="white-space: nowrap;">

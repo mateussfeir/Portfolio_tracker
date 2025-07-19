@@ -116,6 +116,13 @@
             <!-- Real Estate Positions -->
             <div class="card" style="flex: 1 1 45%; min-width: 350px;">
                 <h2>Your Real Estate Positions</h2>
+                <div style="margin-bottom: 1em; text-align: right;">
+                    <form method="get" style="display: inline;">
+                        <input type="hidden" name="currency" value="{{ selected_currency }}">
+                        <button type="submit" name="percent" value="section" {% if percent_mode == 'section' %}style="background:#4caf50;color:#fff;"{% endif %}>% of Real Estate</button>
+                        <button type="submit" name="percent" value="total" {% if percent_mode == 'total' %}style="background:#4caf50;color:#fff;"{% endif %}>% of Total Net Worth</button>
+                    </form>
+                </div>
                 {% if assets %}
                 <table>
                     <thead>
@@ -124,6 +131,7 @@
                             <th>Amount</th>
                             <th>Currency (added)</th>
                             <th>Value</th>
+                            <th>Asset (%)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -134,6 +142,13 @@
                             <td><span class="sensitive-value">{{ asset.amount|floatformat:2 }}</span></td>
                             <td>{{ asset.currency }}</td>
                             <td><span class="sensitive-value">{{ currency_symbol }}{{ asset.value|intcomma2 }}</span></td>
+                            <td>
+                                {% if percent_mode == 'total' %}
+                                    {{ total_percentages|index:forloop.counter0 }}%
+                                {% else %}
+                                    {{ section_percentages|index:forloop.counter0 }}%
+                                {% endif %}
+                            </td>
                             <td style="white-space: nowrap;">
                                 <a href="{% url 'edit_holding' asset.id %}?next={% url 'real_estate' %}?currency={{ selected_currency }}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
                                 <form action="{% url 'delete_holding' asset.id %}" method="post" style="display:inline;">
