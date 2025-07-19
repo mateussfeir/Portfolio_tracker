@@ -466,18 +466,15 @@ def real_estate(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
-        name = request.POST.get('name')
-        amount = request.POST.get('amount')
-        currency = request.POST.get('currency')
-        if name and amount and currency:
-            Asset.objects.create(
-                owner=request.user,
-                type='real_estate',
-                ticker=name,
-                amount=Decimal(amount),
-                currency=currency
-            )
-            return redirect(f"{request.path}?currency={selected_currency}")
+        form = AddAssetForm(request.POST)
+        if form.is_valid():
+            asset = form.save(commit=False)
+            asset.owner = request.user
+            asset.type = 'real_estate'
+            asset.save()
+            return redirect('real_estate')
+    else:
+        form = AddAssetForm()
     # Get all real estate assets
     assets = Asset.objects.filter(owner=request.user, type='real_estate')
     # Calculate values in selected currency
@@ -495,22 +492,9 @@ def real_estate(request):
         })
     # Sort assets by value descending
     assets_with_value.sort(key=lambda x: x['value'], reverse=True)
-    # Pie chart
+    # Pie and bar chart code ...
     labels = [a['ticker'] for a in assets_with_value]
     values = [float(a['value']) for a in assets_with_value]
-    if labels and values:
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-        fig.update_layout(
-            title="Real Estate Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0")
-        )
-        chart_html = fig.to_html(full_html=False)
-    else:
-        chart_html = None
-    # Prepare pie and bar charts for real estate
     if labels and values:
         total = sum(values)
         percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
@@ -555,6 +539,8 @@ def real_estate(request):
     else:
         pie_chart_html = None
         bar_chart_html = None
+
+    # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -571,12 +557,12 @@ def real_estate(request):
         'username': request.user.username,
         'assets': assets_with_value,
         'total_net_worth': total_net_worth,
-        'chart': chart_html,
+        'form': form,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
-        'pie_chart': pie_chart_html,
-        'bar_chart': bar_chart_html,
     })
 
 @login_required
@@ -584,18 +570,15 @@ def cash(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
-        name = request.POST.get('name')
-        amount = request.POST.get('amount')
-        currency = request.POST.get('currency')
-        if name and amount and currency:
-            Asset.objects.create(
-                owner=request.user,
-                type='cash',
-                ticker=name,
-                amount=Decimal(amount),
-                currency=currency
-            )
-            return redirect(f"{request.path}?currency={selected_currency}")
+        form = AddAssetForm(request.POST)
+        if form.is_valid():
+            asset = form.save(commit=False)
+            asset.owner = request.user
+            asset.type = 'cash'
+            asset.save()
+            return redirect('cash')
+    else:
+        form = AddAssetForm()
     # Get all cash assets
     assets = Asset.objects.filter(owner=request.user, type='cash')
     # Calculate values in selected currency
@@ -613,22 +596,9 @@ def cash(request):
         })
     # Sort assets by value descending
     assets_with_value.sort(key=lambda x: x['value'], reverse=True)
-    # Pie chart
+    # Pie and bar chart code ...
     labels = [a['ticker'] for a in assets_with_value]
     values = [float(a['value']) for a in assets_with_value]
-    if labels and values:
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-        fig.update_layout(
-            title="Cash Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0")
-        )
-        chart_html = fig.to_html(full_html=False)
-    else:
-        chart_html = None
-    # Prepare pie and bar charts for cash
     if labels and values:
         total = sum(values)
         percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
@@ -673,6 +643,8 @@ def cash(request):
     else:
         pie_chart_html = None
         bar_chart_html = None
+
+    # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -689,12 +661,12 @@ def cash(request):
         'username': request.user.username,
         'assets': assets_with_value,
         'total_net_worth': total_net_worth,
-        'chart': chart_html,
+        'form': form,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
-        'pie_chart': pie_chart_html,
-        'bar_chart': bar_chart_html,
     })
 
 @login_required
@@ -702,18 +674,15 @@ def other(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
-        name = request.POST.get('name')
-        amount = request.POST.get('amount')
-        currency = request.POST.get('currency')
-        if name and amount and currency:
-            Asset.objects.create(
-                owner=request.user,
-                type='other',
-                ticker=name,
-                amount=Decimal(amount),
-                currency=currency
-            )
-            return redirect(f"{request.path}?currency={selected_currency}")
+        form = AddAssetForm(request.POST)
+        if form.is_valid():
+            asset = form.save(commit=False)
+            asset.owner = request.user
+            asset.type = 'other'
+            asset.save()
+            return redirect('other')
+    else:
+        form = AddAssetForm()
     # Get all other assets
     assets = Asset.objects.filter(owner=request.user, type='other')
     # Calculate values in selected currency
@@ -731,29 +700,16 @@ def other(request):
         })
     # Sort assets by value descending
     assets_with_value.sort(key=lambda x: x['value'], reverse=True)
-    # Pie chart
+    # Pie and bar chart code ...
     labels = [a['ticker'] for a in assets_with_value]
     values = [float(a['value']) for a in assets_with_value]
-    if labels and values:
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent')])
-        fig.update_layout(
-            title="Others Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0")
-        )
-        chart_html = fig.to_html(full_html=False)
-    else:
-        chart_html = None
-    # Prepare pie and bar charts for other
     if labels and values:
         total = sum(values)
         percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
         # Pie chart
         fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
-            title="Others Portfolio Distribution",
+            title="Other Portfolio Distribution",
             margin=dict(t=50, b=50, l=25, r=25),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
@@ -777,7 +733,7 @@ def other(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="Others Portfolio Distribution (Stacked Bar)",
+            title="Other Portfolio Distribution (Stacked Bar)",
             margin=dict(t=50, b=50, l=25, r=25),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
@@ -791,6 +747,8 @@ def other(request):
     else:
         pie_chart_html = None
         bar_chart_html = None
+
+    # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -807,12 +765,12 @@ def other(request):
         'username': request.user.username,
         'assets': assets_with_value,
         'total_net_worth': total_net_worth,
-        'chart': chart_html,
+        'form': form,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
-        'pie_chart': pie_chart_html,
-        'bar_chart': bar_chart_html,
     })
 
 def general(request):
