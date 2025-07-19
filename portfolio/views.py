@@ -178,6 +178,14 @@ def home(request):
         'CHF': 'Swiss Franc'
     }
 
+    # Sort assets by value descending (robust to '-' or non-numeric)
+    def get_value_for_sort(x):
+        try:
+            return float(x['value'])
+        except Exception:
+            return 0
+    assets_with_value.sort(key=get_value_for_sort, reverse=True)
+
     # Render the page
     return render(request, 'home.html', {
         'username': request.user.username,
@@ -368,6 +376,14 @@ def stocks(request):
         'CHF': 'Swiss Franc'
     }
 
+    # Sort assets by value descending (robust to '-' or non-numeric)
+    def get_value_for_sort(x):
+        try:
+            return float(x['value'])
+        except Exception:
+            return 0
+    assets_with_value.sort(key=get_value_for_sort, reverse=True)
+
     return render(request, 'stocks.html', {
         'username': request.user.username,
         'assets': assets_with_value,
@@ -411,6 +427,8 @@ def real_estate(request):
             'currency': asset.currency,
             'value': value,
         })
+    # Sort assets by value descending
+    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
     # Pie chart
     labels = [a['ticker'] for a in assets_with_value]
     values = [float(a['value']) for a in assets_with_value]
@@ -480,6 +498,8 @@ def cash(request):
             'currency': asset.currency,
             'value': value,
         })
+    # Sort assets by value descending
+    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
     # Pie chart
     labels = [a['ticker'] for a in assets_with_value]
     values = [float(a['value']) for a in assets_with_value]
@@ -549,6 +569,8 @@ def other(request):
             'currency': asset.currency,
             'value': value,
         })
+    # Sort assets by value descending
+    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
     # Pie chart
     labels = [a['ticker'] for a in assets_with_value]
     values = [float(a['value']) for a in assets_with_value]
@@ -763,18 +785,19 @@ def general(request):
         cash_percent = 0
         other_percent = 0
 
+    # Build and sort totals list for the table
+    totals = [
+        {'type': 'Crypto', 'url': 'home', 'value': total_crypto, 'percent': crypto_percent},
+        {'type': 'Stocks', 'url': 'stocks', 'value': total_stocks, 'percent': stocks_percent},
+        {'type': 'Real Estate', 'url': 'real_estate', 'value': total_real_estate, 'percent': real_estate_percent},
+        {'type': 'Cash/Fixed Income', 'url': 'cash', 'value': total_cash, 'percent': cash_percent},
+        {'type': 'Others', 'url': 'other', 'value': total_other, 'percent': other_percent},
+    ]
+    totals.sort(key=lambda x: float(x['value']), reverse=True)
+
     return render(request, 'general.html', {
         'username': request.user.username,
-        'total_crypto': total_crypto,
-        'total_stocks': total_stocks,
-        'total_real_estate': total_real_estate,
-        'total_cash': total_cash,
-        'total_other': total_other,
-        'crypto_percent': crypto_percent,
-        'stocks_percent': stocks_percent,
-        'real_estate_percent': real_estate_percent,
-        'cash_percent': cash_percent,
-        'other_percent': other_percent,
+        'totals': totals,
         'total_net_worth': total_net_worth,
         'chart': chart_html,
         'selected_currency': selected_currency,

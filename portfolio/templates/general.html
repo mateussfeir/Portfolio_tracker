@@ -171,31 +171,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for t in totals %}
                         <tr>
-                            <td><a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a></td>
-                            <td><span class="sensitive-value">{{ currency_symbol }}{{ total_crypto|intcomma2 }}</span></td>
-                            <td>{{ crypto_percent|floatformat:2 }}%</td>
+                            <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
+                            <td><span class="sensitive-value">{{ currency_symbol }}{{ t.value|intcomma2 }}</span></td>
+                            <td>{{ t.percent|floatformat:2 }}%</td>
                         </tr>
-                        <tr>
-                            <td><a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a></td>
-                            <td><span class="sensitive-value">{{ currency_symbol }}{{ total_stocks|intcomma2 }}</span></td>
-                            <td>{{ stocks_percent|floatformat:2 }}%</td>
-                        </tr>
-                        <tr>
-                            <td><a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a></td>
-                            <td><span class="sensitive-value">{{ currency_symbol }}{{ total_real_estate|intcomma2 }}</span></td>
-                            <td>{{ real_estate_percent|floatformat:2 }}%</td>
-                        </tr>
-                        <tr>
-                            <td><a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a></td>
-                            <td><span class="sensitive-value">{{ currency_symbol }}{{ total_cash|intcomma2 }}</span></td>
-                            <td>{{ cash_percent|floatformat:2 }}%</td>
-                        </tr>
-                        <tr>
-                            <td><a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a></td>
-                            <td><span class="sensitive-value">{{ currency_symbol }}{{ total_other|intcomma2 }}</span></td>
-                            <td>{{ other_percent|floatformat:2 }}%</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
