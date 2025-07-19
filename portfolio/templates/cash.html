@@ -32,13 +32,26 @@
             font-weight: bold;
             padding: 6px 12px;
             border-radius: 6px;
-            transition: background 0.18s, color 0.18s, transform 0.18s;
+            transition: color 0.18s, transform 0.18s;
             display: inline-block;
         }
         nav a:hover, nav a:focus {
-            background: #232526;
-            color: #38f9d7;
+            color: #4caf50;
+            background: rgba(76, 175, 80, 0.12);
             transform: scale(1.13);
+        }
+        button#show-add-form-btn {
+            background: #4caf50;
+            color: #fff;
+            font-weight: bold;
+            border: 2px solid #4caf50;
+            transition: transform 0.18s;
+        }
+        button#show-add-form-btn:hover, button#show-add-form-btn:focus {
+            background: #4caf50;
+            color: #fff;
+            border: 2px solid #4caf50;
+            transform: scale(1.08);
         }
     </style>
 </head>
@@ -101,21 +114,16 @@
                 {% else %}
                 <p>You have no cash positions yet.</p>
                 {% endif %}
-                <h2>Add a New Cash/Fixed Income Position</h2>
-                <form method="post">
-                    {% csrf_token %}
-                    <label for="name">Name:</label>
-                    <input type="text" name="name" required style="margin: 0 10px;">
-                    <label for="amount">Amount:</label>
-                    <input type="number" step="0.01" min="0" name="amount" required style="margin: 0 10px;">
-                    <label for="currency">Currency:</label>
-                    <select name="currency" required>
-                        {% for code, name in available_currencies.items %}
-                            <option value="{{ code }}">{{ code }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" style="background: #4caf50; color: white; border: none; border-radius: 4px; padding: 4px 12px; margin-left: 10px;">Add Position</button>
-                </form>
+                <!-- Add New Asset Button and Form -->
+                <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
+                    <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
+                    <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit">Add Position</button>
+                        <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
+                    </form>
+                </div>
             </div>
 
             <!-- Pie Chart -->
@@ -148,6 +156,22 @@
             url.searchParams.set('currency', currency);
             window.location.href = url.toString();
         }
+        // Add New Asset Form Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const showBtn = document.getElementById('show-add-form-btn');
+            const form = document.getElementById('add-asset-form');
+            const cancelBtn = document.getElementById('cancel-add-form-btn');
+            if (showBtn && form && cancelBtn) {
+                showBtn.addEventListener('click', function() {
+                    form.style.display = 'block';
+                    showBtn.style.display = 'none';
+                });
+                cancelBtn.addEventListener('click', function() {
+                    form.style.display = 'none';
+                    showBtn.style.display = 'inline-block';
+                });
+            }
+        });
     </script>
 </body>
 </html> 

@@ -95,8 +95,8 @@
             display: inline-block;
         }
         nav a:hover, nav a:focus {
-            background: #232526;
-            color: #38f9d7;
+            color: #4caf50;
+            background: rgba(76, 175, 80, 0.12);
             transform: scale(1.13);
         }
     </style>
@@ -138,27 +138,27 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Crypto</td>
+                            <td><a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a></td>
                             <td>{{ currency_symbol }}{{ total_crypto|intcomma2 }}</td>
                             <td>{{ crypto_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
-                            <td>Stocks</td>
+                            <td><a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a></td>
                             <td>{{ currency_symbol }}{{ total_stocks|intcomma2 }}</td>
                             <td>{{ stocks_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
-                            <td>Real Estate</td>
+                            <td><a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a></td>
                             <td>{{ currency_symbol }}{{ total_real_estate|intcomma2 }}</td>
                             <td>{{ real_estate_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
-                            <td>Cash/Fixed Income</td>
+                            <td><a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a></td>
                             <td>{{ currency_symbol }}{{ total_cash|intcomma2 }}</td>
                             <td>{{ cash_percent|floatformat:2 }}%</td>
                         </tr>
                         <tr>
-                            <td>Others</td>
+                            <td><a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a></td>
                             <td>{{ currency_symbol }}{{ total_other|intcomma2 }}</td>
                             <td>{{ other_percent|floatformat:2 }}%</td>
                         </tr>

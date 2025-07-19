@@ -205,6 +205,18 @@ def delete_holding(request, pk):
 @login_required
 def edit_holding(request, pk):
     asset = get_object_or_404(Asset, pk=pk, owner=request.user)
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
     if request.method == 'POST':
         form = AddAssetForm(request.POST, instance=asset)
         if form.is_valid():
@@ -224,7 +236,7 @@ def edit_holding(request, pk):
                 return redirect('general')
     else:
         form = AddAssetForm(instance=asset)
-    return render(request, 'edit_holding.html', {'form': form, 'asset': asset})
+    return render(request, 'edit_holding.html', {'form': form, 'asset': asset, 'available_currencies': available_currencies})
 
 
 @login_required
