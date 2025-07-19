@@ -82,6 +82,25 @@
             text-align: center;
             color: #aaa;
         }
+        nav {
+            margin-top: 20px;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 20px;
+            color: #4caf50; /* Green links */
+            text-decoration: none;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background 0.18s, color 0.18s, transform 0.18s;
+            display: inline-block;
+        }
+        nav a:hover, nav a:focus {
+            background: #232526;
+            color: #38f9d7;
+            transform: scale(1.13);
+        }
     </style>
 </head>
 <body>
@@ -94,13 +113,13 @@
                 {% endfor %}
             </select>
         </div>
-        <nav style="margin-top: 20px; text-align: center;">
-            <a href="{% url 'general' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">General</a>
-            <a href="{% url 'home' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Crypto</a>
-            <a href="{% url 'stocks' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Stocks</a>
-            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Real Estate</a>
-            <a href="{% url 'cash' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Cash/Fixed Income</a>
-            <a href="{% url 'other' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Others</a>
+        <nav>
+            <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
+            <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
+            <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
+            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
+            <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
+            <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
         </nav>
     </header>
 

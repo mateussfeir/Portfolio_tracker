@@ -49,13 +49,10 @@
         td {
             background-color: #1e1e1e; /* Match the card background */
         }
-
-        /* Target the Action column specifically */
         th:last-child, td:last-child {
             width: 50px; /* Set a small width for the Action column */
             padding: 4px; /* Reduce padding for a "skinny" look */
         }
-
         button {
             cursor: pointer; /* Changes the cursor to a hand on hover */
             background-color: whitesmoke; /* Button background */
@@ -65,11 +62,9 @@
             padding: 4px 8px; /* Adjust padding for usability */
             transition: background-color 0.2s ease; /* Smooth transition effect */
         }
-
         button:hover {
             background-color: #ff1a1a; /* Darker red on hover */
         }
-
         a {
             color: #4caf50; /* Green links */
             text-decoration: none;
@@ -85,6 +80,29 @@
             text-align: center;
             color: #aaa; /* Light gray for footer */
         }
+        nav {
+            margin-top: 20px;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 20px;
+            color: #4caf50; /* Green links */
+            text-decoration: none;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: background 0.18s, color 0.18s, transform 0.18s;
+            display: inline-block;
+        }
+        nav a:hover, nav a:focus {
+            background: #232526;
+            color: #38f9d7;
+            transform: scale(1.13);
+        }
+        @media (max-width: 900px) {
+            .container { flex-direction: column; }
+            .card { min-width: 220px; }
+        }
     </style>
 </head>
 {% load humanize %}
@@ -99,7 +117,7 @@
                 {% endfor %}
             </select>
         </div>
-        <nav style="margin-top: 20px; text-align: center;">
+        <nav>
             <a href="{% url 'general' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">General</a>
             <a href="{% url 'home' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Crypto</a>
             <a href="{% url 'stocks' %}?currency={{ selected_currency }}" style="margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold;">Stocks</a>
