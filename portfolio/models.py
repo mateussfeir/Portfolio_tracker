@@ -17,3 +17,15 @@ class Asset(models.Model):
 
     def __str__(self):
         return f"{self.ticker} ({self.amount})"
+
+class NetWorthSnapshot(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    net_worth = models.DecimalField(max_digits=20, decimal_places=2)
+
+    class Meta:
+        unique_together = ('user', 'date')
+        ordering = ['date']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date}: {self.net_worth}"

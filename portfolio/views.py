@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from .forms import AddAssetForm, SignUpForm
-from .models import Asset
+from .models import Asset, NetWorthSnapshot
 import requests
 from decimal import Decimal, InvalidOperation
 import plotly.graph_objects as go
@@ -11,7 +11,7 @@ from django.shortcuts import render
 import yfinance as yf
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-# test
+from datetime import date
 
 # Currency conversion function
 def get_exchange_rates(base_currency='USD'):
@@ -168,17 +168,18 @@ def home(request):
         # Stacked bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, percentages)):
+        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
+        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
             bar_segments.append(go.Bar(
                 x=[percent],
                 y=[""],
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent:.2f}%"],
+                text=[f"{label}\n{percent}%"],
                 textposition='inside',
                 insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
@@ -400,17 +401,18 @@ def stocks(request):
         # Stacked bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, percentages)):
+        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
+        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
             bar_segments.append(go.Bar(
                 x=[percent],
                 y=[""],
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent:.2f}%"],
+                text=[f"{label}\n{percent}%"],
                 textposition='inside',
                 insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
@@ -514,17 +516,18 @@ def real_estate(request):
         # Stacked bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, percentages)):
+        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
+        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
             bar_segments.append(go.Bar(
                 x=[percent],
                 y=[""],
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent:.2f}%"],
+                text=[f"{label}\n{percent}%"],
                 textposition='inside',
                 insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
@@ -619,17 +622,18 @@ def cash(request):
         # Stacked bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, percentages)):
+        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
+        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
             bar_segments.append(go.Bar(
                 x=[percent],
                 y=[""],
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent:.2f}%"],
+                text=[f"{label}\n{percent}%"],
                 textposition='inside',
                 insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
@@ -724,17 +728,18 @@ def other(request):
         # Stacked bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, percentages)):
+        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
+        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
             bar_segments.append(go.Bar(
                 x=[percent],
                 y=[""],
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent:.2f}%"],
+                text=[f"{label}\n{percent}%"],
                 textposition='inside',
                 insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
@@ -929,17 +934,18 @@ def general(request):
         # Stacked bar chart (single bar, 5 segments)
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, percentages)):
+        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
+        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
             bar_segments.append(go.Bar(
                 x=[percent],
                 y=[""],
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent:.2f}%"],
+                text=[f"{label}\n{percent}%"],
                 textposition='inside',
                 insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
@@ -1009,6 +1015,108 @@ def general(request):
         'show_other_form': show_other_form,
         'cash_currencies': cash_currencies,
         'currency_symbol': currency_symbol,
+        'user': request.user,
+    })
+
+@login_required
+def performance(request):
+    user = request.user
+    today = date.today()
+    selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
+
+    # --- Calculate current net worth (reuse logic from general) ---
+    # Get all user assets by type
+    crypto_assets = Asset.objects.filter(owner=user, type='crypto')
+    stock_assets = Asset.objects.filter(owner=user, type='stock')
+    cash_assets = Asset.objects.filter(owner=user, type='cash')
+    real_estate_assets = Asset.objects.filter(owner=user, type='real_estate')
+    other_assets = Asset.objects.filter(owner=user, type='other')
+
+    # Get prices for crypto
+    crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
+    crypto_prices = get_multiple_asset_prices(crypto_tickers)
+    total_crypto_usd = sum(
+        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        for asset in crypto_assets
+    )
+    total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
+
+    # Get prices for stocks
+    stock_tickers = [asset.ticker.upper() for asset in stock_assets]
+    stock_prices = {}
+    if stock_tickers:
+        if len(stock_tickers) == 1:
+            ticker = stock_tickers[0]
+            try:
+                data = yf.Ticker(ticker).history(period='1d')
+                if not data.empty:
+                    stock_prices[ticker] = float(data['Close'].iloc[-1])
+                else:
+                    stock_prices[ticker] = None
+            except Exception:
+                stock_prices[ticker] = None
+        else:
+            try:
+                data = yf.download(
+                    tickers=stock_tickers,
+                    period='1d',
+                    interval='1d',
+                    group_by='ticker',
+                    threads=True,
+                    progress=False
+                )
+                for ticker in stock_tickers:
+                    try:
+                        stock_prices[ticker] = float(data[ticker]['Close'].iloc[-1])
+                    except Exception:
+                        stock_prices[ticker] = None
+            except Exception:
+                stock_prices = {ticker: None for ticker in stock_tickers}
+    total_stocks_usd = 0
+    for asset in stock_assets:
+        price = stock_prices.get(asset.ticker.upper())
+        price_decimal = safe_decimal(price)
+        total_stocks_usd += price_decimal * asset.amount
+    total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
+
+    # Cash, real estate, other
+    total_cash = sum(convert_currency(cash.amount, cash.currency or 'USD', selected_currency) for cash in cash_assets)
+    total_real_estate = sum(convert_currency(re.amount, re.currency or 'USD', selected_currency) for re in real_estate_assets)
+    total_other = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets)
+
+    total_net_worth = total_crypto + total_stocks + total_real_estate + total_cash + total_other
+
+    # --- Save snapshot if not already saved today ---
+    NetWorthSnapshot.objects.get_or_create(
+        user=user, date=today,
+        defaults={'net_worth': total_net_worth}
+    )
+
+    # --- Get all snapshots for this user ---
+    snapshots = NetWorthSnapshot.objects.filter(user=user).order_by('date')
+    dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
+    values = [float(snap.net_worth) for snap in snapshots]
+
+    # --- Plotly line chart ---
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
+    fig.update_layout(
+        title="Net Worth Over Time",
+        xaxis_title="Date",
+        yaxis_title=f"Net Worth ({currency_symbol})",
+        paper_bgcolor="#121212",
+        plot_bgcolor="#121212",
+        font=dict(color="#e0e0e0")
+    )
+    chart_html = fig.to_html(full_html=False)
+
+    return render(request, 'performance.html', {
+        'chart': chart_html,
+        'snapshots': snapshots,
+        'selected_currency': selected_currency,
+        'currency_symbol': currency_symbol,
+        'user': request.user,
     })
 
 def root_redirect(request):
@@ -1018,13 +1126,13 @@ def root_redirect(request):
         return redirect('login')  # Redirect to 'login' if the user is not logged in
 
 def resume(request):
-    return render(request, 'resume.html')
+    return render(request, 'resume.html', {'user': request.user})
 
 def bio(request):
-    return render(request, 'bio.html')
+    return render(request, 'bio.html', {'user': request.user})
 
 def projects(request):
-    return render(request, 'projects.html')
+    return render(request, 'projects.html', {'user': request.user})
 
 # Mapping user-friendly tickers to CoinGecko identifiers
 COINGECKO_TICKER_MAPPING = {
