@@ -1526,6 +1526,24 @@ def general(request):
     ]
     totals.sort(key=lambda x: float(x['value']), reverse=True)
 
+    # Net Worth Over Time Chart
+    snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
+    dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
+    values = [float(snap.net_worth) for snap in snapshots]
+    networth_line_chart = None
+    if dates and values:
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
+        fig.update_layout(
+            title="Net Worth Over Time",
+            xaxis_title="Date",
+            yaxis_title=f"Net Worth ({currency_symbol})",
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        networth_line_chart = fig.to_html(full_html=False)
+
     return render(request, 'general.html', {
         'username': request.user.username,
         'totals': totals,
@@ -1539,6 +1557,7 @@ def general(request):
         'cash_currencies': cash_currencies,
         'currency_symbol': currency_symbol,
         'user': request.user,
+        'networth_line_chart': networth_line_chart,
     })
 
 @login_required

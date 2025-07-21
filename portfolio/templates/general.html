@@ -204,6 +204,15 @@
         </div>
         <!-- Removed Cash & Other Positions table and header -->
     </div>
+    <!-- Net Worth Over Time Chart -->
+    <div class="card" style="max-width: 900px; margin: 30px auto 0 auto;">
+        <h2 style="text-align:center; margin-bottom: 18px;">Net Worth Over Time</h2>
+        {% if networth_line_chart %}
+            {{ networth_line_chart|safe }}
+        {% else %}
+            <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
+        {% endif %}
+    </div>
 
     <footer>
         <p>
