@@ -260,9 +260,14 @@ def home(request):
         chart_percentages = section_percentages
     # Prepare pie and bar charts for crypto
     if labels and values:
-        total = sum(values)
+        # Pie chart values: use correct basis depending on percent_mode
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            pie_values = [safe_float(asset['value']) / true_total_net_worth_float * 100 for asset in assets_with_value]
+        else:
+            section_sum = sum([safe_float(asset['value']) for asset in assets_with_value])
+            pie_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
         # Pie chart
-        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Crypto Portfolio Distribution",
             margin=dict(t=50, b=50, l=25, r=25),
