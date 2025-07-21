@@ -1023,7 +1023,8 @@ def cash(request):
     # True total net worth
     true_total_net_worth = total_crypto_all + total_stocks_all + total_real_estate_all + total_cash_all + total_other_all
     true_total_net_worth_float = float(true_total_net_worth)
-    # Build assets_with_value, labels, and values before chart and percentage calculations
+    # Build assets_with_value and calculate percentages in one pass
+    section_sum = 0
     labels = []
     values = []
     for asset in assets:
@@ -1036,75 +1037,88 @@ def cash(request):
             'currency': asset.currency,
             'value': value,
         }
-        # Set percentage for table based on percent_mode (robust, like stocks/real estate)
-        if value is not None and ((percent_mode == 'total' and true_total_net_worth_float > 0) or (percent_mode == 'section' and total_net_worth > 0)):
-            if percent_mode == 'total' and true_total_net_worth_float > 0:
-                asset_dict['percentage'] = round(safe_float(value) / true_total_net_worth_float * 100, 2)
-            elif percent_mode == 'section' and total_net_worth > 0:
-                asset_dict['percentage'] = round(safe_float(value) / float(total_net_worth) * 100, 2)
-        else:
-            asset_dict['percentage'] = 0
+        if value:
+            section_sum += float(value)
         assets_with_value.append(asset_dict)
-        labels.append(asset.ticker)
-        values.append(float(value))
+
+    # Now calculate percentages for both table and chart
+    for i, asset in enumerate(assets_with_value):
+        value = asset['value'] if isinstance(asset['value'], (int, float, Decimal)) else None
+        if value:
+            if percent_mode == 'total' and true_total_net_worth_float > 0:
+                pct = float(value) / true_total_net_worth_float * 100
+            elif percent_mode == 'section' and section_sum > 0:
+                pct = float(value) / section_sum * 100
+            else:
+                pct = 0
+            asset['percentage'] = round(pct, 2)
+            labels.append(asset['ticker'])
+            values.append(pct)
+        else:
+            asset['percentage'] = 0
+
     # Sort assets by value descending
     assets_with_value.sort(key=lambda x: x['value'], reverse=True)
-    # Calculate section_percentages and total_percentages for the table (as integers for display)
-    section_sum = sum([safe_float(a['value']) for a in assets_with_value])
-    section_percentages = [int(round(safe_float(a['value']) / section_sum * 100)) if section_sum > 0 else 0 for a in assets_with_value]
-    total_percentages = [int(round(safe_float(a['value']) / true_total_net_worth_float * 100)) if true_total_net_worth_float > 0 else 0 for a in assets_with_value]
-    # For the chart, use the same logic for bar_chart_values as for total_percentages in 'total' mode
-    if percent_mode == 'total':
-        bar_chart_values = total_percentages
+
+    # --- CASH PIE CHART LOGIC ---
+    if labels and values:
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            sum_section_pct = sum(values)
+            if sum_section_pct < 100:
+                labels_with_other = labels + ['Other']
+                values_with_other = values + [100 - sum_section_pct]
+            else:
+                labels_with_other = labels
+                values_with_other = values
+            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=values_with_other, textinfo='percent+label', showlegend=True)])
+        else:
+            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
+            title="Cash Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        pie_chart_html = fig_pie.to_html(full_html=False)
     else:
-        bar_chart_values = section_percentages
-    # Pie chart
-    fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
-    fig_pie.update_layout(
-        title="Cash Portfolio Distribution",
-        margin=dict(t=50, b=50, l=25, r=25),
-        paper_bgcolor="#121212",
-        plot_bgcolor="#121212",
-        font=dict(color="#e0e0e0")
-    )
-    pie_chart_html = fig_pie.to_html(full_html=False)
-    # Stacked bar chart
-    bar_segments = []
-    colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-    # Calculate section and total percentages for bar chart
-    section_sum = sum([safe_float(a['value']) for a in assets_with_value])
-    section_percent_of_total = section_sum / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0
-    xaxis_max = 100 if percent_mode == 'section' else section_percent_of_total
-    if percent_mode == 'total':
-        bar_chart_values = [safe_float(a['value']) / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0 for a in assets_with_value]
+        pie_chart_html = None
+
+    # --- CASH BAR CHART LOGIC ---
+    if labels and values:
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(labels, values)):
+            bar_segments.append(go.Bar(
+                x=[int(round(percent))],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{int(round(percent))}%"],
+                textposition='inside',
+                insidetextanchor='middle',
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
+            ))
+        # Calculate section's percent of total net worth for bar chart x-axis
+        section_percent_of_total = sum(values) if percent_mode == 'total' else 100
+        xaxis_max = 100 if percent_mode == 'section' else section_percent_of_total
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Cash Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
     else:
-        bar_chart_values = [safe_float(a['value']) / section_sum * 100 if section_sum > 0 else 0 for a in assets_with_value]
-    for i, (label, percent) in enumerate(zip(labels, bar_chart_values)):
-        bar_segments.append(go.Bar(
-            x=[int(round(percent))],
-            y=[""],
-            name=label,
-            orientation='h',
-            marker=dict(color=colors[i % len(colors)]),
-            text=[f"{label}\n{int(round(percent))}%"],
-            textposition='inside',
-            insidetextanchor='middle',
-            hovertemplate=f"{label}: {{x}}%<extra></extra>",
-        ))
-    fig_bar = go.Figure(data=bar_segments)
-    fig_bar.update_layout(
-        barmode='stack',
-        title="Cash Portfolio Distribution (Stacked Bar)",
-        margin=dict(t=50, b=50, l=25, r=25),
-        paper_bgcolor="#121212",
-        plot_bgcolor="#121212",
-        font=dict(color="#e0e0e0"),
-        xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-        yaxis=dict(showticklabels=False),
-        showlegend=True,
-        height=180,
-    )
-    bar_chart_html = fig_bar.to_html(full_html=False)
+        bar_chart_html = None
 
     # Get available currencies for dropdown
     available_currencies = {
@@ -1129,8 +1143,6 @@ def cash(request):
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
-        'section_percentages': section_percentages,
-        'total_percentages': total_percentages,
         'percent_mode': percent_mode,
     })
 
