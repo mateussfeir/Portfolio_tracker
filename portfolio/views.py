@@ -611,6 +611,8 @@ def real_estate(request):
     true_total_net_worth_float = 0.0
     labels = []
     values = []
+    pie_chart_html = None
+    bar_chart_html = None
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -1087,6 +1089,10 @@ def other(request):
     true_total_net_worth_float = 0.0
     labels = []
     values = []
+    pie_chart_html = None
+    bar_chart_html = None
+    section_percentages = []
+    total_percentages = []
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
