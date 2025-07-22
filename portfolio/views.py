@@ -560,7 +560,17 @@ def stocks(request):
         if value:
             section_sum += float(value)
         assets_with_value.append(asset_dict)
-    # Now calculate percentages for both table and chart
+
+    # Sort assets by value descending BEFORE calculating percentages
+    def get_value_for_sort(x):
+        try:
+            return float(x['value'])
+        except Exception:
+            return 0
+    assets_with_value.sort(key=get_value_for_sort, reverse=True)
+
+    # Now calculate percentages for both table and chart (after sorting)
+    section_sum = sum([safe_float(a['value']) for a in assets_with_value])
     for i, asset in enumerate(assets_with_value):
         value = asset['value'] if isinstance(asset['value'], (int, float, Decimal)) else None
         if value:
@@ -570,11 +580,12 @@ def stocks(request):
                 pct = float(value) / section_sum * 100
             else:
                 pct = 0
-            asset['percentage'] = round(pct)
+            asset['percentage'] = round(pct, 2)
             labels.append(asset['ticker'])
             values.append(pct)
         else:
             asset['percentage'] = 0
+
     # --- STOCKS PIE CHART LOGIC ---
     if labels and values:
         if percent_mode == 'total' and true_total_net_worth_float > 0:
@@ -649,14 +660,6 @@ def stocks(request):
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc'
     }
-
-    # Sort assets by value descending (robust to '-' or non-numeric)
-    def get_value_for_sort(x):
-        try:
-            return float(x['value'])
-        except Exception:
-            return 0
-    assets_with_value.sort(key=get_value_for_sort, reverse=True)
 
     return render(request, 'stocks.html', {
         'username': request.user.username,
@@ -1041,7 +1044,11 @@ def cash(request):
             section_sum += float(value)
         assets_with_value.append(asset_dict)
 
-    # Now calculate percentages for both table and chart
+    # Sort assets by value descending BEFORE calculating percentages
+    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
+
+    # Now calculate percentages for both table and chart (after sorting)
+    section_sum = sum([safe_float(a['value']) for a in assets_with_value])
     for i, asset in enumerate(assets_with_value):
         value = asset['value'] if isinstance(asset['value'], (int, float, Decimal)) else None
         if value:
@@ -1056,9 +1063,6 @@ def cash(request):
             values.append(pct)
         else:
             asset['percentage'] = 0
-
-    # Sort assets by value descending
-    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
 
     # --- CASH PIE CHART LOGIC ---
     if labels and values:
