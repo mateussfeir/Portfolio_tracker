@@ -943,6 +943,8 @@ def cash(request):
 
     # --- CASH PIE CHART LOGIC ---
     if labels and values:
+        # Use section_total for chart percentages as well
+        bar_chart_values = [safe_float(a['value']) / section_total * 100 if section_total > 0 else 0 for a in assets_with_value]
         if percent_mode == 'total' and true_total_net_worth_float > 0:
             sum_section_pct = sum(values)
             if sum_section_pct < 100:
@@ -969,14 +971,14 @@ def cash(request):
     if labels and values:
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, values)):
+        for i, (label, percent) in enumerate(zip(labels, bar_chart_values)):
             bar_segments.append(go.Bar(
-                x=[int(round(percent))],
+                x=[percent],
                 y=[""],
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{int(round(percent))}%"],
+                text=[f"{label}\n{percent:.2f}%"],
                 textposition='inside',
                 insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x}}%<extra></extra>",
