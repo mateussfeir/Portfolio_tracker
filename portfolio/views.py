@@ -978,7 +978,7 @@ def cash(request):
                 name=label,
                 orientation='h',
                 marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent:.2f}%"],
+                text=[f"{label}\n{int(round(percent))}%"],
                 textposition='inside',
                 insidetextanchor='middle',
                 hovertemplate=f"{label}: {{x}}%<extra></extra>",
