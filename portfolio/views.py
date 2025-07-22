@@ -14,6 +14,7 @@ from django.http import HttpResponseRedirect
 from datetime import date
 import time
 import threading
+from django.core.cache import cache
 
 # Currency conversion function
 _exchange_rate_cache = {}
@@ -128,8 +129,8 @@ def home(request):
     # Get selected currency from request, default to USD
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = Decimal('0')
-    true_total_net_worth_float = 0.0
+    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth_float = float(true_total_net_worth)
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -629,8 +630,8 @@ def stocks(request):
 def real_estate(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = Decimal('0')
-    true_total_net_worth_float = 0.0
+    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth_float = float(true_total_net_worth)
     labels = []
     values = []
     pie_chart_html = None
@@ -904,8 +905,8 @@ def real_estate(request):
 def cash(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = Decimal('0')
-    true_total_net_worth_float = 0.0
+    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth_float = float(true_total_net_worth)
     section_percentages = []
     total_percentages = []
     if request.method == 'POST':
@@ -1109,8 +1110,8 @@ def cash(request):
 def other(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = Decimal('0')
-    true_total_net_worth_float = 0.0
+    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth_float = float(true_total_net_worth)
     labels = []
     values = []
     pie_chart_html = None
@@ -1516,7 +1517,7 @@ def general(request):
     }
 
     # After calculating total_crypto and total_stocks
-    total_net_worth = total_crypto + total_stocks + total_real_estate + total_cash + total_other
+    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
         stocks_percent = (total_stocks / total_net_worth) * 100
@@ -1582,67 +1583,7 @@ def performance(request):
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
 
     # --- Calculate current net worth (reuse logic from general) ---
-    # Get all user assets by type
-    crypto_assets = Asset.objects.filter(owner=user, type='crypto')
-    stock_assets = Asset.objects.filter(owner=user, type='stock')
-    cash_assets = Asset.objects.filter(owner=user, type='cash')
-    real_estate_assets = Asset.objects.filter(owner=user, type='real_estate')
-    other_assets = Asset.objects.filter(owner=user, type='other')
-
-    # Get prices for crypto
-    crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
-    crypto_prices = get_multiple_asset_prices(crypto_tickers)
-    total_crypto_usd = sum(
-        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
-        for asset in crypto_assets
-    )
-    total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
-
-    # Get prices for stocks
-    stock_tickers = [asset.ticker.upper() for asset in stock_assets]
-    stock_prices = {}
-    if stock_tickers:
-        if len(stock_tickers) == 1:
-            ticker = stock_tickers[0]
-            try:
-                data = yf.Ticker(ticker).history(period='1d')
-                if not data.empty:
-                    stock_prices[ticker] = float(data['Close'].iloc[-1])
-                else:
-                    stock_prices[ticker] = None
-            except Exception:
-                stock_prices[ticker] = None
-        else:
-            try:
-                data = yf.download(
-                    tickers=stock_tickers,
-                    period='1d',
-                    interval='1d',
-                    group_by='ticker',
-                    threads=True,
-                    progress=False
-                )
-                for ticker in stock_tickers:
-                    try:
-                        stock_prices[ticker] = float(data[ticker]['Close'].iloc[-1])
-                    except Exception:
-                        stock_prices[ticker] = None
-            except Exception:
-                stock_prices = {ticker: None for ticker in stock_tickers}
-    total_stocks_usd = 0
-    for asset in stock_assets:
-        price = stock_prices.get(asset.ticker.upper())
-        price_decimal = safe_decimal(price)
-        total_stocks_usd += price_decimal * asset.amount
-    total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
-
-    # Cash, real estate, other
-    total_cash = sum(convert_currency(cash.amount, cash.currency or 'USD', selected_currency) for cash in cash_assets)
-    total_real_estate = sum(convert_currency(re.amount, re.currency or 'USD', selected_currency) for re in real_estate_assets)
-    total_other = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets)
-
-    total_net_worth = total_crypto + total_stocks + total_real_estate + total_cash + total_other
-
+    total_net_worth = get_user_total_net_worth(user, selected_currency)
     # --- Save snapshot if not already saved today ---
     NetWorthSnapshot.objects.get_or_create(
         user=user, date=today,
@@ -1777,3 +1718,73 @@ def safe_float(val):
         return float(val)
     except Exception:
         return 0
+
+def get_user_total_net_worth(user, selected_currency):
+    """Compute and cache the user's total net worth in the selected currency for 3 minutes."""
+    cache_key = f"total_net_worth_{user.id}_{selected_currency}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    # Calculate total net worth across all asset types
+    from decimal import Decimal
+    from .models import Asset
+    # Crypto
+    crypto_assets = Asset.objects.filter(owner=user, type='crypto')
+    crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
+    crypto_prices = get_multiple_asset_prices(crypto_tickers)
+    total_crypto_usd = sum(
+        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        for asset in crypto_assets
+    )
+    total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
+    # Stocks
+    stock_assets = Asset.objects.filter(owner=user, type='stock')
+    stock_tickers = [asset.ticker.upper() for asset in stock_assets]
+    stock_prices = {}
+    if stock_tickers:
+        import yfinance as yf
+        if len(stock_tickers) == 1:
+            ticker = stock_tickers[0]
+            try:
+                data = yf.Ticker(ticker).history(period='1d')
+                if not data.empty:
+                    stock_prices[ticker] = float(data['Close'].iloc[-1])
+                else:
+                    stock_prices[ticker] = None
+            except Exception:
+                stock_prices[ticker] = None
+        else:
+            try:
+                data = yf.download(
+                    tickers=stock_tickers,
+                    period='1d',
+                    interval='1d',
+                    group_by='ticker',
+                    threads=True,
+                    progress=False
+                )
+                for ticker in stock_tickers:
+                    try:
+                        stock_prices[ticker] = float(data[ticker]['Close'].iloc[-1])
+                    except Exception:
+                        stock_prices[ticker] = None
+            except Exception:
+                stock_prices = {ticker: None for ticker in stock_tickers}
+    total_stocks_usd = 0
+    for asset in stock_assets:
+        price = stock_prices.get(asset.ticker.upper())
+        price_decimal = safe_decimal(price)
+        total_stocks_usd += price_decimal * asset.amount
+    total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
+    # Cash
+    cash_assets = Asset.objects.filter(owner=user, type='cash')
+    total_cash = sum(convert_currency(cash.amount, cash.currency or 'USD', selected_currency) for cash in cash_assets)
+    # Real Estate
+    real_estate_assets = Asset.objects.filter(owner=user, type='real_estate')
+    total_real_estate = sum(convert_currency(re.amount, re.currency or 'USD', selected_currency) for re in real_estate_assets)
+    # Other
+    other_assets = Asset.objects.filter(owner=user, type='other')
+    total_other = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets)
+    total_net_worth = total_crypto + total_stocks + total_real_estate + total_cash + total_other
+    cache.set(cache_key, total_net_worth, timeout=180)
+    return total_net_worth
