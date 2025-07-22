@@ -1368,8 +1368,13 @@ def general(request):
         'CHF': 'Swiss Franc'
     }
 
-    # After calculating total_crypto and total_stocks
+    # After calculating total_net_worth
     total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    today = date.today()
+    NetWorthSnapshot.objects.get_or_create(
+        user=request.user, date=today,
+        defaults={'net_worth': total_net_worth}
+    )
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
         stocks_percent = (total_stocks / total_net_worth) * 100
@@ -1382,8 +1387,6 @@ def general(request):
         real_estate_percent = 0
         cash_percent = 0
         other_percent = 0
-
-    # Build and sort totals list for the table
     totals = [
         {'type': 'Crypto', 'url': 'home', 'value': total_crypto, 'percent': crypto_percent},
         {'type': 'Stocks', 'url': 'stocks', 'value': total_stocks, 'percent': stocks_percent},
