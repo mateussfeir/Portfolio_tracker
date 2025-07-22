@@ -213,11 +213,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if percent_mode == 'total' %}
-                                    {{ total_percentages|index:forloop.counter0 }}%
-                                {% else %}
-                                    {{ section_percentages|index:forloop.counter0 }}%
-                                {% endif %}
+                                {{ asset.percentage }}%
                             </td>
                             <td style="white-space: nowrap;">
                                 <a href="{% url 'edit_holding' asset.id %}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
