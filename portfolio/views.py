@@ -613,6 +613,8 @@ def real_estate(request):
     values = []
     pie_chart_html = None
     bar_chart_html = None
+    section_percentages = []
+    total_percentages = []
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
