@@ -13,21 +13,39 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from datetime import date
 import time
+import threading
 
 # Currency conversion function
+_exchange_rate_cache = {}
+_exchange_rate_cache_time = {}
+_exchange_rate_cache_lock = threading.Lock()
+CACHE_TTL_SECONDS = 180  # 3 minutes
+
 def get_exchange_rates(base_currency='USD'):
-    """Get exchange rates from USD to other currencies using a free API"""
+    """Get exchange rates from USD to other currencies using a free API, with 3-minute cache."""
+    now = time.time()
+    cache_key = base_currency
+    with _exchange_rate_cache_lock:
+        if (
+            cache_key in _exchange_rate_cache and
+            (now - _exchange_rate_cache_time.get(cache_key, 0)) < CACHE_TTL_SECONDS
+        ):
+            return _exchange_rate_cache[cache_key]
     try:
         # Using exchangerate-api.com (free tier)
         url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
         response = requests.get(url, timeout=5)
         response.raise_for_status()
         data = response.json()
-        return data.get('rates', {})
+        rates = data.get('rates', {})
+        with _exchange_rate_cache_lock:
+            _exchange_rate_cache[cache_key] = rates
+            _exchange_rate_cache_time[cache_key] = now
+        return rates
     except Exception as e:
         print(f"Error fetching exchange rates: {e}")
         # Fallback rates (approximate)
-        return {
+        fallback = {
             'USD': 1,
             'CAD': 1.35,
             'BRL': 52,
@@ -39,6 +57,10 @@ def get_exchange_rates(base_currency='USD'):
             'AUD': 10.52,
             'CHF': 0.88
         }
+        with _exchange_rate_cache_lock:
+            _exchange_rate_cache[cache_key] = fallback
+            _exchange_rate_cache_time[cache_key] = now
+        return fallback
 
 def convert_currency(amount, from_currency='USD', to_currency='USD'):
     """Convert amount from one currency to another"""
