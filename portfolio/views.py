@@ -1399,7 +1399,7 @@ def general(request):
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
-    values = [float(snap.net_worth) for snap in snapshots]
+    values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     networth_line_chart = None
     if dates and values:
         fig = go.Figure()
