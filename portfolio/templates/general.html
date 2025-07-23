@@ -1,8 +1,9 @@
 {% extends "base2.html" %}
 {% load humanize %}
 {% load custom_filters %}
+{% load currency_filters %}
 {% block section_title %}General{% endblock %}
-{% block positions_title %}Portfolio Totals{% endblock %}
+{% block positions_title %}Net Worth Composition{% endblock %}
 {% block table %}
 <table>
     <thead>
@@ -16,7 +17,7 @@
         {% for t in totals %}
         <tr>
             <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
-            <td><span class="sensitive-value">{{ currency_symbol }}{{ t.value|floatformat:2|intcomma }}</span></td>
+            <td><span class="sensitive-value">{{ t.value|currency:currency_symbol }}</span></td>
             <td>{{ t.percent|floatformat:2 }}%</td>
         </tr>
         {% endfor %}
@@ -26,7 +27,6 @@
 {% block add_new %}{% endblock %}
 {% block chart_title %}Portfolio Distribution{% endblock %}
 {% block chart %}
-    <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 0; display: block;">Show Pie Chart</button>
     <div id="pie-chart-div" style="display: none; margin-top: 0; padding-top: 0;">
         {% if pie_chart %}
             {{ pie_chart|safe }}

@@ -22,19 +22,19 @@
             <td><span class="sensitive-value">{{ asset.amount|floatformat:2 }}</span></td>
             <td>
                 {% if asset.price %}
-                    {{ currency_symbol }}{{ asset.price|intcomma }}
+                    {{ currency_symbol }}{{ asset.price|floatformat:2|intcomma }}
                 {% else %}
                     -
                 {% endif %}
             </td>
             <td>
                 {% if asset.value %}
-                    <span class="sensitive-value">{{ currency_symbol }}{{ asset.value|intcomma }}</span>
+                    <span class="sensitive-value">{{ currency_symbol }}{{ asset.value|floatformat:2|intcomma }}</span>
                 {% else %}
                     Could not fetch price
                 {% endif %}
             </td>
-            <td>{{ asset.percentage }}%</td>
+            <td>{{ asset.percentage|floatformat:2 }}%</td>
             <td style="white-space: nowrap;">
                 <a href="{% url 'edit_holding' asset.id %}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
                 <form action="{% url 'delete_holding' asset.id %}" method="post" style="display:inline;">

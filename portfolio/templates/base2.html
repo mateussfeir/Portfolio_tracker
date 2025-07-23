@@ -1,6 +1,7 @@
 {% load static %}
 {% load humanize %}
 {% load custom_filters %}
+{% load currency_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,6 +136,46 @@
           color: white;
           transform: scale(1.05);
         }
+        .dashboard-section {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: flex-start;
+          flex-wrap: wrap;
+          gap: 32px;
+          margin-top: 20px;
+        }
+        .table-card, .chart-card {
+          background-color: #1e1e1e;
+          padding: 0px;
+          border-radius: 12px;
+          box-shadow: 0 0 8px rgba(0, 255, 0, 0.1);
+          flex: 1 1 600px;
+          min-width: 400px;
+          max-width: 700px;
+        }
+        .chart-card {
+          padding-left: 0;
+          padding-right: 0;
+        }
+        #pie-chart-div, #bar-chart-div {
+          width: 100%;
+          height: 300px;
+          margin-left: 0;
+          margin-right: 0;
+          padding-left: 0;
+          padding-right: 0;
+        }
+        @media (max-width: 900px) {
+          .dashboard-section {
+            flex-direction: column;
+            gap: 16px;
+          }
+          .table-card, .chart-card {
+            min-width: 0;
+            max-width: 100%;
+          }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -143,7 +184,7 @@
     <nav>
         <div class="nav-left">
             <span>Logged as: <strong>{{ username }}</strong></span>
-            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|floatformat:2|intcomma }}</span></span>
+            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span></span>
         </div>
         <div class="nav-center">
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
@@ -164,31 +205,34 @@
     </nav>
 </header>
 <div class="container">
-    <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
-        <div class="card" style="margin-bottom: 24px;">
-            <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
-            {% block percent_buttons %}{% endblock %}
-            {% block table %}{% endblock %}
-            {% block add_new %}
-            <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
-                <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
-                <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit">Add Position</button>
-                    <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
-                </form>
+    <div style="width: 100%; max-width: 1400px; margin: 0 auto;">
+        <div class="dashboard-section">
+            <div class="table-card">
+              <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
+              {% block percent_buttons %}{% endblock %}
+              {% block table %}{% endblock %}
+              {% block add_new %}
+              <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
+                  <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
+                  <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
+                      {% csrf_token %}
+                      {{ form.as_p }}
+                      <button type="submit">Add Position</button>
+                      <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
+                  </form>
+              </div>
+              {% endblock %}
             </div>
-            {% endblock %}
-        </div>
-        <div class="card pie-chart-container" style="margin-bottom: 24px;">
-            <div class="section-header">{% block chart_title %}Portfolio Distribution{% endblock %}</div>
-            {% block chart %}
-                <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 0; display: block;">Show Pie Chart</button>
-                <div id="pie-chart-div" style="display: none; margin-top: 0; padding-top: 0;">
+            <div class="chart-card">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <div class="section-header" style="margin: 0;">{% block chart_title %}Portfolio Distribution{% endblock %}</div>
+                <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 0;">Show Pie Chart</button>
+              </div>
+              {% block chart %}
+                <div id="pie-chart-div" style="display: none; margin-top: 0; padding-top: 0; width: 100%; height: 300px;">
                     {% block pie_chart %}{% endblock %}
                 </div>
-                <div id="bar-chart-div" style="display: block; margin-top: 0; padding-top: 0;">
+                <div id="bar-chart-div" style="display: block; margin-top: 0; padding-top: 0; width: 100%; height: 300px;">
                     {% block bar_chart %}{% endblock %}
                 </div>
                 <script>
@@ -211,8 +255,9 @@
                         });
                     });
                 </script>
-            {% endblock %}
-        </div>
+              {% endblock %}
+            </div>
+          </div>
         {# Only show Net Worth Over Time card if block is not empty #}
         {% block networth_over_time_card %}
         <div class="card" style="margin-bottom: 24px;">

@@ -16,6 +16,7 @@ import time
 import threading
 from django.core.cache import cache
 from django.utils import timezone
+import re
 
 # Currency conversion function
 _exchange_rate_cache = {}
@@ -259,7 +260,7 @@ def home(request):
             fig_pie = go.Figure(data=[go.Pie(labels=[asset['ticker'] for asset in assets_with_value], values=pie_values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Crypto Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
@@ -290,13 +291,13 @@ def home(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="Crypto Portfolio Distribution (Stacked Bar)",
-            margin=dict(t=50, b=50, l=25, r=25),
+            title="",
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
             showlegend=True,
             height=180,
         )
@@ -578,7 +579,7 @@ def stocks(request):
             fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Stock Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
@@ -606,13 +607,13 @@ def stocks(request):
             fig_bar = go.Figure(data=bar_segments)
             fig_bar.update_layout(
                 barmode='stack',
-                title="Stock Portfolio Distribution (Stacked Bar)",
-                margin=dict(t=50, b=50, l=25, r=25),
+                title="",
+                margin=dict(t=50, b=50, l=0, r=0),
                 paper_bgcolor="#121212",
                 plot_bgcolor="#121212",
                 font=dict(color="#e0e0e0"),
                 xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-                yaxis=dict(showticklabels=False),
+                yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
                 showlegend=True,
                 height=180,
             )
@@ -783,7 +784,7 @@ def real_estate(request):
             fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Real Estate Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
@@ -815,13 +816,13 @@ def real_estate(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="Real Estate Portfolio Distribution (Stacked Bar)",
-            margin=dict(t=50, b=50, l=25, r=25),
+            title="",
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
             showlegend=True,
             height=180,
         )
@@ -989,7 +990,7 @@ def cash(request):
             fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Cash Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
@@ -1020,13 +1021,13 @@ def cash(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="Cash Portfolio Distribution (Stacked Bar)",
-            margin=dict(t=50, b=50, l=25, r=25),
+            title="",
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
             showlegend=True,
             height=180,
         )
@@ -1135,7 +1136,7 @@ def other(request):
             fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Other Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
@@ -1167,13 +1168,13 @@ def other(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="Other Portfolio Distribution (Stacked Bar)",
-            margin=dict(t=50, b=50, l=25, r=25),
+            title="",
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
             showlegend=True,
             height=180,
         )
@@ -1349,7 +1350,7 @@ def general(request):
         fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
@@ -1374,13 +1375,12 @@ def general(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="Portfolio Distribution (Stacked Bar)",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=10, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
-            yaxis=dict(showticklabels=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
             showlegend=True,
             height=180,
         )
@@ -1441,7 +1441,7 @@ def general(request):
         fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Portfolio Distribution",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
@@ -1466,13 +1466,12 @@ def general(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="Portfolio Distribution (Stacked Bar)",
-            margin=dict(t=50, b=50, l=25, r=25),
+            margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
-            yaxis=dict(showticklabels=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
             showlegend=True,
             height=180,
         )
