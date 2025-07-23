@@ -18,6 +18,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% block main_nav %}
     <nav>
         <a href="{% url 'login' %}">Home</a> 
         <a href="{% url 'resume' %}">Resume</a>
@@ -28,6 +29,7 @@
         <a href="https://docs.python.org/3/" target="_blank" rel="noopener noreferrer">Python Docs</a>
         <a href="https://docs.djangoproject.com/en/stable/" target="_blank" rel="noopener noreferrer">Django Docs</a>
     </nav>
+    {% endblock %}
 
     <div>
         {% block content %}

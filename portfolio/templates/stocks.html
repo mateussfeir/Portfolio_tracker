@@ -50,4 +50,15 @@
 <p>You have no stock positions yet.</p>
 {% endif %}
 {% endblock %}
-{% block chart_title %}Stock Portfolio Distribution{% endblock %} 
+{% block chart_title %}Stock Portfolio Distribution{% endblock %}
+{% block bar_chart %}
+    {% if bar_chart %}
+        {{ bar_chart|safe }}
+    {% endif %}
+{% endblock %}
+
+{% block pie_chart %}
+    {% if pie_chart %}
+        {{ pie_chart|safe }}
+    {% endif %}
+{% endblock %} 

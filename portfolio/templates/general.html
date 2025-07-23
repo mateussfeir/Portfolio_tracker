@@ -23,15 +23,63 @@
     </tbody>
 </table>
 {% endblock %}
+{% block add_new %}{% endblock %}
 {% block chart_title %}Portfolio Distribution{% endblock %}
-{% block content %}
-{{ block.super }}
-<div class="card" style="max-width: 900px; margin: 30px auto 0 auto;">
-    <h2 style="text-align:center; margin-bottom: 18px;">Net Worth Over Time</h2>
+{% block chart %}
+    <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 0; display: block;">Show Pie Chart</button>
+    <div id="pie-chart-div" style="display: none; margin-top: 0; padding-top: 0;">
+        {% if pie_chart %}
+            {{ pie_chart|safe }}
+        {% else %}
+            <p style="color: #aaa;">No chart data available.</p>
+        {% endif %}
+    </div>
+    <div id="bar-chart-div" style="display: block; margin-top: 0; padding-top: 0;">
+        {% if bar_chart %}
+            {{ bar_chart|safe }}
+        {% endif %}
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('toggle-chart-btn');
+            const pieDiv = document.getElementById('pie-chart-div');
+            const barDiv = document.getElementById('bar-chart-div');
+            let showingPie = false;
+            toggleBtn.addEventListener('click', function() {
+                showingPie = !showingPie;
+                if (showingPie) {
+                    pieDiv.style.display = 'block';
+                    barDiv.style.display = 'none';
+                    toggleBtn.textContent = 'Show Bar Chart';
+                } else {
+                    pieDiv.style.display = 'none';
+                    barDiv.style.display = 'block';
+                    toggleBtn.textContent = 'Show Pie Chart';
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block bar_chart %}
+    {% if bar_chart %}
+        {{ bar_chart|safe }}
+    {% endif %}
+{% endblock %}
+
+{% block pie_chart %}
+    {% if pie_chart %}
+        {{ pie_chart|safe }}
+    {% endif %}
+{% endblock %}
+
+{% block networth_over_time %}
     {% if networth_line_chart %}
         {{ networth_line_chart|safe }}
     {% else %}
         <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
     {% endif %}
-</div>
+{% endblock %}
+{% block content %}
+{{ block.super }}
 {% endblock %} 
