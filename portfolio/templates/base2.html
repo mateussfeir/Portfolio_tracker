@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}{% block section_title %}Asset Section{% endblock %}{% endblock %}
+{% block extra_css %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
+        header { background-color: #1f1f1f; color: #fff; padding: 1rem; text-align: center; }
+        .container { margin: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        .card { background: #1e1e1e; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); padding: 20px; flex: 1 1 45%; color: #e0e0e0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #333; text-align: center; vertical-align: middle; }
+        th { background-color: #2a2a2a; }
+        td { background-color: #1e1e1e; }
+        th:last-child, td:last-child { width: 50px; padding: 4px; }
+        button { cursor: pointer; background-color: whitesmoke; color: black; border: none; border-radius: 4px; padding: 4px 8px; transition: background-color 0.2s ease; }
+        button:hover { background-color: #ff1a1a; }
+        a { color: #4caf50; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .pie-chart-container { text-align: center; }
+        footer { margin-top: 20px; text-align: center; color: #aaa; }
+        nav { margin-top: 20px; text-align: center; }
+        nav a { margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold; padding: 6px 12px; border-radius: 6px; transition: background 0.18s, color 0.18s, transform 0.18s; display: inline-block; }
+        nav a:hover, nav a:focus { color: #4caf50; background: rgba(76, 175, 80, 0.12); transform: scale(1.13); }
+        button#show-add-form-btn { background: #4caf50; color: #fff; font-weight: bold; border: 2px solid #4caf50; transition: transform 0.18s; }
+        button#show-add-form-btn:hover, button#show-add-form-btn:focus { background: #4caf50; color: #fff; border: 2px solid #4caf50; transform: scale(1.08); }
+        .privacy-toggle-container { position: fixed; top: 18px; right: 32px; z-index: 1000; }
+        #privacy-toggle-btn { background: #333; color: #fff; border: 1.5px solid #4caf50; border-radius: 6px; padding: 7px 18px; font-weight: bold; cursor: pointer; font-size: 1em; box-shadow: 0 2px 8px rgba(0,0,0,0.12); transition: background 0.18s, color 0.18s, border 0.18s, transform 0.18s; }
+        #privacy-toggle-btn:hover, #privacy-toggle-btn:focus { background: #4caf50; color: #fff; border: 1.5px solid #4caf50; transform: scale(1.08); }
+        .sensitive-value.privacy-hidden { color: #aaa !important; background: #222 !important; border-radius: 4px; padding: 0 8px; letter-spacing: 0.2em; }
+        @media (max-width: 900px) { .container { flex-direction: column; } .card { min-width: 220px; } }
+        h2 { margin-top: 0; }
+        .section-header { font-size: 1.5em; font-weight: bold; margin-bottom: 18px; border-bottom: 2px solid #4caf50; padding-bottom: 6px; }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="privacy-toggle-container">
+    <button id="privacy-toggle-btn" type="button">Privacy Mode: Off</button>
+</div>
+<header>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 40px;">
+        <h1 style="margin: 0 24px 0 0; font-size: 2.2em;">Welcome, {{ username }}!</h1>
+        <div style="font-size: 1.5em; font-weight: bold; color: #4caf50; display: flex; align-items: center; gap: 12px;">
+            {% block networth_label %}Net Worth:{% endblock %} <span id="net-worth-display"><span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|intcomma }}</span></span>
+            <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">
+                {% for code, name in available_currencies.items %}
+                    <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <nav style="margin-top: 20px; text-align: center;">
+        <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
+        <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
+        <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
+        <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
+        <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
+        <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+    </nav>
+</header>
+<div class="container" style="flex-direction: column; align-items: center; padding-top: 20px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 100%; justify-content: center; align-items: flex-start;">
+        <div class="card" style="flex: 1 1 45%; min-width: 350px;">
+            <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
+            {% block percent_buttons %}
+            <form method="get" style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+                <input type="hidden" name="currency" value="{{ selected_currency }}">
+                <button type="submit" name="percent" value="section" {% if percent_mode == 'section' %}style="background:#4caf50;color:#fff;"{% endif %}>% of {% block section_name %}Section{% endblock %}</button>
+                <button type="submit" name="percent" value="total" {% if percent_mode == 'total' %}style="background:#4caf50;color:#fff;"{% endif %}>% of Total Net Worth</button>
+            </form>
+            {% endblock %}
+            {% block table %}{% endblock %}
+            <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
+                <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
+                <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit">Add Position</button>
+                    <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
+                </form>
+            </div>
+        </div>
+        <div class="card pie-chart-container" style="flex: 1 1 45%; min-width: 350px;">
+            <div class="section-header">{% block chart_title %}Portfolio Distribution{% endblock %}</div>
+            <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 12px;">Show Pie Chart</button>
+            <div id="pie-chart-div" style="display: none;">
+                {% if pie_chart %}
+                    {{ pie_chart|safe }}
+                {% else %}
+                    <p style="color: #aaa;">No chart data available.</p>
+                {% endif %}
+            </div>
+            <div id="bar-chart-div" style="display: block;">
+                {% if bar_chart %}
+                    {{ bar_chart|safe }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <p>
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" style="background:none; border:none; color:inherit; cursor:pointer; padding:0;">Logout</button>
+        </form>
+    </p>
+</footer>
+<script>
+    function changeCurrency(currency) {
+        const url = new URL(window.location);
+        url.searchParams.set('currency', currency);
+        window.location.href = url.toString();
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const showBtn = document.getElementById('show-add-form-btn');
+        const form = document.getElementById('add-asset-form');
+        const cancelBtn = document.getElementById('cancel-add-form-btn');
+        if (showBtn && form && cancelBtn) {
+            showBtn.addEventListener('click', function() {
+                form.style.display = 'block';
+                showBtn.style.display = 'none';
+            });
+            cancelBtn.addEventListener('click', function() {
+                form.style.display = 'none';
+                showBtn.style.display = 'inline-block';
+            });
+        }
+    });
+    function setPrivacyMode(on) {
+        const sensitives = document.querySelectorAll('.sensitive-value');
+        sensitives.forEach(el => {
+            if (on) {
+                el.classList.add('privacy-hidden');
+                el.textContent = '****';
+            } else {
+                el.classList.remove('privacy-hidden');
+                location.reload();
+            }
+        });
+        document.getElementById('privacy-toggle-btn').textContent = 'Privacy Mode: ' + (on ? 'On' : 'Off');
+        localStorage.setItem('privacyMode', on ? 'on' : 'off');
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const privacyBtn = document.getElementById('privacy-toggle-btn');
+        const privacyState = localStorage.getItem('privacyMode');
+        if (privacyState === 'on') setPrivacyMode(true);
+        privacyBtn.addEventListener('click', function() {
+            const isOn = localStorage.getItem('privacyMode') === 'on';
+            setPrivacyMode(!isOn);
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggle-chart-btn');
+        const pieDiv = document.getElementById('pie-chart-div');
+        const barDiv = document.getElementById('bar-chart-div');
+        let showingPie = false;
+        toggleBtn.addEventListener('click', function() {
+            showingPie = !showingPie;
+            if (showingPie) {
+                pieDiv.style.display = 'block';
+                barDiv.style.display = 'none';
+                toggleBtn.textContent = 'Show Bar Chart';
+            } else {
+                pieDiv.style.display = 'none';
+                barDiv.style.display = 'block';
+                toggleBtn.textContent = 'Show Pie Chart';
+            }
+        });
+    });
+</script>
+{% endblock %} 

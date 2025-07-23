@@ -1,309 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>General</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Plotly JS -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-        header {
-            background-color: #1f1f1f;
-            color: #fff;
-            padding: 1rem;
-            text-align: center;
-        }
-        .container {
-            margin: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .card {
-            background: #1e1e1e;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            flex: 1 1 45%;
-            color: #e0e0e0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #333;
-            text-align: center;
-            vertical-align: middle;
-        }
-        th {
-            background-color: #2a2a2a;
-        }
-        td {
-            background-color: #1e1e1e;
-        }
-        th:last-child, td:last-child {
-            width: 50px;
-            padding: 4px;
-        }
-        button {
-            cursor: pointer;
-            background-color: whitesmoke;
-            color: black;
-            border: none;
-            border-radius: 4px;
-            padding: 4px 8px;
-            transition: background-color 0.2s ease;
-        }
-        button:hover {
-            background-color: #ff1a1a;
-        }
-        a {
-            color: #4caf50;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .pie-chart-container {
-            text-align: center;
-        }
-        footer {
-            margin-top: 20px;
-            text-align: center;
-            color: #aaa;
-        }
-        nav {
-            margin-top: 20px;
-            text-align: center;
-        }
-        nav a {
-            margin: 0 20px;
-            color: #4caf50; /* Green links */
-            text-decoration: none;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 6px;
-            transition: background 0.18s, color 0.18s, transform 0.18s;
-            display: inline-block;
-        }
-        nav a:hover, nav a:focus {
-            color: #4caf50;
-            background: rgba(76, 175, 80, 0.12);
-            transform: scale(1.13);
-        }
-        .privacy-toggle-container {
-            position: fixed;
-            top: 18px;
-            right: 32px;
-            z-index: 1000;
-        }
-        #privacy-toggle-btn {
-            background: #333;
-            color: #fff;
-            border: 1.5px solid #4caf50;
-            border-radius: 6px;
-            padding: 7px 18px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-            transition: background 0.18s, color 0.18s, border 0.18s, transform 0.18s;
-        }
-        #privacy-toggle-btn:hover, #privacy-toggle-btn:focus {
-            background: #4caf50;
-            color: #fff;
-            border: 1.5px solid #4caf50;
-            transform: scale(1.08);
-        }
-        .sensitive-value.privacy-hidden {
-            color: #aaa !important;
-            background: #222 !important;
-            border-radius: 4px;
-            padding: 0 8px;
-            letter-spacing: 0.2em;
-        }
-    </style>
-</head>
+{% extends "base2.html" %}
 {% load humanize %}
 {% load custom_filters %}
-<body>
-    <div class="privacy-toggle-container">
-        <button id="privacy-toggle-btn" type="button">Privacy Mode: Off</button>
-    </div>
-    <header>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap;">
-            <h1 style="margin: 0 24px 0 0; font-size: 2.2em;">Welcome, {{ username }}!</h1>
-            <div style="font-size: 1.5em; font-weight: bold; color: #4caf50; display: flex; align-items: center; gap: 12px;">
-                Total Net Worth: <span id="net-worth-display"><span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span></span>
-                <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">
-                    {% for code, name in available_currencies.items %}
-                        <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <nav>
-            <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
-            <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
-            <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
-            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
-            <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
-            <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
-        </nav>
-    </header>
-
-    <div class="container" style="flex-direction: column; align-items: center; padding-top: 20px;">
-        <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 100%; justify-content: center; align-items: flex-start;">
-            <!-- General Totals -->
-            <div class="card" style="flex: 1 1 45%; min-width: 350px;">
-                <h2 style="margin-top: 0;">Portfolio Totals</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Total Value</th>
-                            <th>Percentage</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in totals %}
-                        <tr>
-                            <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
-                            <td><span class="sensitive-value">{{ currency_symbol }}{{ t.value|intcomma2 }}</span></td>
-                            <td>{{ t.percent|floatformat:2 }}%</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pie Chart -->
-            <div class="card pie-chart-container" style="flex: 1 1 45%; min-width: 350px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <h2 style="margin: 0;">Portfolio Distribution</h2>
-                    <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em;">Show Pie Chart</button>
-                </div>
-                <div id="pie-chart-div" style="display: none;">
-                    {% if pie_chart %}
-                        {{ pie_chart|safe }}
-                    {% else %}
-                        <p style="color: #aaa;">No chart data available.</p>
-                    {% endif %}
-                </div>
-                <div id="bar-chart-div" style="display: block;">
-                    {% if bar_chart %}
-                        {{ bar_chart|safe }}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <!-- Removed Cash & Other Positions table and header -->
-    </div>
-    <!-- Net Worth Over Time Chart -->
-    <div class="card" style="max-width: 900px; margin: 30px auto 0 auto;">
-        <h2 style="text-align:center; margin-bottom: 18px;">Net Worth Over Time</h2>
-        {% if networth_line_chart %}
-            {{ networth_line_chart|safe }}
-        {% else %}
-            <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
-        {% endif %}
-    </div>
-
-    <footer>
-        <p>
-            <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" style="background:none; border:none; color:inherit; cursor:pointer; padding:0;">Logout</button>
-            </form>
-        </p>
-    </footer>
-
-    <script>
-        function changeCurrency(currency) {
-            // Update URL with new currency parameter
-            const url = new URL(window.location);
-            url.searchParams.set('currency', currency);
-            window.location.href = url.toString();
-        }
-        // Privacy Mode Toggle
-        function setPrivacyMode(on) {
-            const sensitives = document.querySelectorAll('.sensitive-value');
-            sensitives.forEach(el => {
-                if (on) {
-                    el.classList.add('privacy-hidden');
-                    el.textContent = '****';
-                } else {
-                    el.classList.remove('privacy-hidden');
-                    location.reload();
-                }
-            });
-            document.getElementById('privacy-toggle-btn').textContent = 'Privacy Mode: ' + (on ? 'On' : 'Off');
-            localStorage.setItem('privacyMode', on ? 'on' : 'off');
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            // Privacy Mode
-            const privacyBtn = document.getElementById('privacy-toggle-btn');
-            const privacyState = localStorage.getItem('privacyMode');
-            if (privacyState === 'on') setPrivacyMode(true);
-            privacyBtn.addEventListener('click', function() {
-                const isOn = localStorage.getItem('privacyMode') === 'on';
-                setPrivacyMode(!isOn);
-            });
-
-            const toggleBtn = document.getElementById('toggle-chart-btn');
-            const pieDiv = document.getElementById('pie-chart-div');
-            const barDiv = document.getElementById('bar-chart-div');
-            let showingPie = false;
-            toggleBtn.addEventListener('click', function() {
-                showingPie = !showingPie;
-                if (showingPie) {
-                    pieDiv.style.display = 'block';
-                    barDiv.style.display = 'none';
-                    toggleBtn.textContent = 'Show Bar Chart';
-                } else {
-                    pieDiv.style.display = 'none';
-                    barDiv.style.display = 'block';
-                    toggleBtn.textContent = 'Show Pie Chart';
-                }
-            });
-
-            // Add click event for Plotly bar and pie charts
-            function addPlotlyClickHandler(chartDiv) {
-                if (chartDiv && chartDiv.on) {
-                    chartDiv.on('plotly_click', function(data) {
-                        if (data && data.points && data.points.length > 0) {
-                            var label = data.points[0].data.name || data.points[0].label;
-                            var urlMap = {
-                                'Crypto': "{% url 'home' %}?currency={{ selected_currency }}",
-                                'Stocks': "{% url 'stocks' %}?currency={{ selected_currency }}",
-                                'Real Estate': "{% url 'real_estate' %}?currency={{ selected_currency }}",
-                                'Cash': "{% url 'cash' %}?currency={{ selected_currency }}",
-                                'Cash/Fixed Income': "{% url 'cash' %}?currency={{ selected_currency }}",
-                                'Others': "{% url 'other' %}?currency={{ selected_currency }}"
-                            };
-                            if (urlMap[label]) {
-                                window.location.href = urlMap[label];
-                            }
-                        }
-                    });
-                }
-            }
-            // Wait for Plotly charts to render
-            setTimeout(function() {
-                var barChartDiv = barDiv.querySelector('.js-plotly-plot');
-                var pieChartDiv = pieDiv.querySelector('.js-plotly-plot');
-                addPlotlyClickHandler(barChartDiv);
-                addPlotlyClickHandler(pieChartDiv);
-            }, 500);
-        });
-    </script>
-</body>
-</html> 
+{% block section_title %}General{% endblock %}
+{% block positions_title %}Portfolio Totals{% endblock %}
+{% block table %}
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Total Value</th>
+            <th>Percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in totals %}
+        <tr>
+            <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
+            <td><span class="sensitive-value">{{ currency_symbol }}{{ t.value|intcomma }}</span></td>
+            <td>{{ t.percent|floatformat:2 }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block chart_title %}Portfolio Distribution{% endblock %}
+{% block content %}
+{{ block.super }}
+<div class="card" style="max-width: 900px; margin: 30px auto 0 auto;">
+    <h2 style="text-align:center; margin-bottom: 18px;">Net Worth Over Time</h2>
+    {% if networth_line_chart %}
+        {{ networth_line_chart|safe }}
+    {% else %}
+        <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
+    {% endif %}
+</div>
+{% endblock %} 
