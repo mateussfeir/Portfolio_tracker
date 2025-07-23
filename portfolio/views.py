@@ -1223,14 +1223,17 @@ def general(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            margin=dict(t=50, b=50, l=10, r=0),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=100, b=0, l=0, r=0),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
-            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
-            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
+            xaxis=dict(title=None, range=[0, 100], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            height=180,
+            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            height=150,
+            autosize=True
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
@@ -1314,14 +1317,17 @@ def general(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=100, b=0, l=0, r=0),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
-            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
-            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
+            xaxis=dict(title=None, range=[0, 100], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            height=180,
+            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            height=150,
+            autosize=True
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
