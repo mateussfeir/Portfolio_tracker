@@ -1,5 +1,6 @@
 {% extends "base2.html" %}
 {% load humanize %}
+{% load currency_filters %}
 {% block section_title %}Others{% endblock %}
 {% block positions_title %}Your Others Positions{% endblock %}
 {% block table %}
@@ -22,7 +23,7 @@
             <td>{{ asset.ticker }}</td>
             <td><span class="sensitive-value">{{ asset.amount|floatformat:2 }}</span></td>
             <td>{{ asset.currency }}</td>
-            <td><span class="sensitive-value">{{ currency_symbol }}{{ asset.value|floatformat:2|intcomma }}</span></td>
+            <td><span class="sensitive-value">{{ asset.value|currency:currency_symbol }}</span></td>
             <td>{{ asset.percentage|floatformat:2 }}%</td>
             <td style="white-space: nowrap;">
                 <a href="{% url 'edit_holding' asset.id %}?next={% url 'cash' %}?currency={{ selected_currency }}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>

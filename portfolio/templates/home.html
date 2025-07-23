@@ -1,5 +1,6 @@
 {% extends "base2.html" %}
 {% load humanize %}
+{% load currency_filters %}
 {% block section_title %}Crypto{% endblock %}
 {% block positions_title %}Your Crypto Positions{% endblock %}
 {% block table %}
@@ -23,14 +24,14 @@
             <td><span class="sensitive-value">{{ asset.amount|floatformat:2 }}</span></td>
             <td>
                 {% if asset.price %}
-                    {{ currency_symbol }}{{ asset.price|floatformat:2|intcomma }}
+                    {{ asset.price|currency:currency_symbol }}
                 {% else %}
                     -
                 {% endif %}
             </td>
             <td>
                 {% if asset.value %}
-                    <span class="sensitive-value">{{ currency_symbol }}{{ asset.value|floatformat:2|intcomma }}</span>
+                    <span class="sensitive-value">{{ asset.value|currency:currency_symbol }}</span>
                 {% else %}
                     Could not fetch price
                 {% endif %}
