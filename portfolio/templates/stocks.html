@@ -4,6 +4,7 @@
 {% block positions_title %}Your Stock Positions{% endblock %}
 {% block table %}
 {% if assets %}
+<div class="table-wrapper">
 <table>
     <thead>
         <tr>
@@ -46,6 +47,7 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% else %}
 <p>You have no stock positions yet.</p>
 {% endif %}

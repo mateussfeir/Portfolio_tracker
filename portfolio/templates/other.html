@@ -4,6 +4,7 @@
 {% block positions_title %}Your Others Positions{% endblock %}
 {% block table %}
 {% if assets %}
+<div class="table-wrapper">
 <table>
     <thead>
         <tr>
@@ -34,6 +35,7 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% else %}
 <p>You have no others positions yet.</p>
 {% endif %}
