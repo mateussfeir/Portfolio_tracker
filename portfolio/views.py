@@ -213,6 +213,9 @@ def home(request):
         else:
             asset['percentage'] = round((float(value) / section_sum * 100), 2) if section_sum > 0 else 0
 
+    # Calculate section net worth (crypto) in selected currency
+    section_net_worth = sum([float(a['value']) for a in assets_with_value if a['value'] != '-'])
+
     # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
@@ -325,6 +328,7 @@ def home(request):
         'form': form,
         'bitcoin_price': bitcoin_price,  # Pass the Bitcoin price to the template
         'total_net_worth': total_net_worth,
+        'section_net_worth': section_net_worth,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
@@ -910,6 +914,7 @@ def cash(request):
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
+        'section_net_worth': section_sum,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
@@ -1044,6 +1049,7 @@ def other(request):
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
+        'section_net_worth': section_sum,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
