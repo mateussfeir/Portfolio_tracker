@@ -23,6 +23,7 @@ class NetWorthSnapshot(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     net_worth = models.DecimalField(max_digits=20, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'date')
