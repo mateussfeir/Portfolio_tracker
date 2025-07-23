@@ -324,7 +324,7 @@
             <div class="chart-card">
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
                 <div class="section-header" style="margin: 0;">{% block chart_title %}Portfolio Distribution{% endblock %}</div>
-                <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 0;">Show Pie Chart</button>
+                {# Remove the Show Pie Chart button here to avoid duplicate buttons #}
               </div>
               {% block chart %}
                 <div id="pie-chart-div" style="display: none; margin-top: 0 !important; padding-top: 0; width: 100%; height: 300px;">
