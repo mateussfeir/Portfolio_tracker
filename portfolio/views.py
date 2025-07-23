@@ -263,7 +263,9 @@ def home(request):
             margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            height=300,
+            width=400
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Stacked bar chart
@@ -292,7 +294,7 @@ def home(request):
         fig_bar.update_layout(
             barmode='stack',
             title='Portfolio Distribution (stacked bar)',
-            margin=dict(t=64, b=0, l=0, r=0),
+            margin=dict(t=50, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -300,9 +302,10 @@ def home(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=340,
+            height=200,
+            autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False)
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     else:
         pie_chart_html = None
         bar_chart_html = None
@@ -609,7 +612,7 @@ def stocks(request):
             fig_bar.update_layout(
                 barmode='stack',
                 title='Portfolio Distribution (stacked bar)',
-                margin=dict(t=64, b=0, l=0, r=0),
+                margin=dict(t=50, b=0, l=0, r=0),
                 paper_bgcolor="#121212",
                 plot_bgcolor="#121212",
                 font=dict(color="#e0e0e0"),
@@ -617,9 +620,10 @@ def stocks(request):
                 yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
                 showlegend=True,
                 legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-                height=340,
+                height=200,
+                autosize=True
             )
-            bar_chart_html = fig_bar.to_html(full_html=False)
+            bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
         else:
             pie_chart_html = None
             bar_chart_html = None
@@ -819,7 +823,7 @@ def real_estate(request):
         fig_bar.update_layout(
             barmode='stack',
             title='Portfolio Distribution (stacked bar)',
-            margin=dict(t=64, b=0, l=0, r=0),
+            margin=dict(t=50, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -827,9 +831,10 @@ def real_estate(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=340,
+            height=200,
+            autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False)
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     else:
         pie_chart_html = None
         bar_chart_html = None
@@ -1025,7 +1030,7 @@ def cash(request):
         fig_bar.update_layout(
             barmode='stack',
             title='Portfolio Distribution (stacked bar)',
-            margin=dict(t=64, b=0, l=0, r=0),
+            margin=dict(t=50, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -1033,9 +1038,10 @@ def cash(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=340,
+            height=200,
+            autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False)
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     else:
         bar_chart_html = None
 
@@ -1173,7 +1179,7 @@ def other(request):
         fig_bar.update_layout(
             barmode='stack',
             title='Portfolio Distribution (stacked bar)',
-            margin=dict(t=64, b=0, l=0, r=0),
+            margin=dict(t=50, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -1181,9 +1187,10 @@ def other(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=340,
+            height=200,
+            autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False)
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     else:
         pie_chart_html = None
         bar_chart_html = None
