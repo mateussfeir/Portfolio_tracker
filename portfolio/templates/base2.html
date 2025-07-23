@@ -42,7 +42,7 @@
     <div style="display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap; margin-top: 40px;">
         <h1 style="margin: 0 24px 0 0; font-size: 2.2em;">Welcome, {{ username }}!</h1>
         <div style="font-size: 1.5em; font-weight: bold; color: #4caf50; display: flex; align-items: center; gap: 12px;">
-            {% block networth_label %}Net Worth:{% endblock %} <span id="net-worth-display"><span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|intcomma }}</span></span>
+            {% block networth_label %}Net Worth:{% endblock %} <span id="net-worth-display"><span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|floatformat:2|intcomma }}</span></span>
             <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 4px 8px; margin-left: 10px; font-size: 0.8em;">
                 {% for code, name in available_currencies.items %}
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }} - {{ name }}</option>
