@@ -6,6 +6,7 @@ body {
     padding: 0;
 }
 
+/*
 nav {
     background-color: #000;
     padding: 1rem;
@@ -16,6 +17,7 @@ nav {
     left: 0;
     z-index: 1000;
 }
+*/
 
 nav a {
     color: #ffffff;

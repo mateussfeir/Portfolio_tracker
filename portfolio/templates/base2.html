@@ -17,8 +17,15 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
-        header { background-color: #1f1f1f; color: #fff; padding: 1rem; text-align: center; }
-        .container { margin: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        header { color: #fff; padding: 1rem; text-align: center; }
+        .container {
+            margin-top: 0px; /* matches nav height for perfect alignment */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+        }
         .card { background: #1e1e1e; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); padding: 20px; flex: 1 1 45%; color: #e0e0e0; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 10px; border: 1px solid #333; text-align: center; vertical-align: middle; }
@@ -31,42 +38,48 @@
         a:hover { text-decoration: underline; }
         .pie-chart-container { text-align: center; }
         footer { margin-top: 20px; text-align: center; color: #aaa; }
-        nav { position: sticky; top: 0; z-index: 1001; background: #1f1f1f; margin-top: 0; text-align: center; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px; font-size: 1.1em; box-shadow: 0 2px 8px rgba(0,0,0,0.18); padding: 18px 0 12px 0; min-height: 56px; }
+        nav { position: sticky; top: 0; height: 48px; z-index: 1001; background: #1f1f1f; margin-top: 0; text-align: center; display: flex; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 18px; font-size: 1.1em; box-shadow: 0 2px 8px rgba(0,0,0,0.18); padding: 0 0; min-height: 40px; overflow-x: auto; }
         nav a { margin: 0 20px; color: #4caf50; text-decoration: none; font-weight: bold; padding: 6px 12px; border-radius: 6px; transition: background 0.18s, color 0.18s, transform 0.18s; display: inline-block; }
         nav a:hover, nav a:focus { color: #4caf50; background: rgba(76, 175, 80, 0.12); transform: scale(1.13); }
         button#show-add-form-btn { background: #4caf50; color: #fff; font-weight: bold; border: 2px solid #4caf50; transition: transform 0.18s; }
         button#show-add-form-btn:hover, button#show-add-form-btn:focus { background: #4caf50; color: #fff; border: 2px solid #4caf50; transform: scale(1.08); }
-        .privacy-toggle-container { position: fixed; top: 18px; right: 32px; z-index: 1000; }
+        .privacy-toggle-container { position: fixed; top: 18px; right: 32px; z-index: 1100; }
         #privacy-toggle-btn { background: #333; color: #fff; border: 1.5px solid #4caf50; border-radius: 6px; padding: 7px 18px; font-weight: bold; cursor: pointer; font-size: 1em; box-shadow: 0 2px 8px rgba(0,0,0,0.12); transition: background 0.18s, color 0.18s, border 0.18s, transform 0.18s; }
         #privacy-toggle-btn:hover, #privacy-toggle-btn:focus { background: #4caf50; color: #fff; border: 1.5px solid #4caf50; transform: scale(1.08); }
         .sensitive-value.privacy-hidden { color: #aaa !important; background: #222 !important; border-radius: 4px; padding: 0 8px; letter-spacing: 0.2em; }
-        @media (max-width: 900px) { .container { flex-direction: column; } .card { min-width: 220px; } }
+        @media (max-width: 1200px) {
+            nav { font-size: 1em; gap: 10px; padding: 12px 0 8px 0; }
+            nav a, nav span, nav select { font-size: 1em; }
+        }
+        @media (max-width: 900px) {
+            .container { flex-direction: column; } .card { min-width: 220px; }
+            nav { font-size: 0.95em; gap: 6px; padding: 8px 0 6px 0; }
+            nav a, nav span, nav select { font-size: 0.95em; }
+        }
         h2 { margin-top: 0; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-<div class="privacy-toggle-container">
-    <button id="privacy-toggle-btn" type="button">Privacy Mode: Off</button>
-</div>
 <header>
     <nav>
+        <span style="margin-left: 0; color: #aaa; font-size: 1em;">Logged as: <span style="color: #fff; font-weight: bold;">{{ username }}</span></span>
+        <span style="margin-left: 18px; color: #4caf50; font-weight: bold; font-size: 1.1em;">{% block networth_label %}Net Worth:{% endblock %} <span id="net-worth-display"><span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|floatformat:2|intcomma }}</span></span></span>
         <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
         <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
         <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
         <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
         <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
         <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
-        <span style="margin-left: 24px; color: #aaa; font-size: 1em;">Logged as: <span style="color: #fff; font-weight: bold;">{{ username }}</span></span>
-        <span style="margin-left: 18px; color: #4caf50; font-weight: bold; font-size: 1.1em;">{% block networth_label %}Net Worth:{% endblock %} <span id="net-worth-display"><span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|floatformat:2|intcomma }}</span></span></span>
         <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 2px 8px; margin-left: 18px; font-size: 0.95em; width: 80px; min-width: 60px; max-width: 100px; text-align: center;">
             {% for code, name in available_currencies.items %}
                 <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
             {% endfor %}
         </select>
+        <button id="privacy-toggle-btn" type="button" style="margin-left: 18px; background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background 0.18s, color 0.18s, transform 0.18s;">Privacy Mode: Off</button>
     </nav>
 </header>
-<div class="container" style="flex-direction: column; align-items: center; padding-top: 90px;">
+<div class="container">
     <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
         <div class="card" style="margin-bottom: 24px;">
             <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
