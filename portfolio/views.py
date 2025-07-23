@@ -265,8 +265,8 @@ def home(request):
             fig_pie.update_layout(
                 title="Crypto Portfolio Distribution",
                 margin=dict(t=50, b=50, l=0, r=0),
-                paper_bgcolor="#121212",
-                plot_bgcolor="#121212",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
                 font=dict(color="#e0e0e0"),
                 height=300,
                 width=400
@@ -299,8 +299,8 @@ def home(request):
                 barmode='stack',
                 title='Portfolio Distribution (stacked bar)',
                 margin=dict(t=50, b=0, l=0, r=0),
-                paper_bgcolor="#121212",
-                plot_bgcolor="#121212",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
                 font=dict(color="#e0e0e0"),
                 xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
                 yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
@@ -589,8 +589,8 @@ def stocks(request):
         fig_pie.update_layout(
             title="Stock Portfolio Distribution",
             margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
@@ -618,8 +618,8 @@ def stocks(request):
                 barmode='stack',
                 title='Portfolio Distribution (stacked bar)',
                 margin=dict(t=50, b=0, l=0, r=0),
-                paper_bgcolor="#121212",
-                plot_bgcolor="#121212",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
                 font=dict(color="#e0e0e0"),
                 xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
                 yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
@@ -796,8 +796,8 @@ def real_estate(request):
         fig_pie.update_layout(
             title="Real Estate Portfolio Distribution",
             margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
@@ -829,8 +829,8 @@ def real_estate(request):
             barmode='stack',
             title='Portfolio Distribution (stacked bar)',
             margin=dict(t=50, b=0, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
@@ -1004,8 +1004,8 @@ def cash(request):
         fig_pie.update_layout(
             title="Cash Portfolio Distribution",
             margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
@@ -1036,8 +1036,8 @@ def cash(request):
             barmode='stack',
             title='Portfolio Distribution (stacked bar)',
             margin=dict(t=50, b=0, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
@@ -1048,6 +1048,7 @@ def cash(request):
         )
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     else:
+        pie_chart_html = None
         bar_chart_html = None
 
     # Get available currencies for dropdown
@@ -1063,7 +1064,7 @@ def cash(request):
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc'
     }
-    return render(request, 'cash.html', {
+    return render(request, 'other.html', {
         'username': request.user.username,
         'assets': assets_with_value,
         'total_net_worth': total_net_worth,
@@ -1073,6 +1074,8 @@ def cash(request):
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
+        'section_percentages': section_percentages,
+        'total_percentages': total_percentages,
         'percent_mode': percent_mode,
     })
 
@@ -1152,8 +1155,8 @@ def other(request):
         fig_pie.update_layout(
             title="Other Portfolio Distribution",
             margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
@@ -1185,8 +1188,8 @@ def other(request):
             barmode='stack',
             title='Portfolio Distribution (stacked bar)',
             margin=dict(t=50, b=0, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
@@ -1368,8 +1371,8 @@ def general(request):
         fig_pie.update_layout(
             title="Portfolio Distribution",
             margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
@@ -1393,8 +1396,8 @@ def general(request):
         fig_bar.update_layout(
             barmode='stack',
             margin=dict(t=50, b=50, l=10, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
             yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
@@ -1459,8 +1462,8 @@ def general(request):
         fig_pie.update_layout(
             title="Portfolio Distribution",
             margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
@@ -1484,8 +1487,8 @@ def general(request):
         fig_bar.update_layout(
             barmode='stack',
             margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
             yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
