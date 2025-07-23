@@ -15,6 +15,7 @@ from datetime import date
 import time
 import threading
 from django.core.cache import cache
+from django.utils import timezone
 
 # Currency conversion function
 _exchange_rate_cache = {}
@@ -1373,7 +1374,7 @@ def general(request):
     today = date.today()
     NetWorthSnapshot.objects.get_or_create(
         user=request.user, date=today,
-        defaults={'net_worth': total_net_worth}
+        defaults={'net_worth': total_net_worth, 'created_at': timezone.now()}
     )
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
@@ -1442,7 +1443,7 @@ def performance(request):
     # --- Save snapshot if not already saved today ---
     NetWorthSnapshot.objects.get_or_create(
         user=user, date=today,
-        defaults={'net_worth': total_net_worth}
+        defaults={'net_worth': total_net_worth, 'created_at': timezone.now()}
     )
 
     # --- Get all snapshots for this user ---
