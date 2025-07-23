@@ -147,12 +147,14 @@
         }
         .table-card, .chart-card {
           background-color: #1e1e1e;
-          padding: 0px;
+          padding: 4px;
           border-radius: 12px;
-          box-shadow: 0 0 8px rgba(0, 255, 0, 0.1);
+          border: 1px solid #222;
+          box-shadow: 0 0 2px rgba(0,0,0,0.15);
           flex: 1 1 600px;
           min-width: 400px;
           max-width: 700px;
+          margin: 4px 0;
         }
         .chart-card {
           padding-left: 0;
@@ -161,10 +163,8 @@
         #pie-chart-div, #bar-chart-div {
           width: 100%;
           height: 300px;
-          margin-left: 0;
-          margin-right: 0;
-          padding-left: 0;
-          padding-right: 0;
+          margin: 0 0 4px 0;
+          padding: 0;
         }
         @media (max-width: 900px) {
           .dashboard-section {
@@ -175,6 +175,9 @@
             min-width: 0;
             max-width: 100%;
           }
+        }
+        .section-header {
+          margin-bottom: 2px !important;
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -224,15 +227,15 @@
               {% endblock %}
             </div>
             <div class="chart-card">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
                 <div class="section-header" style="margin: 0;">{% block chart_title %}Portfolio Distribution{% endblock %}</div>
                 <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 0;">Show Pie Chart</button>
               </div>
               {% block chart %}
-                <div id="pie-chart-div" style="display: none; margin-top: 0; padding-top: 0; width: 100%; height: 300px;">
+                <div id="pie-chart-div" style="display: none; margin-top: 0 !important; padding-top: 0; width: 100%; height: 300px;">
                     {% block pie_chart %}{% endblock %}
                 </div>
-                <div id="bar-chart-div" style="display: block; margin-top: 0; padding-top: 0; width: 100%; height: 300px;">
+                <div id="bar-chart-div" style="display: block; margin-top: 0 !important; padding-top: 0; width: 100%; height: 300px;">
                     {% block bar_chart %}{% endblock %}
                 </div>
                 <script>

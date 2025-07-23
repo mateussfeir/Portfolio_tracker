@@ -291,15 +291,16 @@ def home(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="",
-            margin=dict(t=50, b=50, l=0, r=0),
+            title=None,
+            margin=dict(t=0, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
-            xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
+            xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            height=180,
+            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            height=140,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
@@ -607,15 +608,16 @@ def stocks(request):
             fig_bar = go.Figure(data=bar_segments)
             fig_bar.update_layout(
                 barmode='stack',
-                title="",
-                margin=dict(t=50, b=50, l=0, r=0),
+                title=None,
+                margin=dict(t=0, b=0, l=0, r=0),
                 paper_bgcolor="#121212",
                 plot_bgcolor="#121212",
                 font=dict(color="#e0e0e0"),
-                xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-                yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
+                xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
+                yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
                 showlegend=True,
-                height=180,
+                legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+                height=140,
             )
             bar_chart_html = fig_bar.to_html(full_html=False)
         else:
@@ -816,15 +818,16 @@ def real_estate(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="",
-            margin=dict(t=50, b=50, l=0, r=0),
+            title=None,
+            margin=dict(t=0, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
-            xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
+            xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            height=180,
+            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            height=140,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
@@ -1021,15 +1024,16 @@ def cash(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="",
-            margin=dict(t=50, b=50, l=0, r=0),
+            title=None,
+            margin=dict(t=0, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
-            xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
+            xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            height=180,
+            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            height=140,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
@@ -1168,15 +1172,16 @@ def other(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title="",
-            margin=dict(t=50, b=50, l=0, r=0),
+            title=None,
+            margin=dict(t=0, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
-            xaxis=dict(title='Percentage', range=[0, xaxis_max], ticksuffix='%'),
-            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, visible=False),
+            xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            height=180,
+            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            height=140,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:

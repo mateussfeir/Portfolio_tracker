@@ -121,14 +121,14 @@
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                 <h2 style="margin: 0;">{% block chart_title %}Portfolio Distribution{% endblock %}</h2>
             </div>
-            <div id="pie-chart-div" style="display: none;">
+            <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; height:300px;">
                 {% if pie_chart %}
                     {{ pie_chart|safe }}
                 {% else %}
                     <p style="color: #aaa;">No chart data available.</p>
                 {% endif %}
             </div>
-            <div id="bar-chart-div" style="display: block;">
+            <div id="bar-chart-div" style="display: block; margin:0; padding:0; width:100%; height:300px;">
                 {% if bar_chart %}
                     {{ bar_chart|safe }}
                 {% endif %}
