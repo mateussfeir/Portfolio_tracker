@@ -1486,7 +1486,7 @@ def get_user_total_net_worth(user, selected_currency):
     crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
     crypto_prices = get_multiple_asset_prices(crypto_tickers)
     total_crypto_usd = sum(
-        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        (safe_decimal(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0)) * asset.amount)
         for asset in crypto_assets
     )
     total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
@@ -1495,7 +1495,7 @@ def get_user_total_net_worth(user, selected_currency):
     stock_tickers = [asset.ticker.upper() for asset in stock_assets]
     stock_prices = get_multiple_stock_prices(stock_tickers)
     total_stocks_usd = sum(
-        (Decimal(str(stock_prices.get(asset.ticker.upper(), 0))) * asset.amount)
+        (safe_decimal(stock_prices.get(asset.ticker.upper(), 0)) * asset.amount)
         for asset in stock_assets
     )
     total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
