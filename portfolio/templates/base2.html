@@ -60,8 +60,23 @@
     </nav>
 </header>
 <div class="container" style="flex-direction: column; align-items: center; padding-top: 20px;">
-    <div style="display: flex; flex-wrap: wrap; gap: 20px; width: 100%; justify-content: center; align-items: flex-start;">
-        <div class="card" style="flex: 1 1 45%; min-width: 350px;">
+    <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
+        <div class="card pie-chart-container" style="margin-bottom: 24px;">
+            <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 0; display: block;">Show Pie Chart</button>
+            <div id="pie-chart-div" style="display: none; margin-top: 0; padding-top: 0;">
+                {% if pie_chart %}
+                    {{ pie_chart|safe }}
+                {% else %}
+                    <p style="color: #aaa;">No chart data available.</p>
+                {% endif %}
+            </div>
+            <div id="bar-chart-div" style="display: block; margin-top: 0; padding-top: 0;">
+                {% if bar_chart %}
+                    {{ bar_chart|safe }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="card" style="margin-bottom: 24px;">
             <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
             {% block percent_buttons %}
             <form method="get" style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
@@ -79,22 +94,6 @@
                     <button type="submit">Add Position</button>
                     <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
                 </form>
-            </div>
-        </div>
-        <div class="card pie-chart-container" style="flex: 1 1 45%; min-width: 350px;">
-            <div class="section-header">{% block chart_title %}Portfolio Distribution{% endblock %}</div>
-            <button id="toggle-chart-btn" style="background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 6px; padding: 6px 18px; font-weight: bold; cursor: pointer; font-size: 1em; margin-bottom: 12px;">Show Pie Chart</button>
-            <div id="pie-chart-div" style="display: none;">
-                {% if pie_chart %}
-                    {{ pie_chart|safe }}
-                {% else %}
-                    <p style="color: #aaa;">No chart data available.</p>
-                {% endif %}
-            </div>
-            <div id="bar-chart-div" style="display: block;">
-                {% if bar_chart %}
-                    {{ bar_chart|safe }}
-                {% endif %}
             </div>
         </div>
     </div>

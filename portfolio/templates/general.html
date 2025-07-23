@@ -16,7 +16,7 @@
         {% for t in totals %}
         <tr>
             <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
-            <td><span class="sensitive-value">{{ currency_symbol }}{{ t.value|intcomma }}</span></td>
+            <td><span class="sensitive-value">{{ currency_symbol }}{{ t.value|floatformat:2|intcomma }}</span></td>
             <td>{{ t.percent|floatformat:2 }}%</td>
         </tr>
         {% endfor %}
