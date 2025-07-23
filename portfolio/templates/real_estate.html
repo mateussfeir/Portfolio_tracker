@@ -2,7 +2,7 @@
 {% load humanize %}
 {% load currency_filters %}
 {% block section_title %}Real Estate{% endblock %}
-{% block positions_title %}Your Real Estate Positions: <span class="sensitive-value">{{ currency_symbol }}{{ section_net_worth|floatformat:2|intcomma }}</span>{% endblock %}
+{% block positions_title %}Your Real Estate Positions: <span class="sensitive-value">{{ section_net_worth|currency:currency_symbol }}</span>{% endblock %}
 
 {% block table %}
 {% if assets %}

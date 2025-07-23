@@ -780,6 +780,7 @@ def real_estate(request):
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
+        'section_net_worth': section_sum,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
