@@ -251,14 +251,20 @@
           overflow-x: auto;
           max-width: 100%;
         }
-        .logout-link {
-            position: static;
+        .logout-form {
+            display: inline;
             margin-left: 12px;
+        }
+        .logout-link {
+            background: none;
+            border: none;
             color: #aaa;
             text-decoration: none;
             font-weight: bold;
             font-size: 1em;
+            cursor: pointer;
             z-index: 1000;
+            margin-left: 0;
         }
         .logout-link:hover {
             color: #fff;
@@ -289,7 +295,10 @@
                 {% endfor %}
             </select>
             <button id="privacy-toggle-btn" type="button" style="margin-left: 12px; background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background 0.18s, color 0.18s, transform 0.18s;">Privacy Mode: Off</button>
-            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+            <form action="{% url 'logout' %}" method="post" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-link">Logout</button>
+            </form>
         </div>
     </nav>
 </header>
