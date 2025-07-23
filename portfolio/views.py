@@ -265,7 +265,7 @@ def home(request):
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0")
         )
-        pie_chart_html = fig_pie.to_html(full_html=False)
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Stacked bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
@@ -291,8 +291,8 @@ def home(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title=None,
-            margin=dict(t=0, b=0, l=0, r=0),
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=64, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -300,7 +300,7 @@ def home(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=140,
+            height=340,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
@@ -608,8 +608,8 @@ def stocks(request):
             fig_bar = go.Figure(data=bar_segments)
             fig_bar.update_layout(
                 barmode='stack',
-                title=None,
-                margin=dict(t=0, b=0, l=0, r=0),
+                title='Portfolio Distribution (stacked bar)',
+                margin=dict(t=64, b=0, l=0, r=0),
                 paper_bgcolor="#121212",
                 plot_bgcolor="#121212",
                 font=dict(color="#e0e0e0"),
@@ -617,7 +617,7 @@ def stocks(request):
                 yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
                 showlegend=True,
                 legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-                height=140,
+                height=340,
             )
             bar_chart_html = fig_bar.to_html(full_html=False)
         else:
@@ -818,8 +818,8 @@ def real_estate(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title=None,
-            margin=dict(t=0, b=0, l=0, r=0),
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=64, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -827,7 +827,7 @@ def real_estate(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=140,
+            height=340,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
@@ -1024,8 +1024,8 @@ def cash(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title=None,
-            margin=dict(t=0, b=0, l=0, r=0),
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=64, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -1033,7 +1033,7 @@ def cash(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=140,
+            height=340,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:
@@ -1172,8 +1172,8 @@ def other(request):
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title=None,
-            margin=dict(t=0, b=0, l=0, r=0),
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=64, b=0, l=0, r=0),
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
             font=dict(color="#e0e0e0"),
@@ -1181,7 +1181,7 @@ def other(request):
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=140,
+            height=340,
         )
         bar_chart_html = fig_bar.to_html(full_html=False)
     else:

@@ -18,7 +18,11 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
-        header { color: #fff; padding: 1rem; text-align: center; }
+        header {
+          padding: 0 !important;
+          margin: 0 !important;
+          height: auto !important;
+        }
         header h1 {
           margin-top: 0;
           margin-bottom: 0;
@@ -28,7 +32,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 0 20px;
+            padding: 0;
             gap: 20px;
         }
         .card {
@@ -51,25 +55,32 @@
         .pie-chart-container { text-align: center; }
         footer { margin-top: 20px; text-align: center; color: #aaa; }
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            padding: 12px 24px;
-            gap: 10px;
-            background: #1f1f1f;
-            position: sticky;
-            top: 0;
-            z-index: 1001;
-            font-size: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px !important;
+          margin: 0 !important;
+          height: auto !important;
+          line-height: normal;
+          background: #000000;
         }
         .nav-left,
         .nav-center,
         .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
+          display: flex;
+          align-items: center;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .nav-left {
+          margin: 0 !important;
+          padding: 0px 0 !important;
+          font-size: 14px;
+        }
+        select,
+        button {
+          margin: 0 !important;
+          padding: 4px 8px;
         }
         .nav-center {
             justify-content: center;
@@ -142,29 +153,48 @@
           justify-content: center;
           align-items: flex-start;
           flex-wrap: wrap;
-          gap: 32px;
-          margin-top: 20px;
+          gap: 0 !important;
+          margin-top: 0px;
         }
-        .table-card, .chart-card {
+        .table-card {
           background-color: #1e1e1e;
-          padding: 4px;
+          padding: 20px;
           border-radius: 12px;
           border: 1px solid #222;
           box-shadow: 0 0 2px rgba(0,0,0,0.15);
-          flex: 1 1 600px;
-          min-width: 400px;
-          max-width: 700px;
-          margin: 4px 0;
+          flex: 0 1 43%;
+          min-width: 0 !important;
+          max-width: 350px;
+          margin: 0 20px !important;
+          overflow: hidden;
         }
         .chart-card {
-          padding-left: 0;
-          padding-right: 0;
+          background-color: #1e1e1e;
+          padding: 4px 0 4px 0;
+          border-radius: 12px;
+          border: 1px solid #222;
+          box-shadow: 0 0 2px rgba(0,0,0,0.15);
+          flex: 1 1 64%;
+          min-width: 0 !important;
+          max-width: 900px;
+          margin: 0 !important;
+          min-height: 300px;
         }
         #pie-chart-div, #bar-chart-div {
           width: 100%;
-          height: 300px;
-          margin: 0 0 4px 0;
+          aspect-ratio: 2/1;
+          min-height: 200px;
+          max-height: 500px;
+          margin: 0;
           padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        #bar-chart-div {
+          height: 340px;
+          aspect-ratio: unset;
+          overflow: visible;
         }
         @media (max-width: 900px) {
           .dashboard-section {
@@ -174,10 +204,35 @@
           .table-card, .chart-card {
             min-width: 0;
             max-width: 100%;
+            width: 100%;
+            flex: 1 1 100%;
+          }
+        }
+        @media (max-width: 768px) {
+          .container {
+            padding: 0 12px;
           }
         }
         .section-header {
           margin-bottom: 2px !important;
+        }
+        .networth-card {
+          padding: 0 !important;
+          max-width: 900px;
+          width: 100%;
+          margin: 0 auto 24px auto;
+          background: #1f1f1f;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+        }
+        .networth-card .section-header {
+          padding: 16px 24px 8px 24px;
+          margin-bottom: 0 !important;
+        }
+        .networth-card .js-plotly-plot {
+          width: 100% !important;
+          height: 100% !important;
+          min-width: 0;
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -263,10 +318,8 @@
           </div>
         {# Only show Net Worth Over Time card if block is not empty #}
         {% block networth_over_time_card %}
-        <div class="card" style="margin-bottom: 24px;">
-            <div class="section-header">Net Worth Over Time</div>
-            {% block networth_over_time %}{% endblock %}
-        </div>
+        <div class="section-header">Net Worth Over Time</div>
+        {% block networth_over_time %}{% endblock %}
         {% endblock %}
     </div>
 </div>
