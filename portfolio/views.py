@@ -107,6 +107,51 @@ def get_multiple_asset_prices(tickers):
             return _crypto_price_cache[ids]
         return {}
 
+# --- Stock price cache function ---
+STOCK_CACHE_TTL_SECONDS = 180  # 3 minutes
+
+def get_multiple_stock_prices(tickers):
+    """
+    Fetch and cache stock prices for a list of tickers for 3 minutes.
+    Returns a dict: {ticker: price}
+    """
+    if not tickers:
+        return {}
+    # Create a cache key based on the sorted tickers
+    cache_key = "stock_prices_" + "_".join(sorted(tickers))
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    prices = {}
+    try:
+        if len(tickers) == 1:
+            ticker = tickers[0]
+            data = yf.Ticker(ticker).history(period='1d')
+            if not data.empty:
+                prices[ticker] = float(data['Close'].iloc[-1])
+            else:
+                prices[ticker] = None
+        else:
+            data = yf.download(
+                tickers=tickers,
+                period='1d',
+                interval='1d',
+                group_by='ticker',
+                threads=True,
+                progress=False
+            )
+            for ticker in tickers:
+                try:
+                    prices[ticker] = float(data[ticker]['Close'].iloc[-1])
+                except Exception:
+                    prices[ticker] = None
+    except Exception:
+        prices = {ticker: None for ticker in tickers}
+
+    cache.set(cache_key, prices, timeout=STOCK_CACHE_TTL_SECONDS)
+    return prices
+
 # Helper function to map user-friendly tickers to CoinGecko identifiers
 def map_ticker(ticker):
     return COINGECKO_TICKER_MAPPING.get(ticker.lower(), ticker.lower())
@@ -410,37 +455,8 @@ def stocks(request):
     user_assets = Asset.objects.filter(owner=request.user, type='stock')
     tickers = [asset.ticker.upper() for asset in user_assets]
 
-    # Fetch stock prices using yfinance
-    prices = {}
-    if tickers:
-        if len(tickers) == 1:
-            # Handle single ticker separately
-            ticker = tickers[0]
-            try:
-                data = yf.Ticker(ticker).history(period='1d')
-                if not data.empty:
-                    prices[ticker] = float(data['Close'].iloc[-1])
-                else:
-                    prices[ticker] = None
-            except Exception:
-                prices[ticker] = None
-        else:
-            try:
-                data = yf.download(
-                    tickers=tickers,
-                    period='1d',
-                    interval='1d',
-                    group_by='ticker',
-                    threads=True,
-                    progress=False
-                )
-                for ticker in tickers:
-                    try:
-                        prices[ticker] = float(data[ticker]['Close'].iloc[-1])
-                    except Exception:
-                        prices[ticker] = None
-            except Exception:
-                prices = {ticker: None for ticker in tickers}
+    # Fetch stock prices using the new cache function
+    prices = get_multiple_stock_prices(tickers)
 
     # Calculate section net worth in USD first
     section_net_worth_usd = 0
@@ -472,35 +488,7 @@ def stocks(request):
     total_crypto_all = convert_currency(total_crypto_usd_all, 'USD', selected_currency)
     # Stocks
     stock_tickers_all = [asset.ticker.upper() for asset in stock_assets_all]
-    stock_prices_all = {}
-    if stock_tickers_all:
-        if len(stock_tickers_all) == 1:
-            ticker = stock_tickers_all[0]
-            try:
-                data = yf.Ticker(ticker).history(period='1d')
-                if not data.empty:
-                    stock_prices_all[ticker] = float(data['Close'].iloc[-1])
-                else:
-                    stock_prices_all[ticker] = None
-            except Exception:
-                stock_prices_all[ticker] = None
-        else:
-            try:
-                data = yf.download(
-                    tickers=stock_tickers_all,
-                    period='1d',
-                    interval='1d',
-                    group_by='ticker',
-                    threads=True,
-                    progress=False
-                )
-                for ticker in stock_tickers_all:
-                    try:
-                        stock_prices_all[ticker] = float(data[ticker]['Close'].iloc[-1])
-                    except Exception:
-                        stock_prices_all[ticker] = None
-            except Exception:
-                stock_prices_all = {ticker: None for ticker in stock_tickers_all}
+    stock_prices_all = get_multiple_stock_prices(stock_tickers_all)
     total_stocks_usd_all = 0
     for asset in stock_assets_all:
         price = stock_prices_all.get(asset.ticker.upper())
@@ -1116,41 +1104,13 @@ def general(request):
 
     # Get prices for stocks
     stock_tickers = [asset.ticker.upper() for asset in stock_assets]
-    stock_prices = {}
-    if stock_tickers:
-        import yfinance as yf
-        if len(stock_tickers) == 1:
-            ticker = stock_tickers[0]
-            try:
-                data = yf.Ticker(ticker).history(period='1d')
-                if not data.empty:
-                    stock_prices[ticker] = float(data['Close'].iloc[-1])
-                else:
-                    stock_prices[ticker] = None
-            except Exception:
-                stock_prices[ticker] = None
-        else:
-            try:
-                data = yf.download(
-                    tickers=stock_tickers,
-                    period='1d',
-                    interval='1d',
-                    group_by='ticker',
-                    threads=True,
-                    progress=False
-                )
-                for ticker in stock_tickers:
-                    try:
-                        stock_prices[ticker] = float(data[ticker]['Close'].iloc[-1])
-                    except Exception:
-                        stock_prices[ticker] = None
-            except Exception:
-                stock_prices = {ticker: None for ticker in stock_tickers}
-    total_stocks_usd = 0
-    for asset in stock_assets:
-        price = stock_prices.get(asset.ticker.upper())
-        price_decimal = safe_decimal(price)
-        total_stocks_usd += price_decimal * asset.amount
+    stock_prices = get_multiple_stock_prices(stock_tickers)
+
+    # Calculate total stocks net worth in USD
+    total_stocks_usd = sum(
+        (Decimal(str(stock_prices.get(asset.ticker.upper(), 0))) * asset.amount)
+        for asset in stock_assets
+    )
     # Convert to selected currency
     total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
 
@@ -1533,41 +1493,11 @@ def get_user_total_net_worth(user, selected_currency):
     # Stocks
     stock_assets = Asset.objects.filter(owner=user, type='stock')
     stock_tickers = [asset.ticker.upper() for asset in stock_assets]
-    stock_prices = {}
-    if stock_tickers:
-        import yfinance as yf
-        if len(stock_tickers) == 1:
-            ticker = stock_tickers[0]
-            try:
-                data = yf.Ticker(ticker).history(period='1d')
-                if not data.empty:
-                    stock_prices[ticker] = float(data['Close'].iloc[-1])
-                else:
-                    stock_prices[ticker] = None
-            except Exception:
-                stock_prices[ticker] = None
-        else:
-            try:
-                data = yf.download(
-                    tickers=stock_tickers,
-                    period='1d',
-                    interval='1d',
-                    group_by='ticker',
-                    threads=True,
-                    progress=False
-                )
-                for ticker in stock_tickers:
-                    try:
-                        stock_prices[ticker] = float(data[ticker]['Close'].iloc[-1])
-                    except Exception:
-                        stock_prices[ticker] = None
-            except Exception:
-                stock_prices = {ticker: None for ticker in stock_tickers}
-    total_stocks_usd = 0
-    for asset in stock_assets:
-        price = stock_prices.get(asset.ticker.upper())
-        price_decimal = safe_decimal(price)
-        total_stocks_usd += price_decimal * asset.amount
+    stock_prices = get_multiple_stock_prices(stock_tickers)
+    total_stocks_usd = sum(
+        (Decimal(str(stock_prices.get(asset.ticker.upper(), 0))) * asset.amount)
+        for asset in stock_assets
+    )
     total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
     # Cash
     cash_assets = Asset.objects.filter(owner=user, type='cash')
