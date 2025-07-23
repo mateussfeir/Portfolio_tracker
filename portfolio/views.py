@@ -120,6 +120,30 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
+            # Create default assets for the new user
+            from .models import Asset
+            from decimal import Decimal
+            default_assets = [
+                {"type": "crypto", "ticker": "BTC", "amount": Decimal("1"), "currency": None},
+                {"type": "crypto", "ticker": "ETH", "amount": Decimal("7"), "currency": None},
+                {"type": "stock", "ticker": "TSLA", "amount": Decimal("12"), "currency": None},
+                {"type": "stock", "ticker": "SPYI", "amount": Decimal("700"), "currency": None},
+                {"type": "stock", "ticker": "AAPL", "amount": Decimal("700"), "currency": None},
+                {"type": "cash", "ticker": "CASH", "amount": Decimal("13000"), "currency": "USD"},
+                {"type": "cash", "ticker": "BMO Bank", "amount": Decimal("27000"), "currency": "CAD"},
+                {"type": "real_estate", "ticker": "Florida house", "amount": Decimal("220000"), "currency": "USD"},
+                {"type": "real_estate", "ticker": "Toronto apartment", "amount": Decimal("470000"), "currency": "CAD"},
+                {"type": "other", "ticker": "Sales Business", "amount": Decimal("3000"), "currency": "USD"},
+                {"type": "other", "ticker": "Audi A3", "amount": Decimal("12000"), "currency": "USD"},
+            ]
+            for asset in default_assets:
+                Asset.objects.create(
+                    owner=user,
+                    type=asset["type"],
+                    ticker=asset["ticker"],
+                    amount=asset["amount"],
+                    currency=asset["currency"]
+                )
             return redirect('general')  # Redirect to the General tab after signup
     else:
         form = SignUpForm()
@@ -739,6 +763,9 @@ def real_estate(request):
             asset_dict['percentage'] = 0
 
     # --- REAL ESTATE PIE CHART LOGIC ---
+    # Build labels and values from sorted assets_with_value
+    labels = [a['ticker'] for a in assets_with_value]
+    values = [float(a['value']) for a in assets_with_value]
     if labels and values:
         if percent_mode == 'total' and true_total_net_worth_float > 0:
             pie_values = [safe_float(a['value']) / true_total_net_worth_float * 100 for a in assets_with_value]
@@ -1374,7 +1401,7 @@ def general(request):
     today = date.today()
     NetWorthSnapshot.objects.get_or_create(
         user=request.user, date=today,
-        defaults={'net_worth': total_net_worth, 'created_at': timezone.now()}
+        defaults={'net_worth': total_net_worth}
     )
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
@@ -1443,7 +1470,7 @@ def performance(request):
     # --- Save snapshot if not already saved today ---
     NetWorthSnapshot.objects.get_or_create(
         user=user, date=today,
-        defaults={'net_worth': total_net_worth, 'created_at': timezone.now()}
+        defaults={'net_worth': total_net_worth}
     )
 
     # --- Get all snapshots for this user ---
