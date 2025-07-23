@@ -1486,44 +1486,45 @@ def get_user_total_net_worth(user, selected_currency):
     cached = cache.get(cache_key)
     if cached is not None:
         return cached
-    # Calculate total net worth across all asset types
     from decimal import Decimal
     from .models import Asset
+    # --- Always sum in USD first ---
     # Crypto
     crypto_assets = Asset.objects.filter(owner=user, type='crypto')
     crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
     crypto_prices = get_multiple_asset_prices(crypto_tickers)
     total_crypto_usd = sum(
-        (safe_decimal(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0)) * asset.amount)
+        safe_decimal(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0)) * asset.amount
         for asset in crypto_assets
     )
-    total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
     # Stocks
     stock_assets = Asset.objects.filter(owner=user, type='stock')
     stock_tickers = [asset.ticker.upper() for asset in stock_assets]
     stock_prices = get_multiple_stock_prices(stock_tickers)
     total_stocks_usd = sum(
-        (safe_decimal(stock_prices.get(asset.ticker.upper(), 0)) * asset.amount)
+        safe_decimal(stock_prices.get(asset.ticker.upper(), 0)) * asset.amount
         for asset in stock_assets
     )
-    total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
     # Cash
     cash_assets = Asset.objects.filter(owner=user, type='cash')
-    total_cash = sum(convert_currency(cash.amount, cash.currency or 'USD', selected_currency) for cash in cash_assets)
+    total_cash_usd = sum(convert_currency(cash.amount, cash.currency or 'USD', 'USD') for cash in cash_assets)
     # Real Estate
     real_estate_assets = Asset.objects.filter(owner=user, type='real_estate')
-    total_real_estate = sum(convert_currency(re.amount, re.currency or 'USD', selected_currency) for re in real_estate_assets)
+    total_real_estate_usd = sum(convert_currency(re.amount, re.currency or 'USD', 'USD') for re in real_estate_assets)
     # Other
     other_assets = Asset.objects.filter(owner=user, type='other')
-    total_other = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets)
-    total_net_worth = total_crypto + total_stocks + total_real_estate + total_cash + total_other
-
-    # --- BTC as display currency ---
+    total_other_usd = sum(convert_currency(o.amount, o.currency or 'USD', 'USD') for o in other_assets)
+    # Sum all in USD
+    total_net_worth_usd = total_crypto_usd + total_stocks_usd + total_real_estate_usd + total_cash_usd + total_other_usd
+    # Convert to selected currency
     if selected_currency == 'BTC':
-        # Get BTC price in USD
         btc_price_data = get_multiple_asset_prices(['bitcoin'])
         btc_price_usd = safe_decimal(btc_price_data.get('bitcoin', {}).get('usd', 0))
         if btc_price_usd > 0:
-            total_net_worth = total_net_worth / btc_price_usd
+            total_net_worth = total_net_worth_usd / btc_price_usd
+        else:
+            total_net_worth = Decimal('0')
+    else:
+        total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
     cache.set(cache_key, total_net_worth, timeout=180)
     return total_net_worth
