@@ -264,6 +264,7 @@ def home(request):
     # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
+        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -272,7 +273,7 @@ def home(request):
         'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
+        'CHF': 'Swiss Franc',
     }
 
     # Prepare pie and bar charts for crypto
@@ -399,6 +400,7 @@ def edit_holding(request, pk):
     asset = get_object_or_404(Asset, pk=pk, owner=request.user)
     available_currencies = {
         'USD': 'US Dollar',
+        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -407,7 +409,7 @@ def edit_holding(request, pk):
         'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
+        'CHF': 'Swiss Franc',
     }
     if request.method == 'POST':
         form = AddAssetForm(request.POST, instance=asset, asset_type=asset.type)
@@ -617,6 +619,7 @@ def stocks(request):
     # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
+        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -625,7 +628,7 @@ def stocks(request):
         'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
+        'CHF': 'Swiss Franc',
     }
 
     return render(request, 'stocks.html', {
@@ -753,6 +756,7 @@ def real_estate(request):
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
+        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -761,7 +765,7 @@ def real_estate(request):
         'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
+        'CHF': 'Swiss Franc',
     }
     return render(request, 'real_estate.html', {
         'username': request.user.username,
@@ -888,6 +892,7 @@ def cash(request):
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
+        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -896,7 +901,7 @@ def cash(request):
         'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
+        'CHF': 'Swiss Franc',
     }
     return render(request, 'cash.html', {
         'username': request.user.username,
@@ -1023,6 +1028,7 @@ def other(request):
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
+        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -1031,7 +1037,7 @@ def other(request):
         'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
+        'CHF': 'Swiss Franc',
     }
     return render(request, 'other.html', {
         'username': request.user.username,
@@ -1202,6 +1208,7 @@ def general(request):
 
     available_currencies = {
         'USD': 'US Dollar',
+        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -1210,7 +1217,7 @@ def general(request):
         'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
+        'CHF': 'Swiss Franc',
     }
 
     # After calculating total_net_worth
@@ -1458,6 +1465,7 @@ CURRENCY_SYMBOLS = {
     'JPY': '¥',
     'AUD': 'A$',
     'CHF': 'Fr.',
+    'BTC': '₿',  # Add BTC symbol
 }
 
 def safe_decimal(val):
@@ -1509,5 +1517,13 @@ def get_user_total_net_worth(user, selected_currency):
     other_assets = Asset.objects.filter(owner=user, type='other')
     total_other = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets)
     total_net_worth = total_crypto + total_stocks + total_real_estate + total_cash + total_other
+
+    # --- BTC as display currency ---
+    if selected_currency == 'BTC':
+        # Get BTC price in USD
+        btc_price_data = get_multiple_asset_prices(['bitcoin'])
+        btc_price_usd = safe_decimal(btc_price_data.get('bitcoin', {}).get('usd', 0))
+        if btc_price_usd > 0:
+            total_net_worth = total_net_worth / btc_price_usd
     cache.set(cache_key, total_net_worth, timeout=180)
     return total_net_worth
