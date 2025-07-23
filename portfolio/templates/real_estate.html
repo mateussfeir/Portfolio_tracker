@@ -48,6 +48,10 @@
     {% endif %}
 {% endblock %}
 
+<div style="margin: 16px 0; font-size: 1.1em; font-weight: 500; color: #e0e0e0;">
+    Real Estate net worth: <span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|floatformat:2|intcomma }}</span>
+</div>
+
 {% block pie_chart %}
     {% if pie_chart %}
         {{ pie_chart|safe }}

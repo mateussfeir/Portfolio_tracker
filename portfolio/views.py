@@ -152,43 +152,29 @@ def signup(request):
 
 @login_required
 def home(request):
-    # Get selected currency from request, default to USD
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
     if request.method == 'POST':
         form = AddAssetForm(request.POST, asset_type='crypto')
         if form.is_valid():
             asset = form.save(commit=False)
             asset.owner = request.user
-            # Ensure new assets added from home are crypto
             asset.type = 'crypto'
             asset.save()
-            return redirect('home')  # Refresh the page after adding the asset
+            return redirect('home')
         else:
             messages.error(request, "Failed to add asset. Please check your inputs.")
     else:
         form = AddAssetForm(asset_type='crypto')
 
-    # Get user crypto assets only
     user_assets = Asset.objects.filter(owner=request.user, type='crypto')
     tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in user_assets]
     prices = get_multiple_asset_prices(tickers)
-
-    # Fetch Bitcoin price explicitly
     bitcoin_price = prices.get('bitcoin', {}).get('usd', 'N/A')
 
-    # Calculate total net worth in USD first
-    total_net_worth_usd = sum(
-        (Decimal(str(prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
-        for asset in user_assets
-    )
-    
-    # Convert to selected currency
-    total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
-
-    # Populate assets and chart data
     assets_with_value = []
     percent_mode = request.GET.get('percent', 'section')
     for asset in user_assets:
@@ -398,16 +384,18 @@ def edit_holding(request, pk):
 
 @login_required
 def stocks(request):
-    # Get selected currency from request, default to USD
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
+    # Calculate true total net worth for navbar (all assets)
+    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    # Calculate section (stocks) net worth for tab display
     if request.method == 'POST':
         form = AddAssetForm(request.POST, asset_type='stock')
         if form.is_valid():
             asset = form.save(commit=False)
             asset.owner = request.user
             asset.type = 'stock'
-            asset.ticker = asset.ticker.upper()  # Ensure ticker is uppercase
+            asset.ticker = asset.ticker.upper()
             asset.save()
             return redirect('stocks')
         else:
@@ -415,7 +403,6 @@ def stocks(request):
     else:
         form = AddAssetForm(asset_type='stock')
 
-    # Get user stock assets
     user_assets = Asset.objects.filter(owner=request.user, type='stock')
     tickers = [asset.ticker.upper() for asset in user_assets]
 
@@ -451,18 +438,17 @@ def stocks(request):
             except Exception:
                 prices = {ticker: None for ticker in tickers}
 
-    # Calculate total net worth in USD first
-    total_net_worth_usd = 0
+    # Calculate section net worth in USD first
+    section_net_worth_usd = 0
     for asset in user_assets:
         price = prices.get(asset.ticker.upper())
         try:
             price_decimal = safe_decimal(price)
         except Exception:
             price_decimal = Decimal('0')
-        total_net_worth_usd += price_decimal * asset.amount
-    
+        section_net_worth_usd += price_decimal * asset.amount
     # Convert to selected currency
-    total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
+    section_net_worth = convert_currency(section_net_worth_usd, 'USD', selected_currency)
 
     # Populate assets and chart data
     assets_with_value = []
@@ -654,7 +640,8 @@ def stocks(request):
         'username': request.user.username,
         'assets': assets_with_value,
         'form': form,
-        'total_net_worth': total_net_worth,
+        'total_net_worth': total_net_worth,  # This is now always the true total net worth
+        'section_net_worth': section_net_worth,  # For tab display only
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
@@ -667,14 +654,10 @@ def stocks(request):
 def real_estate(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
-    labels = []
-    values = []
-    pie_chart_html = None
-    bar_chart_html = None
-    section_percentages = []
-    total_percentages = []
+    percent_mode = request.GET.get('percent', 'section')
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -685,72 +668,11 @@ def real_estate(request):
             return redirect('real_estate')
     else:
         form = AddAssetForm()
-    # Get all real estate assets
-    assets = Asset.objects.filter(owner=request.user, type='real_estate')
-    # Calculate values in selected currency
-    total_net_worth = Decimal('0')
+    user_assets = Asset.objects.filter(owner=request.user, type='real_estate')
     assets_with_value = []
-    percent_mode = request.GET.get('percent', 'section')
-    # Calculate true total net worth (copy from general view)
-    crypto_assets_all = Asset.objects.filter(owner=request.user, type='crypto')
-    stock_assets_all = Asset.objects.filter(owner=request.user, type='stock')
-    cash_assets_all = Asset.objects.filter(owner=request.user, type='cash')
-    real_estate_assets_all = Asset.objects.filter(owner=request.user, type='real_estate')
-    other_assets_all = Asset.objects.filter(owner=request.user, type='other')
-    # Crypto
-    crypto_tickers_all = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets_all]
-    crypto_prices_all = get_multiple_asset_prices(crypto_tickers_all)
-    total_crypto_usd_all = sum((Decimal(str(crypto_prices_all.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount) for asset in crypto_assets_all)
-    total_crypto_all = convert_currency(total_crypto_usd_all, 'USD', selected_currency)
-    # Stocks
-    stock_tickers_all = [asset.ticker.upper() for asset in stock_assets_all]
-    stock_prices_all = {}
-    if stock_tickers_all:
-        if len(stock_tickers_all) == 1:
-            ticker = stock_tickers_all[0]
-            try:
-                data = yf.Ticker(ticker).history(period='1d')
-                if not data.empty:
-                    stock_prices_all[ticker] = float(data['Close'].iloc[-1])
-                else:
-                    stock_prices_all[ticker] = None
-            except Exception:
-                stock_prices_all[ticker] = None
-        else:
-            try:
-                data = yf.download(
-                    tickers=stock_tickers_all,
-                    period='1d',
-                    interval='1d',
-                    group_by='ticker',
-                    threads=True,
-                    progress=False
-                )
-                for ticker in stock_tickers_all:
-                    try:
-                        stock_prices_all[ticker] = float(data[ticker]['Close'].iloc[-1])
-                    except Exception:
-                        stock_prices_all[ticker] = None
-            except Exception:
-                stock_prices_all = {ticker: None for ticker in stock_tickers_all}
-    total_stocks_usd_all = 0
-    for asset in stock_assets_all:
-        price = stock_prices_all.get(asset.ticker.upper())
-        price_decimal = safe_decimal(price)
-        total_stocks_usd_all += price_decimal * asset.amount
-    total_stocks_all = convert_currency(total_stocks_usd_all, 'USD', selected_currency)
-    # Cash
-    total_cash_all = sum(convert_currency(cash.amount, cash.currency or 'USD', selected_currency) for cash in cash_assets_all)
-    # Real Estate
-    total_real_estate_all = sum(convert_currency(re.amount, re.currency or 'USD', selected_currency) for re in real_estate_assets_all)
-    # Other
-    total_other_all = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets_all)
-    # True total net worth
-    true_total_net_worth = total_crypto_all + total_stocks_all + total_real_estate_all + total_cash_all + total_other_all
-    true_total_net_worth_float = float(true_total_net_worth)
-    for asset in assets:
-        value = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
-        total_net_worth += value
+    for asset in user_assets:
+        price = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
+        value = price
         asset_dict = {
             'id': asset.id,
             'ticker': asset.ticker,
@@ -758,29 +680,28 @@ def real_estate(request):
             'currency': asset.currency,
             'value': value,
         }
-        # Always use section (Other) total for table percentage
-        # Calculate section total after the loop
         assets_with_value.append(asset_dict)
-        labels.append(asset.ticker)
-        values.append(float(value))
-    # Sort assets by value descending
-    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
-    # Calculate section total for percentage
-    section_total = float(total_net_worth)
-    for asset_dict in assets_with_value:
-        value = asset_dict['value']
-        if section_total > 0:
-            asset_dict['percentage'] = round(safe_float(value) / section_total * 100, 2)
-        else:
-            asset_dict['percentage'] = 0
-
-    # --- REAL ESTATE PIE CHART LOGIC ---
-    # Build labels and values from sorted assets_with_value
-    labels = [a['ticker'] for a in assets_with_value]
-    values = [float(a['value']) for a in assets_with_value]
-    if labels and values:
+    def get_value_for_sort(x):
+        try:
+            return float(x['value'])
+        except Exception:
+            return 0
+    assets_with_value.sort(key=get_value_for_sort, reverse=True)
+    section_sum = sum([float(a['value']) for a in assets_with_value])
+    for asset in assets_with_value:
+        value = asset['value']
         if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [safe_float(a['value']) / true_total_net_worth_float * 100 for a in assets_with_value]
+            asset['percentage'] = round((float(value) / true_total_net_worth_float * 100), 2) if true_total_net_worth_float > 0 else 0
+        else:
+            asset['percentage'] = round((float(value) / section_sum * 100), 2) if section_sum > 0 else 0
+    labels = [asset['ticker'] for asset in assets_with_value]
+    values = [float(asset['value']) for asset in assets_with_value]
+    pie_chart_html = None
+    bar_chart_html = None
+    if labels and values:
+        total = sum(values)
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            pie_values = [float(v) / true_total_net_worth_float * 100 for v in values]
             sum_section_pct = sum(pie_values)
             if sum_section_pct < 100:
                 labels_with_other = labels + ['Other']
@@ -790,8 +711,8 @@ def real_estate(request):
                 pie_values_with_other = pie_values
             fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
         else:
-            section_sum = sum([safe_float(a['value']) for a in assets_with_value])
-            pie_values = [safe_float(a['value']) / section_sum * 100 if section_sum > 0 else 0 for a in assets_with_value]
+            section_sum = sum(values)
+            pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
             fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
             title="Real Estate Portfolio Distribution",
@@ -800,18 +721,16 @@ def real_estate(request):
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
-        pie_chart_html = fig_pie.to_html(full_html=False)
-        # Stacked bar chart
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
+        # Bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        # Calculate bar chart values based on percent_mode
-        section_sum = sum([safe_float(a['value']) for a in assets_with_value])
-        section_percent_of_total = section_sum / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0
-        xaxis_max = 100 if percent_mode == 'section' else section_percent_of_total
-        if percent_mode == 'total':
-            bar_chart_values = [safe_float(a['value']) / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0 for a in assets_with_value]
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            bar_chart_values = [float(v) / true_total_net_worth_float * 100 for v in values]
+            xaxis_max = sum(bar_chart_values)
         else:
-            bar_chart_values = [safe_float(a['value']) / section_total * 100 if section_total > 0 else 0 for a in assets_with_value]
+            bar_chart_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
+            xaxis_max = 100
         for i, (label, percent) in enumerate(zip(labels, bar_chart_values)):
             bar_segments.append(go.Bar(
                 x=[int(round(percent))],
@@ -840,11 +759,6 @@ def real_estate(request):
             autosize=True
         )
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
-    else:
-        pie_chart_html = None
-        bar_chart_html = None
-
-    # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -860,15 +774,13 @@ def real_estate(request):
     return render(request, 'real_estate.html', {
         'username': request.user.username,
         'assets': assets_with_value,
-        'total_net_worth': total_net_worth,
         'form': form,
-        'pie_chart': pie_chart_html,
-        'bar_chart': bar_chart_html,
+        'total_net_worth': total_net_worth,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
-        'section_percentages': section_percentages,
-        'total_percentages': total_percentages,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
     })
 
@@ -876,10 +788,10 @@ def real_estate(request):
 def cash(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
-    section_percentages = []
-    total_percentages = []
+    percent_mode = request.GET.get('percent', 'section')
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
@@ -890,76 +802,11 @@ def cash(request):
             return redirect('cash')
     else:
         form = AddAssetForm()
-    # Get all cash assets
-    assets = Asset.objects.filter(owner=request.user, type='cash')
-    # Calculate values in selected currency
-    total_net_worth = Decimal('0')
+    user_assets = Asset.objects.filter(owner=request.user, type='cash')
     assets_with_value = []
-    percent_mode = request.GET.get('percent', 'section')
-    # Calculate true total net worth (copy from general view)
-    crypto_assets_all = Asset.objects.filter(owner=request.user, type='crypto')
-    stock_assets_all = Asset.objects.filter(owner=request.user, type='stock')
-    cash_assets_all = Asset.objects.filter(owner=request.user, type='cash')
-    real_estate_assets_all = Asset.objects.filter(owner=request.user, type='real_estate')
-    other_assets_all = Asset.objects.filter(owner=request.user, type='other')
-    # Crypto
-    crypto_tickers_all = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets_all]
-    crypto_prices_all = get_multiple_asset_prices(crypto_tickers_all)
-    total_crypto_usd_all = sum((Decimal(str(crypto_prices_all.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount) for asset in crypto_assets_all)
-    total_crypto_all = convert_currency(total_crypto_usd_all, 'USD', selected_currency)
-    # Stocks
-    stock_tickers_all = [asset.ticker.upper() for asset in stock_assets_all]
-    stock_prices_all = {}
-    if stock_tickers_all:
-        if len(stock_tickers_all) == 1:
-            ticker = stock_tickers_all[0]
-            try:
-                data = yf.Ticker(ticker).history(period='1d')
-                if not data.empty:
-                    stock_prices_all[ticker] = float(data['Close'].iloc[-1])
-                else:
-                    stock_prices_all[ticker] = None
-            except Exception:
-                stock_prices_all[ticker] = None
-        else:
-            try:
-                data = yf.download(
-                    tickers=stock_tickers_all,
-                    period='1d',
-                    interval='1d',
-                    group_by='ticker',
-                    threads=True,
-                    progress=False
-                )
-                for ticker in stock_tickers_all:
-                    try:
-                        stock_prices_all[ticker] = float(data[ticker]['Close'].iloc[-1])
-                    except Exception:
-                        stock_prices_all[ticker] = None
-            except Exception:
-                stock_prices_all = {ticker: None for ticker in stock_tickers_all}
-    total_stocks_usd_all = 0
-    for asset in stock_assets_all:
-        price = stock_prices_all.get(asset.ticker.upper())
-        price_decimal = safe_decimal(price)
-        total_stocks_usd_all += price_decimal * asset.amount
-    total_stocks_all = convert_currency(total_stocks_usd_all, 'USD', selected_currency)
-    # Cash
-    total_cash_all = sum(convert_currency(cash.amount, cash.currency or 'USD', selected_currency) for cash in cash_assets_all)
-    # Real Estate
-    total_real_estate_all = sum(convert_currency(re.amount, re.currency or 'USD', selected_currency) for re in real_estate_assets_all)
-    # Other
-    total_other_all = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets_all)
-    # True total net worth
-    true_total_net_worth = total_crypto_all + total_stocks_all + total_real_estate_all + total_cash_all + total_other_all
-    true_total_net_worth_float = float(true_total_net_worth)
-    # Build assets_with_value and calculate percentages in one pass
-    section_sum = 0
-    labels = []
-    values = []
-    for asset in assets:
-        value = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
-        total_net_worth += value
+    for asset in user_assets:
+        price = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
+        value = price
         asset_dict = {
             'id': asset.id,
             'ticker': asset.ticker,
@@ -967,179 +814,28 @@ def cash(request):
             'currency': asset.currency,
             'value': value,
         }
-        # Always use section (Other) total for table percentage
-        # Calculate section total after the loop
         assets_with_value.append(asset_dict)
-        labels.append(asset.ticker)
-        values.append(float(value))
-    # Sort assets by value descending
-    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
-    # Calculate section total for percentage
-    section_total = float(total_net_worth)
-    for asset_dict in assets_with_value:
-        value = asset_dict['value']
-        if section_total > 0:
-            asset_dict['percentage'] = round(safe_float(value) / section_total * 100, 2)
-        else:
-            asset_dict['percentage'] = 0
-
-    # --- CASH PIE CHART LOGIC ---
-    # Build labels and values from sorted assets_with_value
-    labels = [a['ticker'] for a in assets_with_value]
-    values = [float(a['value']) for a in assets_with_value]
-    if labels and values:
-        # Use section_total for chart percentages as well
-        bar_chart_values = [safe_float(a['value']) / section_total * 100 if section_total > 0 else 0 for a in assets_with_value]
+    def get_value_for_sort(x):
+        try:
+            return float(x['value'])
+        except Exception:
+            return 0
+    assets_with_value.sort(key=get_value_for_sort, reverse=True)
+    section_sum = sum([float(a['value']) for a in assets_with_value])
+    for asset in assets_with_value:
+        value = asset['value']
         if percent_mode == 'total' and true_total_net_worth_float > 0:
-            sum_section_pct = sum(values)
-            if sum_section_pct < 100:
-                labels_with_other = labels + ['Other']
-                values_with_other = values + [100 - sum_section_pct]
-            else:
-                labels_with_other = labels
-                values_with_other = values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=values_with_other, textinfo='percent+label', showlegend=True)])
+            asset['percentage'] = round((float(value) / true_total_net_worth_float * 100), 2) if true_total_net_worth_float > 0 else 0
         else:
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
-        fig_pie.update_layout(
-            title="Cash Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
-        )
-        pie_chart_html = fig_pie.to_html(full_html=False)
-    else:
-        pie_chart_html = None
-
-    # --- CASH BAR CHART LOGIC ---
-    if labels and values:
-        bar_segments = []
-        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        for i, (label, percent) in enumerate(zip(labels, bar_chart_values)):
-            bar_segments.append(go.Bar(
-                x=[percent],
-                y=[""],
-                name=label,
-                orientation='h',
-                marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{int(round(percent))}%"],
-                textposition='inside',
-                insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x}}%<extra></extra>",
-            ))
-        # Calculate section's percent of total net worth for bar chart x-axis
-        section_percent_of_total = sum(values) if percent_mode == 'total' else 100
-        xaxis_max = 100 if percent_mode == 'section' else section_percent_of_total
-        fig_bar = go.Figure(data=bar_segments)
-        fig_bar.update_layout(
-            barmode='stack',
-            title='Portfolio Distribution (stacked bar)',
-            margin=dict(t=50, b=0, l=0, r=0),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
-            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
-            showlegend=True,
-            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=200,
-            autosize=True
-        )
-        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
-    else:
-        pie_chart_html = None
-        bar_chart_html = None
-
-    # Get available currencies for dropdown
-    available_currencies = {
-        'USD': 'US Dollar',
-        'CAD': 'Canadian Dollar',
-        'BRL': 'Brazilian Real',
-        'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
-        'EUR': 'Euro',
-        'GBP': 'British Pound',
-        'JPY': 'Japanese Yen',
-        'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc'
-    }
-    return render(request, 'other.html', {
-        'username': request.user.username,
-        'assets': assets_with_value,
-        'total_net_worth': total_net_worth,
-        'form': form,
-        'pie_chart': pie_chart_html,
-        'bar_chart': bar_chart_html,
-        'selected_currency': selected_currency,
-        'available_currencies': available_currencies,
-        'currency_symbol': currency_symbol,
-        'section_percentages': section_percentages,
-        'total_percentages': total_percentages,
-        'percent_mode': percent_mode,
-    })
-
-@login_required
-def other(request):
-    selected_currency = request.GET.get('currency', 'USD')
-    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
-    true_total_net_worth_float = float(true_total_net_worth)
-    labels = []
-    values = []
+            asset['percentage'] = round((float(value) / section_sum * 100), 2) if section_sum > 0 else 0
+    labels = [asset['ticker'] for asset in assets_with_value]
+    values = [float(asset['value']) for asset in assets_with_value]
     pie_chart_html = None
     bar_chart_html = None
-    section_percentages = []
-    total_percentages = []
-    if request.method == 'POST':
-        form = AddAssetForm(request.POST)
-        if form.is_valid():
-            asset = form.save(commit=False)
-            asset.owner = request.user
-            asset.type = 'other'
-            asset.save()
-            return redirect('other')
-    else:
-        form = AddAssetForm()
-    # Get all other assets
-    assets = Asset.objects.filter(owner=request.user, type='other')
-    # Calculate values in selected currency
-    total_net_worth = Decimal('0')
-    assets_with_value = []
-    percent_mode = request.GET.get('percent', 'section')
-    for asset in assets:
-        value = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
-        total_net_worth += value
-        asset_dict = {
-            'id': asset.id,
-            'ticker': asset.ticker,
-            'amount': asset.amount,
-            'currency': asset.currency,
-            'value': value,
-        }
-        # Always use section (Other) total for table percentage
-        # Calculate section total after the loop
-        assets_with_value.append(asset_dict)
-        labels.append(asset.ticker)
-        values.append(float(value))
-    # Sort assets by value descending
-    assets_with_value.sort(key=lambda x: x['value'], reverse=True)
-    # Calculate section total for percentage
-    section_total = float(total_net_worth)
-    for asset_dict in assets_with_value:
-        value = asset_dict['value']
-        if section_total > 0:
-            asset_dict['percentage'] = round(safe_float(value) / section_total * 100, 2)
-        else:
-            asset_dict['percentage'] = 0
-
-    # --- OTHER PIE CHART LOGIC ---
-    # Build labels and values from sorted assets_with_value
-    labels = [a['ticker'] for a in assets_with_value]
-    values = [float(a['value']) for a in assets_with_value]
     if labels and values:
+        total = sum(values)
         if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [safe_float(a['value']) / true_total_net_worth_float * 100 for a in assets_with_value]
+            pie_values = [float(v) / true_total_net_worth_float * 100 for v in values]
             sum_section_pct = sum(pie_values)
             if sum_section_pct < 100:
                 labels_with_other = labels + ['Other']
@@ -1149,28 +845,26 @@ def other(request):
                 pie_values_with_other = pie_values
             fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
         else:
-            section_sum = sum([safe_float(a['value']) for a in assets_with_value])
-            pie_values = [safe_float(a['value']) / section_sum * 100 if section_sum > 0 else 0 for a in assets_with_value]
+            section_sum = sum(values)
+            pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
             fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
         fig_pie.update_layout(
-            title="Other Portfolio Distribution",
+            title="Cash/Fixed Income Portfolio Distribution",
             margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0")
         )
-        pie_chart_html = fig_pie.to_html(full_html=False)
-        # Stacked bar chart
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
+        # Bar chart
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        # Calculate bar chart values based on percent_mode
-        section_sum = sum([safe_float(a['value']) for a in assets_with_value])
-        section_percent_of_total = section_sum / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0
-        xaxis_max = 100 if percent_mode == 'section' else section_percent_of_total
-        if percent_mode == 'total':
-            bar_chart_values = [safe_float(a['value']) / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0 for a in assets_with_value]
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            bar_chart_values = [float(v) / true_total_net_worth_float * 100 for v in values]
+            xaxis_max = sum(bar_chart_values)
         else:
-            bar_chart_values = [safe_float(a['value']) / section_total * 100 if section_total > 0 else 0 for a in assets_with_value]
+            bar_chart_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
+            xaxis_max = 100
         for i, (label, percent) in enumerate(zip(labels, bar_chart_values)):
             bar_segments.append(go.Bar(
                 x=[int(round(percent))],
@@ -1199,11 +893,140 @@ def other(request):
             autosize=True
         )
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
-    else:
-        pie_chart_html = None
-        bar_chart_html = None
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'INR': 'Indian Rupee',
+        'EUR': 'Euro',
+        'GBP': 'British Pound',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'CHF': 'Swiss Franc'
+    }
+    return render(request, 'cash.html', {
+        'username': request.user.username,
+        'assets': assets_with_value,
+        'form': form,
+        'total_net_worth': total_net_worth,
+        'selected_currency': selected_currency,
+        'available_currencies': available_currencies,
+        'currency_symbol': currency_symbol,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
+        'percent_mode': percent_mode,
+    })
 
-    # Get available currencies for dropdown
+@login_required
+def other(request):
+    selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
+    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    true_total_net_worth = total_net_worth
+    true_total_net_worth_float = float(true_total_net_worth)
+    percent_mode = request.GET.get('percent', 'section')
+    if request.method == 'POST':
+        form = AddAssetForm(request.POST)
+        if form.is_valid():
+            asset = form.save(commit=False)
+            asset.owner = request.user
+            asset.type = 'other'
+            asset.save()
+            return redirect('other')
+    else:
+        form = AddAssetForm()
+    user_assets = Asset.objects.filter(owner=request.user, type='other')
+    assets_with_value = []
+    for asset in user_assets:
+        price = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
+        value = price
+        asset_dict = {
+            'id': asset.id,
+            'ticker': asset.ticker,
+            'amount': asset.amount,
+            'currency': asset.currency,
+            'value': value,
+        }
+        assets_with_value.append(asset_dict)
+    def get_value_for_sort(x):
+        try:
+            return float(x['value'])
+        except Exception:
+            return 0
+    assets_with_value.sort(key=get_value_for_sort, reverse=True)
+    section_sum = sum([float(a['value']) for a in assets_with_value])
+    for asset in assets_with_value:
+        value = asset['value']
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            asset['percentage'] = round((float(value) / true_total_net_worth_float * 100), 2) if true_total_net_worth_float > 0 else 0
+        else:
+            asset['percentage'] = round((float(value) / section_sum * 100), 2) if section_sum > 0 else 0
+    labels = [asset['ticker'] for asset in assets_with_value]
+    values = [float(asset['value']) for asset in assets_with_value]
+    pie_chart_html = None
+    bar_chart_html = None
+    if labels and values:
+        total = sum(values)
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            pie_values = [float(v) / true_total_net_worth_float * 100 for v in values]
+            sum_section_pct = sum(pie_values)
+            if sum_section_pct < 100:
+                labels_with_other = labels + ['Other']
+                pie_values_with_other = pie_values + [100 - sum_section_pct]
+            else:
+                labels_with_other = labels
+                pie_values_with_other = pie_values
+            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
+        else:
+            section_sum = sum(values)
+            pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
+            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
+            title="Other Portfolio Distribution",
+            margin=dict(t=50, b=50, l=0, r=0),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#e0e0e0")
+        )
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
+        # Bar chart
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        if percent_mode == 'total' and true_total_net_worth_float > 0:
+            bar_chart_values = [float(v) / true_total_net_worth_float * 100 for v in values]
+            xaxis_max = sum(bar_chart_values)
+        else:
+            bar_chart_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
+            xaxis_max = 100
+        for i, (label, percent) in enumerate(zip(labels, bar_chart_values)):
+            bar_segments.append(go.Bar(
+                x=[int(round(percent))],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{int(round(percent))}%"],
+                textposition='inside',
+                insidetextanchor='middle',
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=50, b=0, l=0, r=0),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
+            showlegend=True,
+            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            height=200,
+            autosize=True
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -1219,15 +1042,13 @@ def other(request):
     return render(request, 'other.html', {
         'username': request.user.username,
         'assets': assets_with_value,
-        'total_net_worth': total_net_worth,
         'form': form,
-        'pie_chart': pie_chart_html,
-        'bar_chart': bar_chart_html,
+        'total_net_worth': total_net_worth,
         'selected_currency': selected_currency,
         'available_currencies': available_currencies,
         'currency_symbol': currency_symbol,
-        'section_percentages': section_percentages,
-        'total_percentages': total_percentages,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
     })
 
