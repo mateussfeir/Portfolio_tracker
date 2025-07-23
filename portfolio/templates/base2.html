@@ -116,10 +116,13 @@
                 </script>
             {% endblock %}
         </div>
+        {# Only show Net Worth Over Time card if block is not empty #}
+        {% block networth_over_time_card %}
         <div class="card" style="margin-bottom: 24px;">
             <div class="section-header">Net Worth Over Time</div>
             {% block networth_over_time %}{% endblock %}
         </div>
+        {% endblock %}
     </div>
 </div>
 <footer>
