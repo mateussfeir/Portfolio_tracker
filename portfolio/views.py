@@ -242,73 +242,78 @@ def home(request):
     }
 
     # Prepare pie and bar charts for crypto
-    if assets_with_value:
-        # Pie chart values: use correct basis depending on percent_mode
-        if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [safe_float(asset['value']) / true_total_net_worth_float * 100 for asset in assets_with_value]
-            sum_crypto_pct = sum(pie_values)
-            if sum_crypto_pct < 100:
-                labels_with_other = [asset['ticker'] for asset in assets_with_value] + ['Other']
-                pie_values_with_other = pie_values + [100 - sum_crypto_pct]
+    cache_key = f"bar_chart_html_{request.user.id}_{selected_currency}"
+    bar_chart_html = cache.get(cache_key)
+    pie_chart_html = None
+    if not bar_chart_html:
+        if assets_with_value:
+            # Pie chart values: use correct basis depending on percent_mode
+            if percent_mode == 'total' and true_total_net_worth_float > 0:
+                pie_values = [safe_float(asset['value']) / true_total_net_worth_float * 100 for asset in assets_with_value]
+                sum_crypto_pct = sum(pie_values)
+                if sum_crypto_pct < 100:
+                    labels_with_other = [asset['ticker'] for asset in assets_with_value] + ['Other']
+                    pie_values_with_other = pie_values + [100 - sum_crypto_pct]
+                else:
+                    labels_with_other = [asset['ticker'] for asset in assets_with_value]
+                    pie_values_with_other = pie_values
+                fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
             else:
-                labels_with_other = [asset['ticker'] for asset in assets_with_value]
-                pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
-        else:
+                section_sum = sum([safe_float(asset['value']) for asset in assets_with_value])
+                pie_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
+                fig_pie = go.Figure(data=[go.Pie(labels=[asset['ticker'] for asset in assets_with_value], values=pie_values, textinfo='percent+label', showlegend=True)])
+            fig_pie.update_layout(
+                title="Crypto Portfolio Distribution",
+                margin=dict(t=50, b=50, l=0, r=0),
+                paper_bgcolor="#121212",
+                plot_bgcolor="#121212",
+                font=dict(color="#e0e0e0"),
+                height=300,
+                width=400
+            )
+            pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
+            # Stacked bar chart
+            bar_segments = []
+            colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
             section_sum = sum([safe_float(asset['value']) for asset in assets_with_value])
-            pie_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
-            fig_pie = go.Figure(data=[go.Pie(labels=[asset['ticker'] for asset in assets_with_value], values=pie_values, textinfo='percent+label', showlegend=True)])
-        fig_pie.update_layout(
-            title="Crypto Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0"),
-            height=300,
-            width=400
-        )
-        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
-        # Stacked bar chart
-        bar_segments = []
-        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
-        section_sum = sum([safe_float(asset['value']) for asset in assets_with_value])
-        section_percent_of_total = section_sum / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0
-        xaxis_max = 100 if percent_mode == 'section' else section_percent_of_total
-        if percent_mode == 'total':
-            bar_chart_values = [safe_float(asset['value']) / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0 for asset in assets_with_value]
+            section_percent_of_total = section_sum / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0
+            xaxis_max = 100 if percent_mode == 'section' else section_percent_of_total
+            if percent_mode == 'total':
+                bar_chart_values = [safe_float(asset['value']) / true_total_net_worth_float * 100 if true_total_net_worth_float > 0 else 0 for asset in assets_with_value]
+            else:
+                bar_chart_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
+            for i, (label, percent) in enumerate(zip([asset['ticker'] for asset in assets_with_value], bar_chart_values)):
+                bar_segments.append(go.Bar(
+                    x=[int(round(percent))],
+                    y=[""],
+                    name=label,
+                    orientation='h',
+                    marker=dict(color=colors[i % len(colors)]),
+                    text=[f"{label}\n{int(round(percent))}%"],
+                    textposition='inside',
+                    insidetextanchor='middle',
+                    hovertemplate=f"{label}: {{x}}%<extra></extra>",
+                ))
+            fig_bar = go.Figure(data=bar_segments)
+            fig_bar.update_layout(
+                barmode='stack',
+                title='Portfolio Distribution (stacked bar)',
+                margin=dict(t=50, b=0, l=0, r=0),
+                paper_bgcolor="#121212",
+                plot_bgcolor="#121212",
+                font=dict(color="#e0e0e0"),
+                xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
+                yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
+                showlegend=True,
+                legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+                height=200,
+                autosize=True
+            )
+            bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+            cache.set(cache_key, bar_chart_html, timeout=180)
         else:
-            bar_chart_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
-        for i, (label, percent) in enumerate(zip([asset['ticker'] for asset in assets_with_value], bar_chart_values)):
-            bar_segments.append(go.Bar(
-                x=[int(round(percent))],
-                y=[""],
-                name=label,
-                orientation='h',
-                marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{int(round(percent))}%"],
-                textposition='inside',
-                insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x}}%<extra></extra>",
-            ))
-        fig_bar = go.Figure(data=bar_segments)
-        fig_bar.update_layout(
-            barmode='stack',
-            title='Portfolio Distribution (stacked bar)',
-            margin=dict(t=50, b=0, l=0, r=0),
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0"),
-            xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
-            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
-            showlegend=True,
-            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
-            height=200,
-            autosize=True
-        )
-        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
-    else:
-        pie_chart_html = None
-        bar_chart_html = None
+            pie_chart_html = None
+            bar_chart_html = None
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
