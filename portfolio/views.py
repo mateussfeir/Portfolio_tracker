@@ -970,6 +970,9 @@ def cash(request):
             asset_dict['percentage'] = 0
 
     # --- CASH PIE CHART LOGIC ---
+    # Build labels and values from sorted assets_with_value
+    labels = [a['ticker'] for a in assets_with_value]
+    values = [float(a['value']) for a in assets_with_value]
     if labels and values:
         # Use section_total for chart percentages as well
         bar_chart_values = [safe_float(a['value']) / section_total * 100 if section_total > 0 else 0 for a in assets_with_value]
@@ -1112,6 +1115,9 @@ def other(request):
             asset_dict['percentage'] = 0
 
     # --- OTHER PIE CHART LOGIC ---
+    # Build labels and values from sorted assets_with_value
+    labels = [a['ticker'] for a in assets_with_value]
+    values = [float(a['value']) for a in assets_with_value]
     if labels and values:
         if percent_mode == 'total' and true_total_net_worth_float > 0:
             pie_values = [safe_float(a['value']) / true_total_net_worth_float * 100 for a in assets_with_value]
@@ -1423,6 +1429,57 @@ def general(request):
         {'type': 'Others', 'url': 'other', 'value': total_other, 'percent': other_percent},
     ]
     totals.sort(key=lambda x: float(x['value']), reverse=True)
+
+    # Build labels and values from sorted totals
+    labels = [t['type'] for t in totals]
+    values = [float(t['value']) for t in totals]
+    if labels and values:
+        # Calculate percentages
+        total = sum(values)
+        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+        # Pie chart (percent only)
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie.update_layout(
+            title="Portfolio Distribution",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0")
+        )
+        pie_chart_html = fig_pie.to_html(full_html=False)
+        # Stacked bar chart (single bar, 5 segments)
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
+        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent}%"],
+                textposition='inside',
+                insidetextanchor='middle',
+                hovertemplate=f"{label}: {{x}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title="Portfolio Distribution (Stacked Bar)",
+            margin=dict(t=50, b=50, l=25, r=25),
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title='Percentage', range=[0, 100], ticksuffix='%'),
+            yaxis=dict(showticklabels=False),
+            showlegend=True,
+            height=180,
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False)
+    else:
+        pie_chart_html = None
+        bar_chart_html = None
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
