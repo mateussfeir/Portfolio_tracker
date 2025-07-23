@@ -32,7 +32,8 @@ class AddAssetForm(forms.ModelForm):
             'amount': forms.NumberInput(attrs={'placeholder': 'e.g. 1.5'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, asset_type=None, **kwargs):
         super().__init__(*args, **kwargs)
-        # Only show currency field for cash assets (or always show, but only required for cash)
-        # Optionally, you can hide for non-cash by JS in the template
+        # Remove currency field for crypto and stock
+        if asset_type in ['crypto', 'stock']:
+            self.fields.pop('currency', None)

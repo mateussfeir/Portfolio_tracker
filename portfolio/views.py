@@ -132,7 +132,7 @@ def home(request):
     true_total_net_worth = get_user_total_net_worth(request.user, selected_currency)
     true_total_net_worth_float = float(true_total_net_worth)
     if request.method == 'POST':
-        form = AddAssetForm(request.POST)
+        form = AddAssetForm(request.POST, asset_type='crypto')
         if form.is_valid():
             asset = form.save(commit=False)
             asset.owner = request.user
@@ -143,7 +143,7 @@ def home(request):
         else:
             messages.error(request, "Failed to add asset. Please check your inputs.")
     else:
-        form = AddAssetForm()
+        form = AddAssetForm(asset_type='crypto')
 
     # Get user crypto assets only
     user_assets = Asset.objects.filter(owner=request.user, type='crypto')
@@ -340,7 +340,7 @@ def edit_holding(request, pk):
         'CHF': 'Swiss Franc'
     }
     if request.method == 'POST':
-        form = AddAssetForm(request.POST, instance=asset)
+        form = AddAssetForm(request.POST, instance=asset, asset_type=asset.type)
         if form.is_valid():
             form.save()
             messages.success(request, "Asset updated successfully.")
@@ -357,7 +357,7 @@ def edit_holding(request, pk):
             else:
                 return redirect('general')
     else:
-        form = AddAssetForm(instance=asset)
+        form = AddAssetForm(instance=asset, asset_type=asset.type)
     return render(request, 'edit_holding.html', {'form': form, 'asset': asset, 'available_currencies': available_currencies})
 
 
@@ -367,7 +367,7 @@ def stocks(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     if request.method == 'POST':
-        form = AddAssetForm(request.POST)
+        form = AddAssetForm(request.POST, asset_type='stock')
         if form.is_valid():
             asset = form.save(commit=False)
             asset.owner = request.user
@@ -378,7 +378,7 @@ def stocks(request):
         else:
             messages.error(request, "Failed to add asset. Please check your inputs.")
     else:
-        form = AddAssetForm()
+        form = AddAssetForm(asset_type='stock')
 
     # Get user stock assets
     user_assets = Asset.objects.filter(owner=request.user, type='stock')
