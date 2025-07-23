@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import signup, home, delete_holding, root_redirect, resume, bio, projects, stocks, edit_holding, general, real_estate, cash, other, performance
+from .views import signup, home, delete_holding, root_redirect, resume, bio, projects, stocks, edit_holding, general, real_estate, cash, other
 
 urlpatterns = [
     path('', root_redirect, name='root'),
@@ -18,5 +18,4 @@ urlpatterns = [
     path('real_estate/', real_estate, name='real_estate'),
     path('cash/', cash, name='cash'),
     path('other/', other, name='other'),
-    path('performance/', performance, name='performance'),
 ]
