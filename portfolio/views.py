@@ -1223,9 +1223,11 @@ def general(request):
     # After calculating total_net_worth
     total_net_worth = get_user_total_net_worth(request.user, selected_currency)
     today = date.today()
+    # Always save snapshot in USD for consistency with daily command
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
     NetWorthSnapshot.objects.get_or_create(
         user=request.user, date=today,
-        defaults={'net_worth': total_net_worth}
+        defaults={'net_worth': total_net_worth_usd}
     )
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
@@ -1345,9 +1347,11 @@ def performance(request):
     # --- Calculate current net worth (reuse logic from general) ---
     total_net_worth = get_user_total_net_worth(user, selected_currency)
     # --- Save snapshot if not already saved today ---
+    # Always save snapshot in USD for consistency with daily command
+    total_net_worth_usd = get_user_total_net_worth(user, 'USD')
     NetWorthSnapshot.objects.get_or_create(
         user=user, date=today,
-        defaults={'net_worth': total_net_worth}
+        defaults={'net_worth': total_net_worth_usd}
     )
 
     # --- Get all snapshots for this user ---

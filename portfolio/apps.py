@@ -17,7 +17,7 @@ class PortfolioConfig(AppConfig):
         scheduler.add_job(
             lambda: call_command('daily_networth_snapshot'),
             'interval',
-            days=1,
+            hours=6,
             next_run_time=None  # avoids running immediately on startup
         )
         scheduler.start()
