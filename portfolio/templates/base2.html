@@ -156,7 +156,7 @@
           flex-direction: row;
           justify-content: center;
           align-items: stretch; /* Changed from flex-start to stretch to fill container */
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
           gap: 16px;
           margin-top: 0px;
           min-height: auto; /* Allow container to expand */
@@ -169,8 +169,8 @@
           min-height: auto !important;
         }
         .table-card {
-          flex: 0 1 38%;
-          min-width: 220px;
+          flex: 0 0 30%;
+          min-width: 300px;
           max-width: 500px;
           background-color: transparent;
           padding: 0;
@@ -188,8 +188,8 @@
           padding: 10px;
         }
         .chart-card {
-          flex: 1 1 58%;
-          min-width: 300px;
+          flex: 1 1 70%;
+          min-width: 400px;
           max-width: 1000px;
           width: 100%;
           background-color: transparent;
@@ -218,7 +218,7 @@
           height: auto;
           overflow: visible;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 1200px) {
           .dashboard-section {
             flex-direction: column;
             gap: 16px;
@@ -233,6 +233,53 @@
         @media (max-width: 768px) {
           .container {
             padding: 0 12px;
+          }
+          .dashboard-section {
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          .table-card, .chart-card {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            flex: 1 1 100% !important;
+          }
+          /* Ensure table doesn't overflow on mobile */
+          .table-wrapper {
+            overflow-x: auto;
+            max-width: 100%;
+          }
+          table {
+            min-width: 600px; /* Ensure table has minimum width for readability */
+          }
+        }
+        
+        /* Better space utilization on large screens */
+        @media (min-width: 1600px) {
+          .dashboard-section {
+            gap: 24px;
+          }
+          .table-card {
+            flex: 0 0 30%;
+            max-width: 700px;
+          }
+          .chart-card {
+            flex: 1 1 70%;
+            max-width: 1400px;
+          }
+        }
+        
+        /* Debug: Force side-by-side layout on larger screens */
+        @media (min-width: 1200px) {
+          .dashboard-section {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+          }
+          .table-card {
+            flex: 0 0 30% !important;
+          }
+          .chart-card {
+            flex: 1 1 70% !important;
           }
         }
         .section-header {
@@ -330,7 +377,7 @@
     </nav>
 </header>
 <div class="container">
-    <div style="width: 100%; max-width: 1400px; margin: 0 auto;">
+    <div style="width: 100%; max-width: 1800px; margin: 0 auto;">
         <div class="dashboard-section">
             <div class="table-card">
               <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>

@@ -230,3 +230,57 @@ div {
     height: auto !important;
     min-height: auto !important;
 }
+
+/* Responsive layout improvements */
+@media (max-width: 1200px) {
+    .dashboard-section {
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+    
+    .table-card, .chart-card {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-section {
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+    
+    .table-card, .chart-card {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+    
+    /* Ensure table is scrollable on mobile */
+    .table-wrapper {
+        overflow-x: auto;
+        max-width: 100%;
+    }
+    
+    table {
+        min-width: 600px;
+    }
+    
+    /* Ensure charts are responsive on mobile */
+    #pie-chart-div, #bar-chart-div {
+        height: 250px !important;
+        min-height: 200px !important;
+    }
+    
+    .chart-card {
+        padding: 8px 0 !important;
+    }
+    
+    .js-plotly-plot {
+        width: 100% !important;
+        height: 100% !important;
+    }
+}
