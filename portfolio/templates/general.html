@@ -104,6 +104,17 @@
 {% endblock %}
 
 {% block networth_over_time %}
+    <form method="get" id="networth-range-form" style="text-align:center; margin-bottom: 16px;">
+      <label for="range">Show:</label>
+      <select name="range" id="range" onchange="document.getElementById('networth-range-form').submit();">
+        <option value="all" {% if selected_range == 'all' %}selected{% endif %}>Full</option>
+        <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>1Y</option>
+        <option value="3m" {% if selected_range == '3m' %}selected{% endif %}>3M</option>
+        <option value="1m" {% if selected_range == '1m' %}selected{% endif %}>1M</option>
+        <option value="1w" {% if selected_range == '1w' %}selected{% endif %}>1W</option>
+      </select>
+      <input type="hidden" name="currency" value="{{ selected_currency }}">
+    </form>
     {% if networth_line_chart %}
         {{ networth_line_chart|safe }}
     {% else %}
