@@ -155,10 +155,18 @@
           display: flex;
           flex-direction: row;
           justify-content: center;
-          align-items: flex-start; /* Ensures top alignment */
+          align-items: stretch; /* Changed from flex-start to stretch to fill container */
           flex-wrap: wrap;
           gap: 16px;
           margin-top: 0px;
+          min-height: auto; /* Allow container to expand */
+          height: auto; /* Allow container to expand */
+        }
+        
+        /* Ensure flex items can expand to their content */
+        .dashboard-section > * {
+          height: auto !important;
+          min-height: auto !important;
         }
         .table-card {
           flex: 0 1 38%;
@@ -191,12 +199,13 @@
           box-shadow: none;
           min-width: 0 !important;
           margin: 0 !important;
+          height: auto; /* Allow chart card to expand */
+          min-height: auto; /* Allow chart card to expand */
         }
         #pie-chart-div, #bar-chart-div {
           width: 100%;
-          aspect-ratio: 2/1;
           min-height: 200px;
-          max-height: 500px;
+          height: auto;
           margin: 0;
           padding: 0;
           display: flex;
@@ -205,8 +214,8 @@
         }
         #bar-chart-div {
           width: 100%;
-          height: 150px;
-          aspect-ratio: unset;
+          min-height: 150px;
+          height: auto;
           overflow: visible;
         }
         @media (max-width: 900px) {
@@ -340,14 +349,11 @@
               {% endblock %}
             </div>
             <div class="chart-card">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
-                <div class="section-header" style="margin: 0;">{% block chart_title %}Portfolio Distribution{% endblock %}</div>
-              </div>
               {% block chart %}
-                <div id="pie-chart-div" style="display: none; margin-top: 0 !important; padding-top: 0; width: 100%; height: 300px;">
+                <div id="pie-chart-div" style="display: none; margin-top: 0 !important; padding-top: 0; width: 100%; min-height: 200px; height: auto;">
                     {% block pie_chart %}{% endblock %}
                 </div>
-                <div id="bar-chart-div" style="display: block; margin-top: 0 !important; padding-top: 0; width: 100%; height: 300px;">
+                <div id="bar-chart-div" style="display: block; margin-top: 0 !important; padding-top: 0; width: 100%; min-height: 200px; height: auto;">
                     {% block bar_chart %}{% endblock %}
                 </div>
                 <div class="text-center mt-3">

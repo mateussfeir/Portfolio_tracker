@@ -219,3 +219,14 @@ div {
         height: 100% !important;
     }
 }
+
+/* Ensure dashboard section can expand to content */
+.dashboard-section {
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.dashboard-section > * {
+    height: auto !important;
+    min-height: auto !important;
+}
