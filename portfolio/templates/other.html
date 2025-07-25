@@ -41,16 +41,63 @@
 <p>You have no others positions yet.</p>
 {% endif %}
 {% endblock %}
-{% block chart_title %}Other Portfolio Distribution{% endblock %}
-{% block bar_chart %}
-    {% if bar_chart %}
-        {{ bar_chart|safe }}
-    {% endif %}
-{% endblock %}
-
-{% block pie_chart %}
-    {% if pie_chart %}
-        {{ pie_chart|safe }}
-    {% endif %}
+{% block chart %}
+  <div style="margin-bottom: 12px; font-size: 1.2em; color: #4caf50; font-weight: bold; text-align:center;">
+    Your others position: <span class="sensitive-value">{{ section_net_worth|currency:currency_symbol }}</span>
+  </div>
+  <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+      {% if pie_chart %}
+          {{ pie_chart|safe }}
+      {% else %}
+          <p style="color: #aaa;">No chart data available.</p>
+      {% endif %}
+  </div>
+  <div id="bar-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+      {% if bar_chart %}
+          {{ bar_chart|safe }}
+      {% endif %}
+  </div>
+  <div class="text-center mt-3">
+      <button id="toggle-chart-btn" class="btn btn-outline-success">Show Pie Chart</button>
+  </div>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const toggleBtn = document.getElementById('toggle-chart-btn');
+          const pieDiv = document.getElementById('pie-chart-div');
+          const barDiv = document.getElementById('bar-chart-div');
+          let showingPie = false;
+          const isMobile = window.innerWidth <= 768;
+          if (isMobile) {
+              pieDiv.style.display = 'block';
+              barDiv.style.display = 'none';
+              if (toggleBtn) {
+                  toggleBtn.style.display = 'none';
+              }
+          } else {
+              pieDiv.style.display = 'none';
+              barDiv.style.display = 'block';
+              if (toggleBtn) {
+                  toggleBtn.addEventListener('click', function() {
+                      showingPie = !showingPie;
+                      if (showingPie) {
+                          pieDiv.style.display = 'block';
+                          barDiv.style.display = 'none';
+                          toggleBtn.textContent = 'Show Bar Chart';
+                      } else {
+                          pieDiv.style.display = 'none';
+                          barDiv.style.display = 'block';
+                          toggleBtn.textContent = 'Show Pie Chart';
+                      }
+                  });
+              }
+          }
+          window.addEventListener('resize', function() {
+              const newIsMobile = window.innerWidth <= 768;
+              if (newIsMobile !== isMobile) {
+                  location.reload();
+              }
+          });
+      });
+  </script>
 {% endblock %} 
 {% block networth_over_time_card %}{% endblock %} 
