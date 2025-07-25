@@ -153,14 +153,14 @@
         }
         .dashboard-section {
           display: flex;
-          flex-direction: row;
+          flex-direction: column;
           justify-content: center;
-          align-items: stretch; /* Changed from flex-start to stretch to fill container */
+          align-items: center;
           flex-wrap: nowrap;
           gap: 16px;
           margin-top: 0px;
-          min-height: auto; /* Allow container to expand */
-          height: auto; /* Allow container to expand */
+          min-height: auto;
+          height: auto;
         }
         
         /* Ensure flex items can expand to their content */
@@ -168,16 +168,19 @@
           height: auto !important;
           min-height: auto !important;
         }
-        .table-card {
-          flex: 0 0 30%;
-          min-width: 300px;
-          max-width: 500px;
-          background-color: transparent;
+        .table-card, .chart-card {
+          width: 100%;
+          max-width: 900px;
+          min-width: 0;
+          flex: none;
+          margin: 0 auto;
           padding: 0;
-          border-radius: 0;
+          background-color: transparent;
           border: none;
           box-shadow: none;
-          margin: 0 !important;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
         }
         table {
           border-collapse: collapse;
@@ -270,6 +273,7 @@
         }
         
         /* Debug: Force side-by-side layout on larger screens */
+        /*
         @media (min-width: 1200px) {
           .dashboard-section {
             flex-direction: row !important;
@@ -282,6 +286,7 @@
             flex: 1 1 70% !important;
           }
         }
+        */
         .section-header {
           margin-bottom: 2px !important;
         }
@@ -379,22 +384,6 @@
 <div class="container">
     <div style="width: 100%; max-width: 1800px; margin: 0 auto;">
         <div class="dashboard-section">
-            <div class="table-card">
-              <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
-              {% block percent_buttons %}{% endblock %}
-              {% block table %}{% endblock %}
-              {% block add_new %}
-              <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
-                  <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
-                  <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
-                      {% csrf_token %}
-                      {{ form.as_p }}
-                      <button type="submit">Add Position</button>
-                      <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
-                  </form>
-              </div>
-              {% endblock %}
-            </div>
             <div class="chart-card">
               {% block chart %}
                 <div id="pie-chart-div" style="display: none; margin-top: 0 !important; padding-top: 0; width: 100%; min-height: 200px; height: auto;">
@@ -453,6 +442,22 @@
                         });
                     });
                 </script>
+              {% endblock %}
+            </div>
+            <div class="table-card">
+              <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
+              {% block percent_buttons %}{% endblock %}
+              {% block table %}{% endblock %}
+              {% block add_new %}
+              <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
+                  <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
+                  <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
+                      {% csrf_token %}
+                      {{ form.as_p }}
+                      <button type="submit">Add Position</button>
+                      <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
+                  </form>
+              </div>
               {% endblock %}
             </div>
           </div>
