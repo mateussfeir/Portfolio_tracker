@@ -80,12 +80,20 @@
           const barDiv = document.getElementById('bar-chart-div');
           let showingPie = false;
           const isMobile = window.innerWidth <= 768;
+          
           if (isMobile) {
               pieDiv.style.display = 'block';
               barDiv.style.display = 'none';
               if (toggleBtn) {
                   toggleBtn.style.display = 'none';
               }
+              // Ensure proper chart sizing on mobile
+              pieDiv.style.height = '300px';
+              pieDiv.style.minHeight = '250px';
+              pieDiv.style.maxHeight = '350px';
+              barDiv.style.height = '300px';
+              barDiv.style.minHeight = '250px';
+              barDiv.style.maxHeight = '350px';
           } else {
               pieDiv.style.display = 'none';
               barDiv.style.display = 'block';
@@ -104,6 +112,7 @@
                   });
               }
           }
+          
           window.addEventListener('resize', function() {
               const newIsMobile = window.innerWidth <= 768;
               if (newIsMobile !== isMobile) {

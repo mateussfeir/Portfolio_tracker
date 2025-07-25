@@ -205,18 +205,59 @@ div {
 /* Mobile-specific chart styles */
 @media (max-width: 768px) {
     #pie-chart-div, #bar-chart-div {
-        height: 250px !important;
-        min-height: 200px !important;
+        height: 300px !important;
+        min-height: 250px !important;
+        max-height: 350px !important;
+        margin-bottom: 20px !important;
     }
     
     .chart-card {
         padding: 8px 0 !important;
+        margin-bottom: 20px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     /* Ensure charts are responsive on mobile */
     .js-plotly-plot {
         width: 100% !important;
         height: 100% !important;
+        max-height: 350px !important;
+    }
+    
+    /* Ensure proper spacing between chart and table */
+    .dashboard-section {
+        gap: 30px !important;
+        padding: 0 10px !important;
+    }
+    
+    .table-card {
+        margin-top: 20px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Ensure table doesn't overflow and has proper spacing */
+    .table-wrapper {
+        overflow-x: auto;
+        max-width: 100%;
+        margin-top: 10px !important;
+    }
+    
+    table {
+        min-width: 600px;
+        margin-top: 10px !important;
+    }
+    
+    /* Add more space around the toggle button */
+    .text-center.mt-3 {
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* Ensure container has proper padding */
+    .container {
+        padding: 0 10px !important;
     }
 }
 

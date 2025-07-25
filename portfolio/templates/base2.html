@@ -221,6 +221,15 @@
           height: auto;
           overflow: visible;
         }
+        @media (max-width: 768px) {
+          #pie-chart-div, #bar-chart-div {
+            height: 300px !important;
+            min-height: 250px !important;
+            max-height: 350px !important;
+            margin-bottom: 20px !important;
+          }
+        }
+        
         @media (max-width: 1200px) {
           .dashboard-section {
             flex-direction: column;
@@ -239,7 +248,8 @@
           }
           .dashboard-section {
             flex-direction: column !important;
-            gap: 16px !important;
+            gap: 30px !important;
+            padding: 0 10px !important;
           }
           .table-card, .chart-card {
             min-width: 0 !important;
@@ -247,13 +257,27 @@
             width: 100% !important;
             flex: 1 1 100% !important;
           }
+          .chart-card {
+            margin-bottom: 20px !important;
+            padding: 8px 0 !important;
+          }
+          .table-card {
+            margin-top: 20px !important;
+          }
           /* Ensure table doesn't overflow on mobile */
           .table-wrapper {
             overflow-x: auto;
             max-width: 100%;
+            margin-top: 10px !important;
           }
           table {
             min-width: 600px; /* Ensure table has minimum width for readability */
+            margin-top: 10px !important;
+          }
+          .js-plotly-plot {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 350px !important;
           }
         }
         
@@ -412,6 +436,10 @@
                             if (toggleBtn) {
                                 toggleBtn.style.display = 'none';
                             }
+                            // Ensure proper chart sizing on mobile
+                            pieDiv.style.height = '300px';
+                            pieDiv.style.minHeight = '250px';
+                            pieDiv.style.maxHeight = '350px';
                         } else {
                             // On desktop, show bar chart by default and enable toggle
                             pieDiv.style.display = 'none';
