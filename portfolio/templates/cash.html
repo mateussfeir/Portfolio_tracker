@@ -5,6 +5,7 @@
 {% block positions_title %}Your Cash/Fixed Income Positions: <span class="sensitive-value">{{ section_net_worth|currency:currency_symbol }}</span>{% endblock %}
 {% block table %}
 {% if assets %}
+<div class="table-wrapper">
 <table>
     <thead>
         <tr>
@@ -35,6 +36,7 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% else %}
 <p>You have no cash positions yet.</p>
 {% endif %}
