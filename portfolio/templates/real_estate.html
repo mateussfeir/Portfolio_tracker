@@ -3,16 +3,10 @@
 {% load currency_filters %}
 {% block section_title %}Real Estate{% endblock %}
 {% block positions_title %}Your Real Estate Positions: <span class="sensitive-value">{{ section_net_worth|currency:currency_symbol }}</span>{% endblock %}
-{# Vertical stacking: chart above table, no flex/grid parent #}
-{% block content %}
-<div class="chart-container" style="margin-bottom: 20px;">
-    {% if bar_chart %}
-        {{ bar_chart|safe }}
-    {% endif %}
-</div>
+
+{% block table %}
 {% if assets %}
-<div class="table-container">
-<div class="table-responsive">
+<div class="table-wrapper">
 <table>
     <thead>
         <tr>
@@ -44,8 +38,21 @@
     </tbody>
 </table>
 </div>
-</div>
 {% else %}
 <p>You have no real estate positions yet.</p>
 {% endif %}
-{% endblock %} 
+{% endblock %}
+
+{% block bar_chart %}
+    {% if bar_chart %}
+        {{ bar_chart|safe }}
+    {% endif %}
+{% endblock %}
+
+{% block pie_chart %}
+    {% if pie_chart %}
+        {{ pie_chart|safe }}
+    {% endif %}
+{% endblock %}
+
+{% block networth_over_time_card %}{% endblock %} 
