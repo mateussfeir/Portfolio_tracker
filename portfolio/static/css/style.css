@@ -376,3 +376,47 @@ div {
   }
 }
 
+/* Mobile-specific pie chart improvements */
+@media (max-width: 768px) {
+    /* Ensure pie charts are fully visible and centered */
+    .js-plotly-plot {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        text-align: center !important;
+    }
+    
+    /* Improve pie chart container responsiveness */
+    .chart-container {
+        width: 100% !important;
+        overflow-x: hidden !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+    }
+    
+    /* Ensure pie chart legends don't get cut off */
+    .js-plotly-plot .legend {
+        position: relative !important;
+        transform: none !important;
+    }
+    
+    /* Reduce chart height on very small screens */
+    @media (max-width: 480px) {
+        .js-plotly-plot {
+            height: 300px !important;
+        }
+    }
+}
+
+/* Ensure charts are responsive across all devices */
+.chart-container {
+    width: 100%;
+    overflow-x: hidden;
+    text-align: center;
+}
+
+.js-plotly-plot {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+

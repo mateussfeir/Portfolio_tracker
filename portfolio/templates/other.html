@@ -68,12 +68,14 @@
           let showingPie = false;
           const isMobile = window.innerWidth <= 768;
           if (isMobile) {
-              pieDiv.style.display = 'block';
-              barDiv.style.display = 'none';
+              // On mobile, show bar chart by default and hide toggle button
+              pieDiv.style.display = 'none';
+              barDiv.style.display = 'block';
               if (toggleBtn) {
                   toggleBtn.style.display = 'none';
               }
           } else {
+              // On desktop, show bar chart by default and enable toggle
               pieDiv.style.display = 'none';
               barDiv.style.display = 'block';
               if (toggleBtn) {

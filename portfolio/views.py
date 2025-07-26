@@ -293,46 +293,47 @@ def home(request):
             else:
                 labels_with_other = [asset['ticker'] for asset in assets_with_value]
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
         else:
             section_sum = sum([safe_float(asset['value']) for asset in assets_with_value])
             pie_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
-            fig_pie = go.Figure(data=[go.Pie(labels=[asset['ticker'] for asset in assets_with_value], values=pie_values, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=[asset['ticker'] for asset in assets_with_value], values=pie_values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Crypto Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
+            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
-            # Position pie chart more to the left
+            # Center the pie chart
             xaxis=dict(
-                domain=[0, 0.6],  # Use only 60% of width, positioned to the left
+                domain=[0.1, 0.9],  # Use 80% of width, centered
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0, 1],  # Use full height
+                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Adjust legend position to the right of the pie chart
+            # Position legend below the chart
             showlegend=True,
             legend=dict(
-                x=0.65,  # Position legend to the right of the pie chart
-                y=0.5,
-                xanchor='left',
-                yanchor='middle',
+                orientation="h",  # Horizontal legend
+                y=-0.25,  # Position further below the chart
+                x=0.5,
+                xanchor="center",
+                yanchor="top",
                 bgcolor='rgba(0,0,0,0)',
                 bordercolor='rgba(0,0,0,0)',
                 font=dict(size=12)
             ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,
+            height=400,  # Increased height to accommodate legend
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
     # --- Only cache and reuse bar_chart_html ---
@@ -574,15 +575,45 @@ def stocks(request):
             else:
                 labels_with_other = labels
                 values_with_other = values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=values_with_other, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=values_with_other, textinfo='none', showlegend=True)])
         else:
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Stock Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
+            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Center the pie chart
+            xaxis=dict(
+                domain=[0.1, 0.9],  # Use 80% of width, centered
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            # Position legend below the chart
+            showlegend=True,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                y=-0.25,  # Position further below the chart
+                x=0.5,
+                xanchor="center",
+                yanchor="top",
+                bgcolor='rgba(0,0,0,0)',
+                bordercolor='rgba(0,0,0,0)',
+                font=dict(size=12)
+            ),
+            # Ensure responsive behavior
+            autosize=True,
+            height=400,  # Increased height to accommodate legend
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
         # --- STOCKS BAR CHART LOGIC ---
@@ -715,17 +746,47 @@ def real_estate(request):
             else:
                 labels_with_other = labels
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
         else:
             section_sum = sum(values)
             pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Real Estate Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
+            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Center the pie chart
+            xaxis=dict(
+                domain=[0.1, 0.9],  # Use 80% of width, centered
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            # Position legend below the chart
+            showlegend=True,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                y=-0.25,  # Position further below the chart
+                x=0.5,
+                xanchor="center",
+                yanchor="top",
+                bgcolor='rgba(0,0,0,0)',
+                bordercolor='rgba(0,0,0,0)',
+                font=dict(size=12)
+            ),
+            # Ensure responsive behavior
+            autosize=True,
+            height=400,  # Increased height to accommodate legend
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -851,17 +912,47 @@ def cash(request):
             else:
                 labels_with_other = labels
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
         else:
             section_sum = sum(values)
             pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Cash/Fixed Income Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
+            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Center the pie chart
+            xaxis=dict(
+                domain=[0.1, 0.9],  # Use 80% of width, centered
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            # Position legend below the chart
+            showlegend=True,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                y=-0.25,  # Position further below the chart
+                x=0.5,
+                xanchor="center",
+                yanchor="top",
+                bgcolor='rgba(0,0,0,0)',
+                bordercolor='rgba(0,0,0,0)',
+                font=dict(size=12)
+            ),
+            # Ensure responsive behavior
+            autosize=True,
+            height=400,  # Increased height to accommodate legend
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -987,17 +1078,47 @@ def other(request):
             else:
                 labels_with_other = labels
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
         else:
             section_sum = sum(values)
             pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='percent+label', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Other Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
+            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Center the pie chart
+            xaxis=dict(
+                domain=[0.1, 0.9],  # Use 80% of width, centered
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            # Position legend below the chart
+            showlegend=True,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                y=-0.25,  # Position further below the chart
+                x=0.5,
+                xanchor="center",
+                yanchor="top",
+                bgcolor='rgba(0,0,0,0)',
+                bordercolor='rgba(0,0,0,0)',
+                font=dict(size=12)
+            ),
+            # Ensure responsive behavior
+            autosize=True,
+            height=400,  # Increased height to accommodate legend
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -1173,42 +1294,43 @@ def general(request):
         total = sum(values)
         percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
         # Pie chart (percent only)
-        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
+            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
-            # Position pie chart more to the left
+            # Center the pie chart
             xaxis=dict(
-                domain=[0, 0.5],  # Use only 50% of width, positioned to the left
+                domain=[0.1, 0.9],  # Use 80% of width, centered
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0, 1],  # Use full height
+                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Adjust legend position to the right of the pie chart
+            # Position legend below the chart
             showlegend=True,
             legend=dict(
-                x=0.55,  # Position legend to the right of the pie chart
-                y=0.5,
-                xanchor='left',
-                yanchor='middle',
+                orientation="h",  # Horizontal legend
+                y=-0.25,  # Position further below the chart
+                x=0.5,
+                xanchor="center",
+                yanchor="top",
                 bgcolor='rgba(0,0,0,0)',
                 bordercolor='rgba(0,0,0,0)',
                 font=dict(size=12)
             ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,
+            height=400,  # Increased height to accommodate legend
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         
@@ -1300,15 +1422,45 @@ def general(request):
         total = sum(values)
         percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
         # Pie chart (percent only)
-        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='percent+label', showlegend=True)])
+        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Portfolio Distribution",
-            margin=dict(t=50, b=50, l=0, r=0),
+            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Center the pie chart
+            xaxis=dict(
+                domain=[0.1, 0.9],  # Use 80% of width, centered
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            # Position legend below the chart
+            showlegend=True,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                y=-0.25,  # Position further below the chart
+                x=0.5,
+                xanchor="center",
+                yanchor="top",
+                bgcolor='rgba(0,0,0,0)',
+                bordercolor='rgba(0,0,0,0)',
+                font=dict(size=12)
+            ),
+            # Ensure responsive behavior
+            autosize=True,
+            height=400,  # Increased height to accommodate legend
         )
-        pie_chart_html = fig_pie.to_html(full_html=False)
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Stacked bar chart (single bar, 5 segments)
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]

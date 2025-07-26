@@ -53,9 +53,9 @@
             const isMobile = window.innerWidth <= 768;
             
             if (isMobile) {
-                // On mobile, show only pie chart and hide toggle button
-                pieDiv.style.display = 'block';
-                barDiv.style.display = 'none';
+                // On mobile, show bar chart by default and hide toggle button
+                pieDiv.style.display = 'none';
+                barDiv.style.display = 'block';
                 if (toggleBtn) {
                     toggleBtn.style.display = 'none';
                 }
