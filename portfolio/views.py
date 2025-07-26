@@ -1351,26 +1351,37 @@ def general(request):
     # Apply date filtering based on selected_range
     if selected_range != 'all' and snapshots.exists():
         from datetime import timedelta
-        today = date.today()
+        from django.utils import timezone
         
-        if selected_range == '1W':
+        # Use timezone-aware today
+        today = timezone.now().date()
+        
+        # Handle both lowercase and uppercase range values
+        range_lower = selected_range.lower()
+        
+        if range_lower == '1w':
             start_date = today - timedelta(days=7)
-        elif selected_range == '1M':
+        elif range_lower == '1m':
             start_date = today - timedelta(days=30)
-        elif selected_range == '3M':
+        elif range_lower == '3m':
             start_date = today - timedelta(days=90)
-        elif selected_range == '6M':
+        elif range_lower == '6m':
             start_date = today - timedelta(days=180)
-        elif selected_range == '1Y':
+        elif range_lower == '1y':
             start_date = today - timedelta(days=365)
         else:
             start_date = None
             
         if start_date:
+            # Filter snapshots to only include those from start_date onwards
             snapshots = snapshots.filter(date__gte=start_date)
+            print(f"Filtering snapshots: selected_range={selected_range}, start_date={start_date}, total_snapshots={snapshots.count()}")
     
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
+    
+    print(f"Chart data: selected_range={selected_range}, dates_count={len(dates)}, date_range={dates[0] if dates else 'None'} to {dates[-1] if dates else 'None'}")
+    
     networth_line_chart = None
     if dates and values:
         fig = go.Figure()
