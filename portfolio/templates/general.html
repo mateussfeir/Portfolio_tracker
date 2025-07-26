@@ -221,6 +221,24 @@
             width: 100% !important;
             max-width: 100% !important;
         }
+        
+        /* Pie chart specific positioning */
+        .pielayer {
+            transform: translateX(-20px) !important;  /* Shift pie chart to the left */
+        }
+        
+        /* Ensure pie chart container uses full width */
+        .plot-container {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        /* Mobile-specific pie chart adjustments */
+        @media only screen and (max-width: 768px) {
+            .pielayer {
+                transform: translateX(-10px) !important;  /* Less shift on mobile */
+            }
+        }
     </style>
     
     <script>

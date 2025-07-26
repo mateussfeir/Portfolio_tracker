@@ -303,7 +303,36 @@ def home(request):
             margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Position pie chart more to the left
+            xaxis=dict(
+                domain=[0, 0.6],  # Use only 60% of width, positioned to the left
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0, 1],  # Use full height
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            # Adjust legend position to the right of the pie chart
+            showlegend=True,
+            legend=dict(
+                x=0.65,  # Position legend to the right of the pie chart
+                y=0.5,
+                xanchor='left',
+                yanchor='middle',
+                bgcolor='rgba(0,0,0,0)',
+                bordercolor='rgba(0,0,0,0)',
+                font=dict(size=12)
+            ),
+            # Ensure responsive behavior
+            autosize=True,
+            height=400,
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
     # --- Only cache and reuse bar_chart_html ---
@@ -1233,9 +1262,39 @@ def general(request):
             margin=dict(t=50, b=50, l=0, r=0),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Position pie chart more to the left
+            xaxis=dict(
+                domain=[0, 0.5],  # Use only 50% of width, positioned to the left
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0, 1],  # Use full height
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            # Adjust legend position to the right of the pie chart
+            showlegend=True,
+            legend=dict(
+                x=0.55,  # Position legend to the right of the pie chart
+                y=0.5,
+                xanchor='left',
+                yanchor='middle',
+                bgcolor='rgba(0,0,0,0)',
+                bordercolor='rgba(0,0,0,0)',
+                font=dict(size=12)
+            ),
+            # Ensure responsive behavior
+            autosize=True,
+            height=400,
         )
-        pie_chart_html = fig_pie.to_html(full_html=False)
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
+        
         # Stacked bar chart (single bar, 5 segments)
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
@@ -1267,7 +1326,7 @@ def general(request):
             height=200,
             autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False)
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     else:
         pie_chart_html = None
         bar_chart_html = None
@@ -1364,7 +1423,7 @@ def general(request):
             height=200,
             autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False)
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     else:
         pie_chart_html = None
         bar_chart_html = None
