@@ -1347,6 +1347,28 @@ def general(request):
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
+    
+    # Apply date filtering based on selected_range
+    if selected_range != 'all' and snapshots.exists():
+        from datetime import timedelta
+        today = date.today()
+        
+        if selected_range == '1W':
+            start_date = today - timedelta(days=7)
+        elif selected_range == '1M':
+            start_date = today - timedelta(days=30)
+        elif selected_range == '3M':
+            start_date = today - timedelta(days=90)
+        elif selected_range == '6M':
+            start_date = today - timedelta(days=180)
+        elif selected_range == '1Y':
+            start_date = today - timedelta(days=365)
+        else:
+            start_date = None
+            
+        if start_date:
+            snapshots = snapshots.filter(date__gte=start_date)
+    
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     networth_line_chart = None
