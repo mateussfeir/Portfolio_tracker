@@ -382,20 +382,6 @@ def home(request):
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
-    if selected_range != 'all' and snapshots.exists():
-        last_date = snapshots.last().date
-        if selected_range == '1y':
-            start_date = last_date - timedelta(days=365)
-        elif selected_range == '3m':
-            start_date = last_date - timedelta(days=90)
-        elif selected_range == '1m':
-            start_date = last_date - timedelta(days=30)
-        elif selected_range == '1w':
-            start_date = last_date - timedelta(days=7)
-        else:
-            start_date = None
-        if start_date:
-            snapshots = snapshots.filter(date__gte=start_date)
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     networth_line_chart = None
@@ -1430,20 +1416,6 @@ def general(request):
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
-    if selected_range != 'all' and snapshots.exists():
-        last_date = snapshots.last().date
-        if selected_range == '1y':
-            start_date = last_date - timedelta(days=365)
-        elif selected_range == '3m':
-            start_date = last_date - timedelta(days=90)
-        elif selected_range == '1m':
-            start_date = last_date - timedelta(days=30)
-        elif selected_range == '1w':
-            start_date = last_date - timedelta(days=7)
-        else:
-            start_date = None
-        if start_date:
-            snapshots = snapshots.filter(date__gte=start_date)
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     networth_line_chart = None
