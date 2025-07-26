@@ -1057,7 +1057,7 @@ def other(request):
 def general(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    selected_range = request.GET.get('range', 'all')
+    selected_range = request.GET.get('range', '1m')
     show_cash_form = request.GET.get('show_cash_form') == '1'
     show_other_form = request.GET.get('show_other_form') == '1'
     cash_currencies = ['USD', 'CAD', 'BRL', 'KRW', 'INR', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF']
