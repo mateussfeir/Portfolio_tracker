@@ -115,11 +115,147 @@
       </select>
       <input type="hidden" name="currency" value="{{ selected_currency }}">
     </form>
-    {% if networth_line_chart %}
-        {{ networth_line_chart|safe }}
-    {% else %}
-        <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
-    {% endif %}
+    
+    <!-- Responsive chart container -->
+    <div class="chart-responsive-container" style="width: 100%; overflow-x: auto; padding: 0; margin: 0;">
+        {% if networth_line_chart %}
+            <div class="networth-chart-wrapper" style="width: 100%; min-width: 300px;">
+                {{ networth_line_chart|safe }}
+            </div>
+        {% else %}
+            <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
+        {% endif %}
+    </div>
+    
+    <style>
+        /* Mobile-specific chart styling */
+        @media only screen and (max-width: 768px) {
+            .chart-responsive-container {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+            
+            .networth-chart-wrapper {
+                width: 100% !important;
+                min-width: 280px !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Hide Plotly modebar on mobile to save space */
+            .modebar-container {
+                display: none !important;
+            }
+            
+            /* Ensure chart fits properly */
+            .js-plotly-plot {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 300px !important;
+                max-height: 400px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Adjust form styling for mobile */
+            #networth-range-form {
+                margin-bottom: 12px !important;
+                font-size: 14px;
+            }
+            
+            #networth-range-form select {
+                font-size: 14px;
+                padding: 4px 8px;
+            }
+        }
+        
+        /* Ensure proper chart sizing on all devices */
+        .js-plotly-plot {
+            width: 100% !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Fix for Plotly chart responsiveness */
+        .plot-container {
+            width: 100% !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Ensure chart container uses full width */
+        .chart-responsive-container {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        .networth-chart-wrapper {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Additional fixes for Plotly chart spacing */
+        .plotly-graph-div {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        .svg-container {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Force minimal left spacing for Y-axis */
+        .ytick text {
+            font-size: 10px !important;
+        }
+        
+        /* Ensure the chart uses maximum available width */
+        .main-svg {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    </style>
+    
+    <script>
+        // Ensure chart resizes properly on window resize
+        window.addEventListener('resize', function() {
+            // Trigger Plotly resize if available
+            if (typeof Plotly !== 'undefined') {
+                const plotElements = document.querySelectorAll('.js-plotly-plot');
+                plotElements.forEach(function(element) {
+                    if (element && element.layout) {
+                        Plotly.Plots.resize(element);
+                    }
+                });
+            }
+        });
+        
+        // Additional mobile optimizations
+        document.addEventListener('DOMContentLoaded', function() {
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Hide modebar on mobile for better space usage
+                const modebarElements = document.querySelectorAll('.modebar-container');
+                modebarElements.forEach(function(element) {
+                    element.style.display = 'none';
+                });
+                
+                // Ensure chart container doesn't overflow
+                const chartContainer = document.querySelector('.chart-responsive-container');
+                if (chartContainer) {
+                    chartContainer.style.overflowX = 'hidden';
+                }
+            }
+        });
+    </script>
 {% endblock %}
 {% block content %}
 {{ block.super }}

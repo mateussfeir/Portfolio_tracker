@@ -353,21 +353,85 @@ def home(request):
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
+    if selected_range != 'all' and snapshots.exists():
+        last_date = snapshots.last().date
+        if selected_range == '1y':
+            start_date = last_date - timedelta(days=365)
+        elif selected_range == '3m':
+            start_date = last_date - timedelta(days=90)
+        elif selected_range == '1m':
+            start_date = last_date - timedelta(days=30)
+        elif selected_range == '1w':
+            start_date = last_date - timedelta(days=7)
+        else:
+            start_date = None
+        if start_date:
+            snapshots = snapshots.filter(date__gte=start_date)
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
-    values = [float(snap.net_worth) for snap in snapshots]
+    values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     networth_line_chart = None
     if dates and values:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
+        
+        # Responsive layout configuration
         fig.update_layout(
             title="Net Worth Over Time",
             xaxis_title="Date",
             yaxis_title=f"Net Worth ({currency_symbol})",
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Responsive settings
+            autosize=True,
+            height=400,  # Fixed height for consistency
+            margin=dict(t=50, b=80, l=25, r=30),  # Reduced left margin further
+            # Mobile-friendly x-axis configuration
+            xaxis=dict(
+                tickangle=0,  # Horizontal labels instead of vertical
+                tickmode='auto',
+                nticks=min(8, len(dates)),  # Limit number of ticks on mobile
+                tickformat='%b %d',  # Shorter date format
+                tickfont=dict(size=10),  # Smaller font for mobile
+            ),
+            # Mobile-friendly y-axis configuration
+            yaxis=dict(
+                tickfont=dict(size=10),  # Smaller font for mobile
+                tickformat=',',  # Add commas to large numbers
+                tickwidth=1,  # Reduce tick width
+                ticklen=3,  # Reduce tick length
+                side='left',  # Ensure Y-axis is on the left
+                automargin=True,  # Let Plotly auto-adjust margins
+            ),
+            # Hide modebar on mobile (optional)
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1,
+                font=dict(size=10)
+            )
         )
-        networth_line_chart = fig.to_html(full_html=False)
+        
+        # Generate chart with responsive config
+        networth_line_chart = fig.to_html(
+            full_html=False, 
+            config={
+                "responsive": True,
+                "displayModeBar": True,
+                "displaylogo": False,
+                "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d"],
+                "toImageButtonOptions": {
+                    "format": "png",
+                    "filename": "net_worth_chart",
+                    "height": 400,
+                    "width": 800,
+                    "scale": 2
+                }
+            }
+        )
 
     return render(request, 'home.html', {
         'username': request.user.username,
@@ -1327,15 +1391,65 @@ def general(request):
     if dates and values:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
+        
+        # Responsive layout configuration
         fig.update_layout(
             title="Net Worth Over Time",
             xaxis_title="Date",
             yaxis_title=f"Net Worth ({currency_symbol})",
             paper_bgcolor="#121212",
             plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0")
+            font=dict(color="#e0e0e0"),
+            # Responsive settings
+            autosize=True,
+            height=400,  # Fixed height for consistency
+            margin=dict(t=50, b=80, l=25, r=30),  # Reduced left margin further
+            # Mobile-friendly x-axis configuration
+            xaxis=dict(
+                tickangle=0,  # Horizontal labels instead of vertical
+                tickmode='auto',
+                nticks=min(8, len(dates)),  # Limit number of ticks on mobile
+                tickformat='%b %d',  # Shorter date format
+                tickfont=dict(size=10),  # Smaller font for mobile
+            ),
+            # Mobile-friendly y-axis configuration
+            yaxis=dict(
+                tickfont=dict(size=10),  # Smaller font for mobile
+                tickformat=',',  # Add commas to large numbers
+                tickwidth=1,  # Reduce tick width
+                ticklen=3,  # Reduce tick length
+                side='left',  # Ensure Y-axis is on the left
+                automargin=True,  # Let Plotly auto-adjust margins
+            ),
+            # Hide modebar on mobile (optional)
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1,
+                font=dict(size=10)
+            )
         )
-        networth_line_chart = fig.to_html(full_html=False)
+        
+        # Generate chart with responsive config
+        networth_line_chart = fig.to_html(
+            full_html=False, 
+            config={
+                "responsive": True,
+                "displayModeBar": True,
+                "displaylogo": False,
+                "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d"],
+                "toImageButtonOptions": {
+                    "format": "png",
+                    "filename": "net_worth_chart",
+                    "height": 400,
+                    "width": 800,
+                    "scale": 2
+                }
+            }
+        )
 
     return render(request, 'general.html', {
         'username': request.user.username,
@@ -1374,20 +1488,66 @@ def performance(request):
     # --- Get all snapshots for this user ---
     snapshots = NetWorthSnapshot.objects.filter(user=user).order_by('date')
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
-    values = [float(snap.net_worth) for snap in snapshots]
+    values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
 
     # --- Plotly line chart ---
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
+    
+    # Responsive layout configuration
     fig.update_layout(
         title="Net Worth Over Time",
         xaxis_title="Date",
         yaxis_title=f"Net Worth ({currency_symbol})",
         paper_bgcolor="#121212",
         plot_bgcolor="#121212",
-        font=dict(color="#e0e0e0")
+        font=dict(color="#e0e0e0"),
+        # Responsive settings
+        autosize=True,
+        height=400,  # Fixed height for consistency
+        margin=dict(t=50, b=80, l=60, r=20),  # Adjusted margins for mobile
+        # Mobile-friendly x-axis configuration
+        xaxis=dict(
+            tickangle=0,  # Horizontal labels instead of vertical
+            tickmode='auto',
+            nticks=min(8, len(dates)),  # Limit number of ticks on mobile
+            tickformat='%b %d',  # Shorter date format
+            tickfont=dict(size=10),  # Smaller font for mobile
+        ),
+        # Mobile-friendly y-axis configuration
+        yaxis=dict(
+            tickfont=dict(size=10),  # Smaller font for mobile
+            tickformat=',',  # Add commas to large numbers
+        ),
+        # Hide modebar on mobile (optional)
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            font=dict(size=10)
+        )
     )
-    chart_html = fig.to_html(full_html=False)
+    
+    # Generate chart with responsive config
+    chart_html = fig.to_html(
+        full_html=False, 
+        config={
+            "responsive": True,
+            "displayModeBar": True,
+            "displaylogo": False,
+            "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d"],
+            "toImageButtonOptions": {
+                "format": "png",
+                "filename": "net_worth_chart",
+                "height": 400,
+                "width": 800,
+                "scale": 2
+            }
+        }
+    )
 
     return render(request, 'performance.html', {
         'chart': chart_html,

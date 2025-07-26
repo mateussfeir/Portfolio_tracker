@@ -373,6 +373,80 @@
           font-weight: 600;
           color: #e0e0e0;
         }
+        
+        /* Mobile-specific chart improvements */
+        @media only screen and (max-width: 768px) {
+            /* Ensure charts are responsive on mobile */
+            .js-plotly-plot {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 300px !important;
+                max-height: 400px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Hide modebar on mobile to save space */
+            .modebar-container {
+                display: none !important;
+            }
+            
+            /* Better mobile layout for dashboard */
+            .dashboard-section {
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+            
+            .chart-card, .table-card {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            /* Ensure proper chart container sizing */
+            .plot-container {
+                width: 100% !important;
+                height: auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Fix for chart overflow issues */
+            .chart-responsive-container {
+                overflow-x: hidden !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+        }
+        
+        /* Global chart responsiveness */
+        .plot-container {
+            width: 100% !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Ensure body doesn't overflow on mobile */
+        body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Additional chart container fixes */
+        .chart-responsive-container {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow-x: hidden !important;
+        }
+        
+        .networth-chart-wrapper {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
