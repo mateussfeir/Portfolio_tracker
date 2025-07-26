@@ -2,7 +2,7 @@
 {% load humanize %}
 {% load currency_filters %}
 {% block section_title %}Others{% endblock %}
-{% block positions_title %}Your Others Positions: <span class="sensitive-value">{{ section_net_worth|currency:currency_symbol }}</span>{% endblock %}
+{% block positions_title %}Your Others Positions{% endblock %}
 {% block table %}
 {% if assets %}
 <div class="table-wrapper">
