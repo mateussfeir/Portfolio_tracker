@@ -1,0 +1,37 @@
+# Chart Configuration
+# Easy to adjust chart heights and other settings in one place
+
+# Net Worth Chart Heights (in pixels)
+NETWORTH_CHART_HEIGHT_DESKTOP = 500  # Change this for desktop height
+NETWORTH_CHART_HEIGHT_TABLET = 450   # Change this for tablet height  
+NETWORTH_CHART_HEIGHT_MOBILE = 350   # Change this for mobile height
+NETWORTH_CHART_HEIGHT_SMALL_MOBILE = 300  # Change this for small mobile height
+
+# Chart Margins (in pixels)
+CHART_MARGIN_DESKTOP = 40
+CHART_MARGIN_TABLET = 30
+CHART_MARGIN_MOBILE = 20
+
+# Chart Colors
+CHART_LINE_COLOR = '#4caf50'
+CHART_MARKER_COLOR = '#4caf50'
+CHART_MARKER_BORDER_COLOR = '#2e7d32'
+CHART_BACKGROUND_COLOR = '#1a1a1a'
+CHART_PLOT_BACKGROUND_COLOR = '#2a2a2a'
+CHART_GRID_COLOR = '#333'
+CHART_AXIS_COLOR = '#444'
+CHART_TEXT_COLOR = '#e0e0e0'
+CHART_TICK_COLOR = '#b0b0b0'
+
+# Chart Styling
+CHART_LINE_WIDTH = 3
+CHART_MARKER_SIZE = 6
+CHART_MARKER_BORDER_WIDTH = 1
+CHART_TITLE_FONT_SIZE = 20
+CHART_AXIS_FONT_SIZE = 11
+CHART_LEGEND_FONT_SIZE = 12
+
+# Responsive breakpoints
+MOBILE_BREAKPOINT = 768
+TABLET_BREAKPOINT = 1024
+SMALL_MOBILE_BREAKPOINT = 480 

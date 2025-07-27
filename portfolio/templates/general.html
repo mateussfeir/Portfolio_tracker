@@ -1,133 +1,440 @@
-{% extends "base2.html" %}
+{% load static %}
 {% load humanize %}
 {% load custom_filters %}
 {% load currency_filters %}
-{% block section_title %}General{% endblock %}
-{% block positions_title %}Net Worth Composition{% endblock %}
-{% block table %}
-<table>
-    <thead>
-        <tr>
-            <th>Type</th>
-            <th>Total Value</th>
-            <th>Percentage</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in totals %}
-        <tr>
-            <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
-            <td><span class="sensitive-value">{{ t.value|currency:currency_symbol }}</span></td>
-            <td>{{ t.percent|floatformat:2 }}%</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endblock %}
-{% block add_new %}{% endblock %}
-{% block chart_title %}{% endblock %}
-{% block chart %}
-    <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
-        {% if pie_chart %}
-            {{ pie_chart|safe }}
-        {% else %}
-            <p style="color: #aaa;">No chart data available.</p>
-        {% endif %}
-    </div>
-    <div id="bar-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
-        {% if bar_chart %}
-            {{ bar_chart|safe }}
-        {% endif %}
-    </div>
-    <div class="text-center mt-3">
-        <button id="toggle-chart-btn" class="btn btn-outline-success">Show Pie Chart</button>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleBtn = document.getElementById('toggle-chart-btn');
-            const pieDiv = document.getElementById('pie-chart-div');
-            const barDiv = document.getElementById('bar-chart-div');
-            let showingPie = false;
-            
-            // Check if device is mobile (screen width <= 768px)
-            const isMobile = window.innerWidth <= 768;
-            
-            if (isMobile) {
-                // On mobile, show bar chart by default and hide toggle button
-                pieDiv.style.display = 'none';
-                barDiv.style.display = 'block';
-                if (toggleBtn) {
-                    toggleBtn.style.display = 'none';
-                }
-            } else {
-                // On desktop, show bar chart by default and enable toggle
-                pieDiv.style.display = 'none';
-                barDiv.style.display = 'block';
-                if (toggleBtn) {
-                    toggleBtn.addEventListener('click', function() {
-                        showingPie = !showingPie;
-                        if (showingPie) {
-                            pieDiv.style.display = 'block';
-                            barDiv.style.display = 'none';
-                            toggleBtn.textContent = 'Show Bar Chart';
-                        } else {
-                            pieDiv.style.display = 'none';
-                            barDiv.style.display = 'block';
-                            toggleBtn.textContent = 'Show Pie Chart';
-                        }
-                    });
-                }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon_16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon_32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'images/favicon_48x48.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/bitbalance_favicon.ico' %}">
+    <meta name="msapplication-TileImage" content="{% static 'images/favicon_32x32.png' %}">
+    <meta name="msapplication-TileColor" content="#000000">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
+        header {
+          padding: 0 !important;
+          margin: 0 !important;
+          height: auto !important;
+        }
+        header h1 {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+        .container {
+            margin-top: 0px; /* matches nav height for perfect alignment */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            gap: 20px;
+        }
+        .card {
+          background: #1f1f1f;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+          padding: 20px;
+          color: #e0e0e0;
+          margin: 16px 0;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #333; text-align: center; vertical-align: middle; }
+        th { background-color: #2a2a2a; }
+        td { background-color: #1e1e1e; }
+        th:last-child, td:last-child { width: 50px; padding: 4px; }
+        button { cursor: pointer; background-color: whitesmoke; color: black; border: none; border-radius: 4px; padding: 4px 8px; transition: background-color 0.2s ease; }
+        button:hover { background-color: #ff1a1a; }
+        a { color: #4caf50; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .pie-chart-container { text-align: center; }
+        footer { margin-top: 20px; text-align: center; color: #aaa; }
+        nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px !important;
+          margin: 0 !important;
+          height: auto !important;
+          line-height: normal;
+          background: #000000;
+        }
+        .nav-left,
+        .nav-center,
+        .nav-right {
+          display: flex;
+          align-items: center;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .nav-left {
+          margin: 0 !important;
+          padding: 0px 0 !important;
+          font-size: 14px;
+        }
+        select,
+        button {
+          margin: 0 !important;
+          padding: 4px 8px;
+        }
+        .nav-center {
+            justify-content: center;
+            flex-grow: 1;
+            flex-wrap: wrap;
+        }
+        .nav-right {
+            justify-content: flex-end;
+        }
+        @media (max-width: 800px) {
+            nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            .nav-center {
+                justify-content: center;
+            }
+            .nav-left, .nav-right {
+                justify-content: center;
+            }
+        }
+        h2 { margin-top: 0; }
+        .nav-left, .nav-center, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-center {
+            flex-grow: 1;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .nav-right {
+            gap: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 800px) {
+            nav {
+                flex-direction: column;
+                align-items: stretch;
+                height: auto;
+                min-height: unset;
+                padding: 0 0;
+            }
+            .nav-center {
+                justify-content: space-around;
+                flex-wrap: wrap;
+            }
+            .nav-left, .nav-right {
+                justify-content: center;
+                width: 100%;
+                margin-bottom: 4px;
+            }
+        }
+        .nav-left span, .nav-center a, .nav-left strong, .nav-left .sensitive-value {
+          color: #4caf50 !important;
+        }
+        #toggle-chart-btn:hover {
+          background: #4caf50;
+          color: white;
+          transform: scale(1.05);
+        }
+        #privacy-toggle-btn:hover {
+          background: #4caf50;
+          color: white;
+          transform: scale(1.05);
+        }
+        .dashboard-section {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: nowrap;
+          gap: 16px;
+          margin-top: 0px;
+          min-height: auto;
+          height: auto;
+        }
+        
+        /* Ensure flex items can expand to their content */
+        .dashboard-section > * {
+          height: auto !important;
+          min-height: auto !important;
+        }
+        .table-card, .chart-card {
+          width: 100%;
+          max-width: 900px;
+          min-width: 0;
+          flex: none;
+          margin: 0 auto;
+          padding: 0;
+          background-color: transparent;
+          border: none;
+          box-shadow: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        table td, table th {
+          border-bottom: 1px solid #333;
+          padding: 10px;
+        }
+        .chart-card {
+          flex: 1 1 70%;
+          min-width: 400px;
+          max-width: 1000px;
+          width: 100%;
+          background-color: transparent;
+          padding: 4px 0 4px 0;
+          border-radius: 0;
+          border: none;
+          box-shadow: none;
+          min-width: 0 !important;
+          margin: 0 !important;
+          height: auto; /* Allow chart card to expand */
+          min-height: auto; /* Allow chart card to expand */
+        }
+        #pie-chart-div, #bar-chart-div {
+          width: 100%;
+          min-height: 200px;
+          height: auto;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        #bar-chart-div {
+          width: 100%;
+          min-height: 150px;
+          height: auto;
+          overflow: visible;
+        }
+        @media (max-width: 768px) {
+          #pie-chart-div, #bar-chart-div {
+            height: 300px !important;
+            min-height: 250px !important;
+            max-height: 350px !important;
+            margin-bottom: 20px !important;
+          }
+        }
+        
+        @media (max-width: 1200px) {
+          .dashboard-section {
+            flex-direction: column;
+            gap: 16px;
+          }
+          .table-card, .chart-card {
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+            flex: 1 1 100%;
+          }
+        }
+        @media (max-width: 768px) {
+          .container {
+            padding: 0 12px;
+          }
+          .dashboard-section {
+            flex-direction: column !important;
+            gap: 30px !important;
+            padding: 0 10px !important;
+            margin-top: 20px !important; /* Add top margin to account for mobile navigation */
+          }
+          .table-card, .chart-card {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            flex: 1 1 100% !important;
+          }
+          .chart-card {
+            margin-bottom: 20px !important;
+            padding: 8px 0 !important;
+            margin-top: 10px !important; /* Additional margin for chart card on mobile */
+          }
+          .table-card {
+            margin-top: 20px !important;
+          }
+          /* Ensure table doesn't overflow on mobile */
+          .table-wrapper {
+            overflow-x: auto;
+            max-width: 100%;
+            margin-top: 10px !important;
+          }
+          table {
+            min-width: 600px; /* Ensure table has minimum width for readability */
+            margin-top: 10px !important;
+          }
+          .js-plotly-plot {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 350px !important;
+          }
+        }
+        
+        /* Better space utilization on large screens */
+        @media (min-width: 1600px) {
+          .dashboard-section {
+            gap: 24px;
+          }
+          .table-card {
+            flex: 0 0 30%;
+            max-width: 700px;
+          }
+          .chart-card {
+            flex: 1 1 70%;
+            max-width: 1400px;
+          }
+        }
+        
+        .section-header {
+          margin-bottom: 2px !important;
+        }
+        .networth-card {
+          padding: 0 !important;
+          max-width: 900px;
+          width: 100%;
+          margin: 0 auto 24px auto;
+          background: #1f1f1f;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+        }
+        .networth-card .section-header {
+          padding: 16px 24px 8px 24px;
+          margin-bottom: 0 !important;
+        }
+        .networth-card .js-plotly-plot {
+          width: 100% !important;
+          height: 100% !important;
+          min-width: 0;
+        }
+        .table-wrapper {
+          overflow-x: auto;
+          max-width: 100%;
+        }
+        .logout-form {
+            display: inline;
+            margin-left: 12px;
+        }
+        .logout-link {
+            background: none;
+            border: none;
+            color: #aaa;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            z-index: 1000;
+            margin-left: 0;
+        }
+        .logout-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .networth-container {
+          display: flex;
+          align-items: flex-start;
+          gap: 32px;
+          width: 100%;
+          margin-top: 0;
+        }
+        .networth-table, .networth-chart {
+          display: flex;
+          flex-direction: column;
+          flex: 1 1 0;
+        }
+        .networth-table h3, .networth-chart h3 {
+          margin: 0 0 10px 0;
+          font-size: 1.25em;
+          font-weight: 600;
+          color: #e0e0e0;
+        }
+        
+        /* Mobile-specific chart improvements */
+        @media only screen and (max-width: 768px) {
+            /* Ensure charts are responsive on mobile */
+            .js-plotly-plot {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 300px !important;
+                max-height: 400px !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             
-            // Handle window resize
-            window.addEventListener('resize', function() {
-                const newIsMobile = window.innerWidth <= 768;
-                if (newIsMobile !== isMobile) {
-                    // Reload page when switching between mobile and desktop
-                    location.reload();
-                }
-            });
-        });
-    </script>
-{% endblock %}
-
-{% block bar_chart %}
-    {% if bar_chart %}
-        {{ bar_chart|safe }}
-    {% endif %}
-{% endblock %}
-
-{% block pie_chart %}
-    {% if pie_chart %}
-        {{ pie_chart|safe }}
-    {% endif %}
-{% endblock %}
-
-{% block networth_over_time %}
-    <form method="get" id="networth-range-form" style="text-align:center; margin-bottom: 16px;">
-      <label for="range">Show:</label>
-      <select name="range" id="range" onchange="document.getElementById('networth-range-form').submit();">
-        <option value="all" {% if selected_range == 'all' %}selected{% endif %}>Full</option>
-        <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>1Y</option>
-        <option value="3m" {% if selected_range == '3m' %}selected{% endif %}>3M</option>
-        <option value="1m" {% if selected_range == '1m' %}selected{% endif %}>1M</option>
-        <option value="1w" {% if selected_range == '1w' %}selected{% endif %}>1W</option>
-      </select>
-      <input type="hidden" name="currency" value="{{ selected_currency }}">
-    </form>
-    
-    <!-- Responsive chart container -->
-    <div class="chart-responsive-container" style="width: 100%; overflow-x: auto; padding: 0; margin: 0;">
-        {% if networth_line_chart %}
-            <div class="networth-chart-wrapper" style="width: 100%; min-width: 300px;">
-                {{ networth_line_chart|safe }}
-            </div>
-        {% else %}
-            <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
-        {% endif %}
-    </div>
-    
-    <style>
+            /* Hide modebar on mobile to save space */
+            .modebar-container {
+                display: none !important;
+            }
+            
+            /* Better mobile layout for dashboard */
+            .dashboard-section {
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+            
+            .chart-card, .table-card {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            /* Ensure proper chart container sizing */
+            .plot-container {
+                width: 100% !important;
+                height: auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Fix for chart overflow issues */
+            .chart-responsive-container {
+                overflow-x: hidden !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+        }
+        
+        /* Global chart responsiveness */
+        .plot-container {
+            width: 100% !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        /* Ensure body doesn't overflow on mobile */
+        body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Additional chart container fixes */
+        .chart-responsive-container {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow-x: hidden !important;
+        }
+        
+        .networth-chart-wrapper {
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
         /* Mobile-specific chart styling */
         @media only screen and (max-width: 768px) {
             .chart-responsive-container {
@@ -250,41 +557,220 @@
             }
         }
     </style>
-    
-    <script>
-        // Ensure chart resizes properly on window resize
-        window.addEventListener('resize', function() {
-            // Trigger Plotly resize if available
-            if (typeof Plotly !== 'undefined') {
-                const plotElements = document.querySelectorAll('.js-plotly-plot');
-                plotElements.forEach(function(element) {
-                    if (element && element.layout) {
-                        Plotly.Plots.resize(element);
-                    }
-                });
-            }
-        });
+</head>
+<body>
+<header>
+    <nav>
+        <div class="nav-left">
+            <span>Logged as: <strong>{{ username }}</strong></span>
+            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span></span>
+        </div>
+        <div class="nav-center">
+            <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
+            <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
+            <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
+            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
+            <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
+            <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+        </div>
+        <div class="nav-right">
+            <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 2px 8px; font-size: 0.95em; width: 80px; min-width: 60px; max-width: 100px; text-align: center;">
+                {% for code, name in available_currencies.items %}
+                    <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
+                {% endfor %}
+            </select>
+            <button id="privacy-toggle-btn" type="button" style="margin-left: 12px; background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background 0.18s, color 0.18s, transform 0.18s;">Privacy Mode: Off</button>
+            <form action="{% url 'logout' %}" method="post" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-link">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <div style="width: 100%; max-width: 1800px; margin: 0 auto;">
+        <div class="dashboard-section">
+            <div class="chart-card">
+                <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+                    {% if pie_chart %}
+                        {{ pie_chart|safe }}
+                    {% else %}
+                        <p style="color: #aaa;">No chart data available.</p>
+                    {% endif %}
+                </div>
+                <div id="bar-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+                    {% if bar_chart %}
+                        {{ bar_chart|safe }}
+                    {% endif %}
+                </div>
+                <div class="text-center mt-3">
+                    <button id="toggle-chart-btn" class="btn btn-outline-success">Show Pie Chart</button>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const toggleBtn = document.getElementById('toggle-chart-btn');
+                        const pieDiv = document.getElementById('pie-chart-div');
+                        const barDiv = document.getElementById('bar-chart-div');
+                        let showingPie = false;
+                        
+                        // Check if device is mobile (screen width <= 768px)
+                        const isMobile = window.innerWidth <= 768;
+                        
+                        if (isMobile) {
+                            // On mobile, show bar chart by default and hide toggle button
+                            pieDiv.style.display = 'none';
+                            barDiv.style.display = 'block';
+                            if (toggleBtn) {
+                                toggleBtn.style.display = 'none';
+                            }
+                        } else {
+                            // On desktop, show bar chart by default and enable toggle
+                            pieDiv.style.display = 'none';
+                            barDiv.style.display = 'block';
+                            if (toggleBtn) {
+                                toggleBtn.addEventListener('click', function() {
+                                    showingPie = !showingPie;
+                                    if (showingPie) {
+                                        pieDiv.style.display = 'block';
+                                        barDiv.style.display = 'none';
+                                        toggleBtn.textContent = 'Show Bar Chart';
+                                    } else {
+                                        pieDiv.style.display = 'none';
+                                        barDiv.style.display = 'block';
+                                        toggleBtn.textContent = 'Show Pie Chart';
+                                    }
+                                });
+                            }
+                        }
+                        
+                        // Handle window resize
+                        window.addEventListener('resize', function() {
+                            const newIsMobile = window.innerWidth <= 768;
+                            if (newIsMobile !== isMobile) {
+                                // Reload page when switching between mobile and desktop
+                                location.reload();
+                            }
+                        });
+                    });
+                </script>
+            </div>
+            <div class="table-card">
+                <div class="section-header">Net Worth Composition</div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Total Value</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in totals %}
+                            <tr>
+                                <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
+                                <td><span class="sensitive-value">{{ t.value|currency:currency_symbol }}</span></td>
+                                <td>{{ t.percent|floatformat:2 }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         
-        // Additional mobile optimizations
-        document.addEventListener('DOMContentLoaded', function() {
-            const isMobile = window.innerWidth <= 768;
-            
-            if (isMobile) {
-                // Hide modebar on mobile for better space usage
-                const modebarElements = document.querySelectorAll('.modebar-container');
-                modebarElements.forEach(function(element) {
-                    element.style.display = 'none';
-                });
-                
-                // Ensure chart container doesn't overflow
-                const chartContainer = document.querySelector('.chart-responsive-container');
-                if (chartContainer) {
-                    chartContainer.style.overflowX = 'hidden';
+        <!-- Net Worth Over Time Section -->
+        <div class="section-header">Net Worth Over Time</div>
+        <form method="get" id="networth-range-form" style="text-align:center; margin-bottom: 16px;">
+          <label for="range">Show:</label>
+          <select name="range" id="range" onchange="document.getElementById('networth-range-form').submit();">
+            <option value="all" {% if selected_range == 'all' %}selected{% endif %}>Full</option>
+            <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>1Y</option>
+            <option value="3m" {% if selected_range == '3m' %}selected{% endif %}>3M</option>
+            <option value="1m" {% if selected_range == '1m' %}selected{% endif %}>1M</option>
+            <option value="1w" {% if selected_range == '1w' %}selected{% endif %}>1W</option>
+          </select>
+          <input type="hidden" name="currency" value="{{ selected_currency }}">
+        </form>
+        
+        <!-- Responsive chart container -->
+        <div class="chart-responsive-container" style="width: 100%; overflow-x: auto; padding: 0; margin: 0;">
+            {% if networth_line_chart %}
+                <div class="networth-chart-wrapper" style="width: 100%; min-width: 300px;">
+                    {{ networth_line_chart|safe }}
+                </div>
+            {% else %}
+                <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
+            {% endif %}
+        </div>
+        
+        <script>
+            // Ensure chart resizes properly on window resize
+            window.addEventListener('resize', function() {
+                // Trigger Plotly resize if available
+                if (typeof Plotly !== 'undefined') {
+                    const plotElements = document.querySelectorAll('.js-plotly-plot');
+                    plotElements.forEach(function(element) {
+                        if (element && element.layout) {
+                            Plotly.Plots.resize(element);
+                        }
+                    });
                 }
+            });
+            
+            // Additional mobile optimizations
+            document.addEventListener('DOMContentLoaded', function() {
+                const isMobile = window.innerWidth <= 768;
+                
+                if (isMobile) {
+                    // Hide modebar on mobile for better space usage
+                    const modebarElements = document.querySelectorAll('.modebar-container');
+                    modebarElements.forEach(function(element) {
+                        element.style.display = 'none';
+                    });
+                    
+                    // Ensure chart container doesn't overflow
+                    const chartContainer = document.querySelector('.chart-responsive-container');
+                    if (chartContainer) {
+                        chartContainer.style.overflowX = 'hidden';
+                    }
+                }
+            });
+        </script>
+    </div>
+</div>
+<footer></footer>
+<script>
+    function changeCurrency(currency) {
+        const url = new URL(window.location);
+        url.searchParams.set('currency', currency);
+        window.location.href = url.toString();
+    }
+    
+    function setPrivacyMode(on) {
+        const sensitives = document.querySelectorAll('.sensitive-value');
+        sensitives.forEach(el => {
+            if (on) {
+                el.classList.add('privacy-hidden');
+                el.textContent = '****';
+            } else {
+                el.classList.remove('privacy-hidden');
+                location.reload();
             }
         });
-    </script>
-{% endblock %}
-{% block content %}
-{{ block.super }}
-{% endblock %} 
+        document.getElementById('privacy-toggle-btn').textContent = 'Privacy Mode: ' + (on ? 'On' : 'Off');
+        localStorage.setItem('privacyMode', on ? 'on' : 'off');
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const privacyBtn = document.getElementById('privacy-toggle-btn');
+        const privacyState = localStorage.getItem('privacyMode');
+        if (privacyState === 'on') setPrivacyMode(true);
+        privacyBtn.addEventListener('click', function() {
+            const isOn = localStorage.getItem('privacyMode') === 'on';
+            setPrivacyMode(!isOn);
+        });
+    });
+</script>
+</body>
+</html> 
