@@ -370,7 +370,23 @@ def home(request):
                 plot_bgcolor="rgba(0,0,0,0)",
                 font=dict(color="#e0e0e0"),
                 xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
-                yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
+                yaxis=dict(
+                    tickfont=dict(size=11, color='#cccccc'),
+                    tickformat=',',
+                    tickwidth=1,
+                    ticklen=4,
+                    tickcolor='#333333',
+                    showgrid=True,
+                    gridcolor='rgba(255,255,255,0.1)',
+                    gridwidth=1,
+                    zeroline=False,
+                    showline=True,
+                    linecolor='rgba(255,255,255,0.2)',
+                    linewidth=1,
+                    side='left',
+                    automargin=True,
+                    range=[min(bar_chart_values) * 0.95, max(bar_chart_values) * 1.05]  # Start from min value with some padding
+                ),
                 showlegend=True,
                 legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
                 height=200,
@@ -644,7 +660,23 @@ def stocks(request):
                 plot_bgcolor="rgba(0,0,0,0)",
                 font=dict(color="#e0e0e0"),
                 xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
-                yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
+                yaxis=dict(
+                    tickfont=dict(size=11, color='#cccccc'),
+                    tickformat=',',
+                    tickwidth=1,
+                    ticklen=4,
+                    tickcolor='#333333',
+                    showgrid=True,
+                    gridcolor='rgba(255,255,255,0.1)',
+                    gridwidth=1,
+                    zeroline=False,
+                    showline=True,
+                    linecolor='rgba(255,255,255,0.2)',
+                    linewidth=1,
+                    side='left',
+                    automargin=True,
+                    range=[min(bar_chart_values) * 0.95, max(bar_chart_values) * 1.05]  # Start from min value with some padding
+                ),
                 showlegend=True,
                 legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
                 height=200,
@@ -1500,6 +1532,9 @@ def general(request):
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
     
+    # Debug: Print snapshot count
+    print(f"DEBUG: Found {snapshots.count()} snapshots for user {request.user.username}")
+    
     # Apply date filtering based on selected_range
     if selected_range != 'all' and snapshots.exists():
         from datetime import timedelta
@@ -1527,76 +1562,128 @@ def general(request):
         if start_date:
             # Filter snapshots to only include those from start_date onwards
             snapshots = snapshots.filter(date__gte=start_date)
-            print(f"Filtering snapshots: selected_range={selected_range}, start_date={start_date}, total_snapshots={snapshots.count()}")
+            print(f"DEBUG: After filtering for range '{selected_range}': {snapshots.count()} snapshots")
     
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     
-    print(f"Chart data: selected_range={selected_range}, dates_count={len(dates)}, date_range={dates[0] if dates else 'None'} to {dates[-1] if dates else 'None'}")
+    print(f"DEBUG: Chart data - dates: {len(dates)}, values: {len(values)}")
+    print(f"DEBUG: Date range: {dates[0] if dates else 'None'} to {dates[-1] if dates else 'None'}")
+    print(f"DEBUG: Values range: {min(values) if values else 'None'} to {max(values) if values else 'None'}")
+    print(f"DEBUG: Y-axis range: {min(values) * 0.999 if values else 'None'} to {max(values) * 1.001 if values else 'None'}")
     
     networth_line_chart = None
     if dates and values:
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
-        
-        # Responsive layout configuration
-        fig.update_layout(
-            title="Net Worth Over Time",
-            xaxis_title="Date",
-            yaxis_title=f"Net Worth ({currency_symbol})",
-            paper_bgcolor="#121212",
-            plot_bgcolor="#121212",
-            font=dict(color="#e0e0e0"),
-            # Responsive settings
-            autosize=True,
-            height=400,  # Fixed height for consistency
-            margin=dict(t=50, b=80, l=25, r=30),  # Reduced left margin further
-            # Mobile-friendly x-axis configuration
-            xaxis=dict(
-                tickangle=0,  # Horizontal labels instead of vertical
-                tickmode='auto',
-                nticks=min(8, len(dates)),  # Limit number of ticks on mobile
-                tickformat='%b %d',  # Shorter date format
-                tickfont=dict(size=10),  # Smaller font for mobile
-            ),
-            # Mobile-friendly y-axis configuration
-            yaxis=dict(
-                tickfont=dict(size=10),  # Smaller font for mobile
-                tickformat=',',  # Add commas to large numbers
-                tickwidth=1,  # Reduce tick width
-                ticklen=3,  # Reduce tick length
-                side='left',  # Ensure Y-axis is on the left
-                automargin=True,  # Let Plotly auto-adjust margins
-            ),
-            # Hide modebar on mobile (optional)
-            showlegend=True,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1,
-                font=dict(size=10)
+        try:
+            fig = go.Figure()
+            
+            # Modern gradient line chart
+            fig.add_trace(go.Scatter(
+                x=dates, 
+                y=values, 
+                mode='lines+markers', 
+                name='Net Worth',
+                line=dict(
+                    width=3,
+                    color='#4caf50',
+                    shape='spline'  # Smooth curved lines
+                ),
+                marker=dict(
+                    size=6,
+                    color='#4caf50',
+                    line=dict(width=2, color='#ffffff'),
+                    symbol='circle'
+                ),
+                fill='tonexty',  # Fill area below the line
+                fillcolor='rgba(76, 175, 80, 0.1)',  # Light green fill
+                hovertemplate='<b>%{x}</b><br>Net Worth: <b>%{y:,.0f} ' + currency_symbol + '</b><extra></extra>'
+            ))
+            
+            # Modern layout configuration
+            fig.update_layout(
+                title=dict(
+                    text="Net Worth Over Time",
+                    font=dict(size=20, color='#ffffff', family='Arial, sans-serif'),
+                    x=0.5,
+                    xanchor='center'
+                ),
+                xaxis_title=None,  # Remove x-axis title for cleaner look
+                yaxis_title=None,  # Remove y-axis title for cleaner look
+                paper_bgcolor="rgba(0,0,0,0)",  # Transparent background
+                plot_bgcolor="rgba(0,0,0,0)",  # Transparent plot background
+                font=dict(color="#e0e0e0", family='Arial, sans-serif'),
+                # Responsive settings
+                autosize=True,
+                height=400,  # Keep same height
+                margin=dict(t=60, b=40, l=40, r=20),  # Adjusted margins for modern look
+                # Modern x-axis styling
+                xaxis=dict(
+                    tickangle=0,
+                    tickmode='auto',
+                    nticks=min(8, len(dates)),
+                    tickformat='%b %d',
+                    tickfont=dict(size=11, color='#cccccc'),
+                    tickcolor='#333333',
+                    tickwidth=1,
+                    ticklen=4,
+                    showgrid=True,
+                    gridcolor='rgba(255,255,255,0.1)',
+                    gridwidth=1,
+                    zeroline=False,
+                    showline=True,
+                    linecolor='rgba(255,255,255,0.2)',
+                    linewidth=1
+                ),
+                # Modern y-axis styling
+                yaxis=dict(
+                    tickfont=dict(size=11, color='#cccccc'),
+                    tickformat=',',
+                    tickwidth=1,
+                    ticklen=4,
+                    tickcolor='#333333',
+                    showgrid=True,
+                    gridcolor='rgba(255,255,255,0.1)',
+                    gridwidth=1,
+                    zeroline=False,
+                    showline=True,
+                    linecolor='rgba(255,255,255,0.2)',
+                    linewidth=1,
+                    side='left',
+                    automargin=True,
+                    range=[min(values) * 0.999, max(values) * 1.001]  # Tighter range with minimal padding
+                ),
+                # Hide legend for cleaner look
+                showlegend=False,
+                # Modern hover styling
+                hovermode='x unified',
+                hoverlabel=dict(
+                    bgcolor='rgba(0,0,0,0.9)',
+                    bordercolor='#4caf50',
+                    font=dict(size=12, color='#ffffff')
+                )
             )
-        )
-        
-        # Generate chart with responsive config
-        networth_line_chart = fig.to_html(
-            full_html=False, 
-            config={
-                "responsive": True,
-                "displayModeBar": True,
-                "displaylogo": False,
-                "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d"],
-                "toImageButtonOptions": {
-                    "format": "png",
-                    "filename": "net_worth_chart",
-                    "height": 400,
-                    "width": 800,
-                    "scale": 2
+            
+            # Generate chart with modern config
+            networth_line_chart = fig.to_html(
+                full_html=False, 
+                config={
+                    "responsive": True,
+                    "displayModeBar": True,
+                    "displaylogo": False,
+                    "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d", "zoomIn2d", "zoomOut2d"],
+                    "toImageButtonOptions": {
+                        "format": "png",
+                        "filename": "net_worth_chart",
+                        "height": 400,
+                        "width": 800,
+                        "scale": 2
+                    }
                 }
-            }
-        )
+            )
+            
+        except Exception as e:
+            print(f"ERROR generating chart: {e}")
+            networth_line_chart = None
 
     return render(request, 'general.html', {
         'username': request.user.username,
