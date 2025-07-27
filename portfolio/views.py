@@ -323,7 +323,7 @@ def home(request):
             showlegend=True,
             legend=dict(
                 orientation="h",  # Horizontal legend
-                y=-0.25,  # Position further below the chart
+                y=-0.35,  # Position further below the chart
                 x=0.5,
                 xanchor="center",
                 yanchor="top",
@@ -372,7 +372,7 @@ def home(request):
                 xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
                 yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
                 showlegend=True,
-                legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+                legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
                 height=200,
                 autosize=True
             )
@@ -603,7 +603,7 @@ def stocks(request):
             showlegend=True,
             legend=dict(
                 orientation="h",  # Horizontal legend
-                y=-0.25,  # Position further below the chart
+                y=-0.35,  # Position further below the chart
                 x=0.5,
                 xanchor="center",
                 yanchor="top",
@@ -646,7 +646,7 @@ def stocks(request):
                 xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
                 yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
                 showlegend=True,
-                legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+                legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
                 height=200,
                 autosize=True
             )
@@ -776,7 +776,7 @@ def real_estate(request):
             showlegend=True,
             legend=dict(
                 orientation="h",  # Horizontal legend
-                y=-0.25,  # Position further below the chart
+                y=-0.35,  # Position further below the chart
                 x=0.5,
                 xanchor="center",
                 yanchor="top",
@@ -821,7 +821,7 @@ def real_estate(request):
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
         )
@@ -942,7 +942,7 @@ def cash(request):
             showlegend=True,
             legend=dict(
                 orientation="h",  # Horizontal legend
-                y=-0.25,  # Position further below the chart
+                y=-0.35,  # Position further below the chart
                 x=0.5,
                 xanchor="center",
                 yanchor="top",
@@ -987,7 +987,7 @@ def cash(request):
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
         )
@@ -1108,7 +1108,7 @@ def other(request):
             showlegend=True,
             legend=dict(
                 orientation="h",  # Horizontal legend
-                y=-0.25,  # Position further below the chart
+                y=-0.35,  # Position further below the chart
                 x=0.5,
                 xanchor="center",
                 yanchor="top",
@@ -1153,7 +1153,7 @@ def other(request):
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
         )
@@ -1320,7 +1320,7 @@ def general(request):
             showlegend=True,
             legend=dict(
                 orientation="h",  # Horizontal legend
-                y=-0.25,  # Position further below the chart
+                y=-0.35,  # Position further below the chart
                 x=0.5,
                 xanchor="center",
                 yanchor="top",
@@ -1361,7 +1361,7 @@ def general(request):
             xaxis=dict(title=None, range=[0, 100], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
         )
@@ -1448,7 +1448,7 @@ def general(request):
             showlegend=True,
             legend=dict(
                 orientation="h",  # Horizontal legend
-                y=-0.25,  # Position further below the chart
+                y=-0.35,  # Position further below the chart
                 x=0.5,
                 xanchor="center",
                 yanchor="top",
@@ -1488,7 +1488,7 @@ def general(request):
             xaxis=dict(title=None, range=[0, 100], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=True,
-            legend=dict(orientation="h", x=0.5, y=-0.2, xanchor="center"),
+            legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
         )
