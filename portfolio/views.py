@@ -18,6 +18,8 @@ from django.core.cache import cache
 from django.utils import timezone
 import re
 from datetime import timedelta
+from django.db.models import Max
+from django.db.models.functions import TruncDate
 
 # Currency conversion function
 _exchange_rate_cache = {}
@@ -1713,7 +1715,24 @@ def general(request):
             new_user_minutes_remaining = 10 - int(time_since_creation.total_seconds() / 60)
 
     # Net Worth Over Time Chart
-    snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
+    # Get only the latest snapshot per day for smooth chart
+    from django.db.models import Max
+    from django.db.models.functions import TruncDate
+    
+    # Get the latest snapshot ID for each day
+    latest_snapshot_ids = (
+        NetWorthSnapshot.objects
+        .filter(user=request.user)
+        .annotate(date_only=TruncDate('created_at'))
+        .values('date_only')
+        .annotate(latest_id=Max('id'))
+        .values_list('latest_id', flat=True)
+    )
+    
+    # Get the actual snapshots using those IDs
+    snapshots = NetWorthSnapshot.objects.filter(
+        id__in=latest_snapshot_ids
+    ).order_by('created_at')
     
     # Apply date filtering based on selected_range
     if selected_range != 'all' and snapshots.exists():
@@ -1741,9 +1760,9 @@ def general(request):
             
         if start_date:
             # Filter snapshots to only include those from start_date onwards
-            snapshots = snapshots.filter(date__gte=start_date)
+            snapshots = snapshots.filter(created_at__date__gte=start_date)
     
-    dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
+    dates = [snap.created_at.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     
     networth_line_chart = None
@@ -1925,8 +1944,22 @@ def performance(request):
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
 
     # --- Get all snapshots for this user ---
-    snapshots = NetWorthSnapshot.objects.filter(user=user).order_by('date')
-    dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
+    # Get only the latest snapshot per day for smooth chart
+    latest_snapshot_ids = (
+        NetWorthSnapshot.objects
+        .filter(user=user)
+        .annotate(date_only=TruncDate('created_at'))
+        .values('date_only')
+        .annotate(latest_id=Max('id'))
+        .values_list('latest_id', flat=True)
+    )
+    
+    # Get the actual snapshots using those IDs
+    snapshots = NetWorthSnapshot.objects.filter(
+        id__in=latest_snapshot_ids
+    ).order_by('created_at')
+    
+    dates = [snap.created_at.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
 
     # --- Plotly line chart ---
