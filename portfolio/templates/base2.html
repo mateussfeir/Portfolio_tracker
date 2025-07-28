@@ -457,7 +457,7 @@
     <nav>
         <div class="nav-left">
             <span>Logged as: <strong>{{ username }}</strong></span>
-            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span> ₿{{ btc_equivalent|floatformat:4 }}</span>
+            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span> ₿{{ btc_equivalent|floatformat:2 }}</span>
         </div>
         <div class="nav-center">
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>

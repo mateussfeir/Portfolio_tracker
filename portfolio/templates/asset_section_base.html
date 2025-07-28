@@ -75,7 +75,7 @@
     <h1>Welcome, {{ username }}!</h1>
     <nav>
         <div class="nav-left">
-            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span> ₿{{ btc_equivalent|floatformat:4 }}</span>
+            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span> ₿{{ btc_equivalent|floatformat:2 }}</span>
         </div>
         <div class="nav-center">
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
