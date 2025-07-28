@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import signup, home, delete_holding, root_redirect, resume, bio, projects, stocks, edit_holding, general, real_estate, cash, other
+from .views import signup, home, delete_holding, root_redirect, resume, bio, projects, stocks, edit_holding, general, real_estate, cash, other, vehicles
 
 urlpatterns = [
     path('', root_redirect, name='root'),
@@ -16,6 +16,7 @@ urlpatterns = [
     path('stocks/', stocks, name='stocks'),
     path('general/', general, name='general'),
     path('real_estate/', real_estate, name='real_estate'),
+    path('vehicles/', vehicles, name='vehicles'),
     path('cash/', cash, name='cash'),
     path('other/', other, name='other'),
 ]

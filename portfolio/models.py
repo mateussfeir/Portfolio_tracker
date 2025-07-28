@@ -7,6 +7,7 @@ class Asset(models.Model):
         ('stock', 'Stock'),
         ('cash', 'Cash'),
         ('real_estate', 'Real Estate'),
+        ('vehicle', 'Vehicle'),
         ('other', 'Other'),
     ]
 

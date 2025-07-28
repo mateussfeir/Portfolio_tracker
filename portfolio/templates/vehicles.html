@@ -1,0 +1,117 @@
+{% extends "base2.html" %}
+{% load humanize %}
+{% load currency_filters %}
+{% block section_title %}Vehicles{% endblock %}
+{% block positions_title %}Your Vehicle Positions{% endblock %}
+
+{% block table %}
+{% if assets %}
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Currency (added)</th>
+            <th>Value</th>
+            <th>Asset (%)</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for asset in assets %}
+        <tr>
+            <td>{{ asset.ticker }}</td>
+            <td><span class="sensitive-value">{{ asset.amount|floatformat:2 }}</span></td>
+            <td>{{ asset.currency }}</td>
+            <td><span class="sensitive-value">{{ asset.value|currency:currency_symbol }}</span></td>
+            <td>{{ asset.percentage|floatformat:2 }}%</td>
+            <td style="white-space: nowrap;">
+                <a href="{% url 'edit_holding' asset.id %}?next={% url 'vehicles' %}?currency={{ selected_currency }}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
+                <form action="{% url 'delete_holding' asset.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">X</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<p>You have no vehicle positions yet.</p>
+{% endif %}
+{% endblock %}
+
+{% block bar_chart %}
+    {% if bar_chart %}
+        {{ bar_chart|safe }}
+    {% endif %}
+{% endblock %}
+
+{% block pie_chart %}
+    {% if pie_chart %}
+        {{ pie_chart|safe }}
+    {% endif %}
+{% endblock %}
+
+{% block networth_over_time_card %}{% endblock %} 
+
+{% block chart %}
+  <div style="margin-bottom: 12px; font-size: 1.2em; color: #4caf50; font-weight: bold; text-align:center;">
+    Your vehicle position: <span class="sensitive-value">{{ section_net_worth|currency:currency_symbol }}</span>
+  </div>
+  <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 120px; height: auto;">
+      {% if pie_chart %}
+          {{ pie_chart|safe }}
+      {% else %}
+          <p style="color: #aaa;">No chart data available.</p>
+      {% endif %}
+  </div>
+  <div id="bar-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 120px; height: auto;">
+      {% if bar_chart %}
+          {{ bar_chart|safe }}
+      {% endif %}
+  </div>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const toggleBtn = document.getElementById('toggle-chart-btn');
+          const pieDiv = document.getElementById('pie-chart-div');
+          const barDiv = document.getElementById('bar-chart-div');
+          let showingPie = false;
+          const isMobile = window.innerWidth <= 768;
+          if (isMobile) {
+              // On mobile, show bar chart by default and hide toggle button
+              pieDiv.style.display = 'none';
+              barDiv.style.display = 'block';
+              if (toggleBtn) {
+                  toggleBtn.style.display = 'none';
+              }
+          
+              // On desktop, show bar chart by default and enable toggle
+              pieDiv.style.display = 'none';
+              barDiv.style.display = 'block';
+              if (toggleBtn) {
+                  toggleBtn.addEventListener('click', function() {
+                      showingPie = !showingPie;
+                      if (showingPie) {
+                          pieDiv.style.display = 'block';
+                          barDiv.style.display = 'none';
+                          toggleBtn.textContent = 'Show Bar Chart';
+                      } else {
+                          pieDiv.style.display = 'none';
+                          barDiv.style.display = 'block';
+                          toggleBtn.textContent = 'Show Pie Chart';
+                      }
+                  });
+              }
+          }
+          window.addEventListener('resize', function() {
+              const newIsMobile = window.innerWidth <= 768;
+              if (newIsMobile !== isMobile) {
+                  location.reload();
+              }
+          });
+      });
+  </script>
+{% endblock %} 
