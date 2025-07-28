@@ -1723,7 +1723,7 @@ def general(request):
     latest_snapshot_ids = (
         NetWorthSnapshot.objects
         .filter(user=request.user)
-        .annotate(date_only=TruncDate('created_at'))
+        .annotate(date_only=TruncDate('date'))
         .values('date_only')
         .annotate(latest_id=Max('id'))
         .values_list('latest_id', flat=True)
@@ -1732,7 +1732,7 @@ def general(request):
     # Get the actual snapshots using those IDs
     snapshots = NetWorthSnapshot.objects.filter(
         id__in=latest_snapshot_ids
-    ).order_by('created_at')
+    ).order_by('date')
     
     # Apply date filtering based on selected_range
     if selected_range != 'all' and snapshots.exists():
@@ -1760,9 +1760,9 @@ def general(request):
             
         if start_date:
             # Filter snapshots to only include those from start_date onwards
-            snapshots = snapshots.filter(created_at__date__gte=start_date)
+            snapshots = snapshots.filter(date__gte=start_date)
     
-    dates = [snap.created_at.strftime('%Y-%m-%d') for snap in snapshots]
+    dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     
     networth_line_chart = None
@@ -1948,7 +1948,7 @@ def performance(request):
     latest_snapshot_ids = (
         NetWorthSnapshot.objects
         .filter(user=user)
-        .annotate(date_only=TruncDate('created_at'))
+        .annotate(date_only=TruncDate('date'))
         .values('date_only')
         .annotate(latest_id=Max('id'))
         .values_list('latest_id', flat=True)
@@ -1957,9 +1957,9 @@ def performance(request):
     # Get the actual snapshots using those IDs
     snapshots = NetWorthSnapshot.objects.filter(
         id__in=latest_snapshot_ids
-    ).order_by('created_at')
+    ).order_by('date')
     
-    dates = [snap.created_at.strftime('%Y-%m-%d') for snap in snapshots]
+    dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
 
     # --- Plotly line chart ---
