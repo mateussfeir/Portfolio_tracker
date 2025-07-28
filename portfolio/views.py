@@ -351,15 +351,15 @@ def home(request):
                 bar_chart_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
             for i, (label, percent) in enumerate(zip([asset['ticker'] for asset in assets_with_value], bar_chart_values)):
                 bar_segments.append(go.Bar(
-                    x=[int(round(percent))],
+                    x=[percent],  # Use actual percentage value instead of rounding
                     y=[""],
                     name=label,
                     orientation='h',
                     marker=dict(color=colors[i % len(colors)]),
-                    text=[f"{label}\n{int(round(percent))}%"],
+                    text=[f"{label}\n{percent:.1f}%"],  # Show one decimal place
                     textposition='inside',
                     insidetextanchor='middle',
-                    hovertemplate=f"{label}: {{x}}%<extra></extra>",
+                    hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
                 ))
             fig_bar = go.Figure(data=bar_segments)
             fig_bar.update_layout(
@@ -385,7 +385,7 @@ def home(request):
                     linewidth=1,
                     side='left',
                     automargin=True,
-                    range=[min(bar_chart_values) * 0.95, max(bar_chart_values) * 1.05]  # Start from min value with some padding
+                    range=[-0.5, 0.5]  # Start from min value with some padding
                 ),
                 showlegend=True,
                 legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
@@ -675,7 +675,7 @@ def stocks(request):
                     linewidth=1,
                     side='left',
                     automargin=True,
-                    range=[min(values) * 0.95, max(values) * 1.05]  # Start from min value with some padding
+                    range=[-0.5, 0.5]  # Start from min value with some padding
                 ),
                 showlegend=True,
                 legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
@@ -1017,7 +1017,23 @@ def cash(request):
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
-            yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
+            yaxis=dict(
+                tickfont=dict(size=11, color='#cccccc'),
+                tickformat=',',
+                tickwidth=1,
+                ticklen=4,
+                tickcolor='#333333',
+                showgrid=True,
+                gridcolor='rgba(255,255,255,0.1)',
+                gridwidth=1,
+                zeroline=False,
+                showline=True,
+                linecolor='rgba(255,255,255,0.2)',
+                linewidth=1,
+                side='left',
+                automargin=True,
+                range=[-0.5, 0.5]  # Fixed range for horizontal bar chart
+            ),
             showlegend=True,
             legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
