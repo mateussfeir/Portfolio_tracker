@@ -1723,8 +1723,7 @@ def general(request):
     latest_snapshot_ids = (
         NetWorthSnapshot.objects
         .filter(user=request.user)
-        .annotate(date_only=TruncDate('date'))
-        .values('date_only')
+        .values('date')
         .annotate(latest_id=Max('id'))
         .values_list('latest_id', flat=True)
     )
@@ -1948,8 +1947,7 @@ def performance(request):
     latest_snapshot_ids = (
         NetWorthSnapshot.objects
         .filter(user=user)
-        .annotate(date_only=TruncDate('date'))
-        .values('date_only')
+        .values('date')
         .annotate(latest_id=Max('id'))
         .values_list('latest_id', flat=True)
     )
