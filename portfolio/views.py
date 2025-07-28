@@ -200,6 +200,11 @@ def signup(request):
 def home(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
+    
+    # Clear cache to ensure fresh calculations including vehicles
+    cache_key = f"total_net_worth_{request.user.id}_{selected_currency}"
+    cache.delete(cache_key)
+    
     total_net_worth = get_user_total_net_worth(request.user, selected_currency)
     true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
@@ -537,7 +542,7 @@ def stocks(request):
     # Other
     total_other_all = sum(convert_currency(o.amount, o.currency or 'USD', selected_currency) for o in other_assets_all)
     # True total net worth
-    true_total_net_worth = total_crypto_all + total_stocks_all + total_real_estate_all + total_cash_all + total_vehicle_all + total_other_all
+    true_total_net_worth = total_crypto_all + total_stocks_all + total_real_estate_all + total_vehicle_all + total_cash_all + total_other_all
     true_total_net_worth_float = float(true_total_net_worth)
     # Build assets_with_value and calculate percentages in one pass
     section_sum = 0
@@ -1412,6 +1417,10 @@ def general(request):
     show_other_form = request.GET.get('show_other_form') == '1'
     cash_currencies = ['USD', 'CAD', 'BRL', 'KRW', 'INR', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF']
 
+    # Clear cache to ensure fresh calculations including vehicles
+    cache_key = f"total_net_worth_{request.user.id}_{selected_currency}"
+    cache.delete(cache_key)
+
     # Handle cash form submission
     if request.method == 'POST' and request.POST.get('form_type') == 'add_cash':
         amount = request.POST.get('amount')
@@ -1497,6 +1506,9 @@ def general(request):
         other_value = convert_currency(other.amount, other.currency or 'USD', selected_currency)
         total_other += other_value
 
+    # Calculate the true total net worth (sum of all asset types)
+    total_net_worth = total_crypto + total_stocks + total_real_estate + total_vehicle + total_cash + total_other
+
     # Pie chart data
     labels = []
     values = []
@@ -1533,15 +1545,7 @@ def general(request):
         'CHF': 'Swiss Franc',
     }
 
-    # After calculating total_net_worth
-    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
-    today = date.today()
-    # Always save snapshot in USD for consistency with daily command
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
-    NetWorthSnapshot.objects.get_or_create(
-        user=request.user, date=today,
-        defaults={'net_worth': total_net_worth_usd}
-    )
+    # Calculate percentages based on the true total net worth
     if total_net_worth > 0:
         crypto_percent = (total_crypto / total_net_worth) * 100
         stocks_percent = (total_stocks / total_net_worth) * 100
@@ -1566,15 +1570,12 @@ def general(request):
     ]
     totals.sort(key=lambda x: float(x['value']), reverse=True)
 
-    # Build labels and values from sorted totals
-    labels = [t['type'] for t in totals]
-    values = [float(t['value']) for t in totals]
-    if labels and values:
-        # Calculate percentages
-        total = sum(values)
-        percentages = [(v / total) * 100 if total > 0 else 0 for v in values]
+    # Build labels and values from sorted totals for charts
+    chart_labels = [t['type'] for t in totals]
+    chart_values = [float(t['value']) for t in totals]
+    if chart_labels and chart_values:
         # Pie chart (percent only)
-        fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='none', showlegend=True)])
+        fig_pie = go.Figure(data=[go.Pie(labels=chart_labels, values=chart_values, textinfo='none', showlegend=True)])
         fig_pie.update_layout(
             title="Portfolio Distribution",
             margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
@@ -1617,8 +1618,10 @@ def general(request):
         # Stacked bar chart (single bar, 6 segments)
         bar_segments = []
         colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63", "#00bcd4"]
-        int_percentages = [int(round((v / total) * 100)) if total > 0 else 0 for v in values]
-        for i, (label, percent) in enumerate(zip(labels, int_percentages)):
+        # Use the same percentages from the table for consistency
+        table_percentages = [t['percent'] for t in totals]
+        int_percentages = [int(round(p)) for p in table_percentages]
+        for i, (label, percent) in enumerate(zip(chart_labels, int_percentages)):
             bar_segments.append(go.Bar(
                 x=[percent],
                 y=[""],
@@ -1649,6 +1652,14 @@ def general(request):
     else:
         pie_chart_html = None
         bar_chart_html = None
+
+    # Save snapshot in USD for consistency with daily command
+    today = date.today()
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    NetWorthSnapshot.objects.get_or_create(
+        user=request.user, date=today,
+        defaults={'net_worth': total_net_worth_usd}
+    )
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
