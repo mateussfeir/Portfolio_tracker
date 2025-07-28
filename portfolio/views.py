@@ -675,7 +675,7 @@ def stocks(request):
                     linewidth=1,
                     side='left',
                     automargin=True,
-                    range=[min(bar_chart_values) * 0.95, max(bar_chart_values) * 1.05]  # Start from min value with some padding
+                    range=[min(values) * 0.95, max(values) * 1.05]  # Start from min value with some padding
                 ),
                 showlegend=True,
                 legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
@@ -1602,7 +1602,7 @@ def general(request):
             # Modern layout configuration
             fig.update_layout(
                 title=dict(
-                    text="Net Worth Over Time",
+                    text=f"Net Worth Over Time ({selected_currency})",
                     font=dict(size=20, color='#ffffff', family='Arial, sans-serif'),
                     x=0.5,
                     xanchor='center'
@@ -1730,7 +1730,7 @@ def performance(request):
     
     # Responsive layout configuration
     fig.update_layout(
-        title="Net Worth Over Time",
+        title=f"Net Worth Over Time ({selected_currency})",
         xaxis_title="Date",
         yaxis_title=f"Net Worth ({currency_symbol})",
         paper_bgcolor="#121212",
