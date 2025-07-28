@@ -267,6 +267,10 @@ def home(request):
     # Calculate section net worth (crypto) in selected currency
     section_net_worth = sum([float(a['value']) for a in assets_with_value if a['value'] != '-'])
 
+    # Calculate BTC equivalent
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+
     # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
@@ -414,6 +418,7 @@ def home(request):
         'pie_chart': pie_chart_html,
         'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
+        'btc_equivalent': btc_equivalent,
     })
 
 @login_required
@@ -713,6 +718,10 @@ def stocks(request):
         'CHF': 'Swiss Franc',
     }
 
+    # Calculate BTC equivalent
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+
     return render(request, 'stocks.html', {
         'username': request.user.username,
         'assets': assets_with_value,
@@ -725,6 +734,7 @@ def stocks(request):
         'pie_chart': pie_chart_html,
         'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
+        'btc_equivalent': btc_equivalent,
     })
 
 @login_required
@@ -878,6 +888,11 @@ def real_estate(request):
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
     }
+    
+    # Calculate BTC equivalent
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+    
     return render(request, 'real_estate.html', {
         'username': request.user.username,
         'assets': assets_with_value,
@@ -890,6 +905,7 @@ def real_estate(request):
         'pie_chart': pie_chart_html,
         'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
+        'btc_equivalent': btc_equivalent,
     })
 
 @login_required
@@ -1044,6 +1060,11 @@ def vehicles(request):
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
     }
+    
+    # Calculate BTC equivalent
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+    
     return render(request, 'vehicles.html', {
         'username': request.user.username,
         'assets': assets_with_value,
@@ -1056,6 +1077,7 @@ def vehicles(request):
         'pie_chart': pie_chart_html,
         'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
+        'btc_equivalent': btc_equivalent,
     })
 
 @login_required
@@ -1226,6 +1248,11 @@ def cash(request):
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
     }
+    
+    # Calculate BTC equivalent
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+    
     return render(request, 'cash.html', {
         'username': request.user.username,
         'assets': assets_with_value,
@@ -1238,6 +1265,7 @@ def cash(request):
         'pie_chart': pie_chart_html,
         'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
+        'btc_equivalent': btc_equivalent,
     })
 
 @login_required
@@ -1392,6 +1420,11 @@ def other(request):
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
     }
+    
+    # Calculate BTC equivalent
+    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+    
     return render(request, 'other.html', {
         'username': request.user.username,
         'assets': assets_with_value,
@@ -1404,6 +1437,7 @@ def other(request):
         'pie_chart': pie_chart_html,
         'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
+        'btc_equivalent': btc_equivalent,
     })
 
 def general(request):
@@ -1658,6 +1692,9 @@ def general(request):
         defaults={'net_worth': total_net_worth_usd}
     )
 
+    # Calculate BTC equivalent
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
     
@@ -1820,6 +1857,7 @@ def general(request):
         'user': request.user,
         'selected_range': selected_range,
         'networth_line_chart': networth_line_chart,
+        'btc_equivalent': btc_equivalent,
     })
 
 @login_required
@@ -1838,6 +1876,9 @@ def performance(request):
         user=user, date=today,
         defaults={'net_worth': total_net_worth_usd}
     )
+
+    # Calculate BTC equivalent
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
 
     # --- Get all snapshots for this user ---
     snapshots = NetWorthSnapshot.objects.filter(user=user).order_by('date')
@@ -1909,6 +1950,7 @@ def performance(request):
         'selected_currency': selected_currency,
         'currency_symbol': currency_symbol,
         'user': request.user,
+        'btc_equivalent': btc_equivalent,
     })
 
 def root_redirect(request):
@@ -2057,3 +2099,16 @@ def get_user_total_net_worth(user, selected_currency):
     total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
     cache.set(cache_key, total_net_worth, timeout=180)
     return total_net_worth
+
+def get_btc_equivalent(total_net_worth_usd):
+    """Calculate BTC equivalent of the total net worth"""
+    try:
+        btc_price_data = get_multiple_asset_prices(['bitcoin'])
+        btc_price_usd = safe_decimal(btc_price_data.get('bitcoin', {}).get('usd', 0))
+        if btc_price_usd > 0:
+            btc_equivalent = total_net_worth_usd / btc_price_usd
+            return btc_equivalent
+        else:
+            return Decimal('0')
+    except Exception:
+        return Decimal('0')
