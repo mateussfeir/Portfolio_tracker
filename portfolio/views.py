@@ -270,7 +270,6 @@ def home(request):
     # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -433,7 +432,6 @@ def edit_holding(request, pk):
     asset = get_object_or_404(Asset, pk=pk, owner=request.user)
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -703,7 +701,7 @@ def stocks(request):
     # Get available currencies for dropdown
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
+        
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -870,7 +868,6 @@ def real_estate(request):
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -1036,7 +1033,7 @@ def vehicles(request):
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
+        
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -1218,7 +1215,7 @@ def cash(request):
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
+        
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -1384,7 +1381,7 @@ def other(request):
         bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
+        
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -1533,7 +1530,7 @@ def general(request):
 
     available_currencies = {
         'USD': 'US Dollar',
-        'BTC': 'Bitcoin',
+        
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
@@ -2003,7 +2000,6 @@ CURRENCY_SYMBOLS = {
     'JPY': '¥',
     'AUD': 'A$',
     'CHF': 'Fr.',
-    'BTC': '₿',  # Add BTC symbol
 }
 
 def safe_decimal(val):
@@ -2058,14 +2054,6 @@ def get_user_total_net_worth(user, selected_currency):
     # Sum all in USD
     total_net_worth_usd = total_crypto_usd + total_stocks_usd + total_real_estate_usd + total_cash_usd + total_vehicle_usd + total_other_usd
     # Convert to selected currency
-    if selected_currency == 'BTC':
-        btc_price_data = get_multiple_asset_prices(['bitcoin'])
-        btc_price_usd = safe_decimal(btc_price_data.get('bitcoin', {}).get('usd', 0))
-        if btc_price_usd > 0:
-            total_net_worth = total_net_worth_usd / btc_price_usd
-        else:
-            total_net_worth = Decimal('0')
-    else:
-        total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
+    total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
     cache.set(cache_key, total_net_worth, timeout=180)
     return total_net_worth
