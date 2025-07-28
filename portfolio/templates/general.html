@@ -711,6 +711,15 @@
             </div>
         </div>
         
+        <!-- New User Message -->
+        {% if show_new_user_message %}
+        <div class="card" style="margin: 20px auto; max-width: 600px; text-align: center; background: #2a2a2a; border: 1px solid #4caf50;">
+            <h3 style="color: #4caf50; margin-bottom: 10px;">Welcome to Bitbalance! 🎉</h3>
+            <p style="margin-bottom: 10px;">Your first net worth snapshot will be taken in <strong>{{ new_user_minutes_remaining }} minutes</strong>.</p>
+            <p style="color: #aaa; font-size: 0.9em; margin-bottom: 0;">This gives you time to add your assets before we start tracking your portfolio performance.</p>
+        </div>
+        {% endif %}
+        
         <!-- Net Worth Over Time Section -->
         <form method="get" id="networth-range-form" style="text-align:center; margin-bottom: 16px;">
           <label for="range">Show:</label>

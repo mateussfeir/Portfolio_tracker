@@ -1663,13 +1663,54 @@ def general(request):
     # Save snapshot in USD for consistency with daily command
     today = date.today()
     total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
-    NetWorthSnapshot.objects.get_or_create(
-        user=request.user, date=today,
-        defaults={'net_worth': total_net_worth_usd}
-    )
+    
+    # Check if this is the user's first snapshot
+    existing_snapshots = NetWorthSnapshot.objects.filter(user=request.user)
+    if existing_snapshots.exists():
+        # User has snapshots, create today's snapshot normally
+        NetWorthSnapshot.objects.get_or_create(
+            user=request.user, date=today,
+            defaults={'net_worth': total_net_worth_usd}
+        )
+    else:
+        # This is the user's first time - check if 10 minutes have passed since account creation
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Get the user's first snapshot (which should be the only one if it exists)
+        first_snapshot = existing_snapshots.first()
+        
+        if first_snapshot is None:
+            # No snapshots exist yet - check if 10 minutes have passed since user creation
+            user_created_time = request.user.date_joined
+            current_time = timezone.now()
+            time_since_creation = current_time - user_created_time
+            
+            # Only create snapshot if more than 10 minutes have passed
+            if time_since_creation > timedelta(minutes=10):
+                NetWorthSnapshot.objects.create(
+                    user=request.user, date=today,
+                    net_worth=total_net_worth_usd
+                )
 
     # Calculate BTC equivalent
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+
+    # Check if user is new and show appropriate message
+    show_new_user_message = False
+    new_user_minutes_remaining = 0
+    
+    if not NetWorthSnapshot.objects.filter(user=request.user).exists():
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        user_created_time = request.user.date_joined
+        current_time = timezone.now()
+        time_since_creation = current_time - user_created_time
+        
+        if time_since_creation <= timedelta(minutes=10):
+            show_new_user_message = True
+            new_user_minutes_remaining = 10 - int(time_since_creation.total_seconds() / 60)
 
     # Net Worth Over Time Chart
     snapshots = NetWorthSnapshot.objects.filter(user=request.user).order_by('date')
@@ -1834,6 +1875,8 @@ def general(request):
         'selected_range': selected_range,
         'networth_line_chart': networth_line_chart,
         'btc_equivalent': btc_equivalent,
+        'show_new_user_message': show_new_user_message,
+        'new_user_minutes_remaining': new_user_minutes_remaining,
     })
 
 @login_required
@@ -1848,10 +1891,35 @@ def performance(request):
     # --- Save snapshot if not already saved today ---
     # Always save snapshot in USD for consistency with daily command
     total_net_worth_usd = get_user_total_net_worth(user, 'USD')
-    NetWorthSnapshot.objects.get_or_create(
-        user=user, date=today,
-        defaults={'net_worth': total_net_worth_usd}
-    )
+    
+    # Check if this is the user's first snapshot
+    existing_snapshots = NetWorthSnapshot.objects.filter(user=user)
+    if existing_snapshots.exists():
+        # User has snapshots, create today's snapshot normally
+        NetWorthSnapshot.objects.get_or_create(
+            user=user, date=today,
+            defaults={'net_worth': total_net_worth_usd}
+        )
+    else:
+        # This is the user's first time - check if 10 minutes have passed since account creation
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Get the user's first snapshot (which should be the only one if it exists)
+        first_snapshot = existing_snapshots.first()
+        
+        if first_snapshot is None:
+            # No snapshots exist yet - check if 10 minutes have passed since user creation
+            user_created_time = user.date_joined
+            current_time = timezone.now()
+            time_since_creation = current_time - user_created_time
+            
+            # Only create snapshot if more than 10 minutes have passed
+            if time_since_creation > timedelta(minutes=10):
+                NetWorthSnapshot.objects.create(
+                    user=user, date=today,
+                    net_worth=total_net_worth_usd
+                )
 
     # Calculate BTC equivalent
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
