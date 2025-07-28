@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.apps import apps
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.base import STATE_RUNNING, STATE_STOPPED
 
@@ -7,11 +8,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            # Try to get the scheduler instance
-            from portfolio.apps import PortfolioConfig
-            app_config = PortfolioConfig()
+            # Get the portfolio app config properly
+            portfolio_config = apps.get_app_config('portfolio')
             
-            if hasattr(app_config, '_scheduler_started'):
+            if hasattr(portfolio_config, '_scheduler_started'):
                 self.stdout.write(self.style.SUCCESS('✓ Scheduler is running'))
                 self.stdout.write('  - Net worth snapshots will be taken every 6 hours')
                 self.stdout.write('  - Next run will be 6 hours from the last execution')
