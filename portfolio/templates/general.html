@@ -182,14 +182,8 @@
           flex-direction: column;
           align-items: center;
         }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-        }
-        table td, table th {
-          border-bottom: 1px solid #333;
-          padding: 10px;
-        }
+        
+        /* Chart card styling */
         .chart-card {
           flex: 1 1 70%;
           min-width: 400px;
@@ -204,6 +198,40 @@
           margin: 0 !important;
           height: auto; /* Allow chart card to expand */
           min-height: auto; /* Allow chart card to expand */
+        }
+        
+        /* Desktop side-by-side layout (1200px and above) */
+        @media (min-width: 1200px) {
+          .dashboard-section {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+          }
+          
+          .table-card {
+            flex: 0 0 40%;
+            max-width: 40%;
+            width: 40%;
+            margin: 0;
+            order: 1;
+          }
+          
+          .chart-card {
+            flex: 0 0 60%;
+            max-width: 60%;
+            width: 60%;
+            order: 2;
+          }
+        }
+        
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        table td, table th {
+          border-bottom: 1px solid #333;
+          padding: 10px;
         }
         #pie-chart-div, #bar-chart-div {
           width: 100%;
@@ -287,15 +315,17 @@
         /* Better space utilization on large screens */
         @media (min-width: 1600px) {
           .dashboard-section {
-            gap: 24px;
+            gap: 32px;
           }
           .table-card {
-            flex: 0 0 30%;
-            max-width: 700px;
+            flex: 0 0 40%;
+            max-width: 40%;
+            order: 1;
           }
           .chart-card {
-            flex: 1 1 70%;
-            max-width: 1400px;
+            flex: 0 0 60%;
+            max-width: 60%;
+            order: 2;
           }
         }
         
