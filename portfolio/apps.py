@@ -6,19 +6,27 @@ class PortfolioConfig(AppConfig):
     name = "portfolio"
 
     def ready(self):
-        from apscheduler.schedulers.background import BackgroundScheduler
-        from django.core.management import call_command
-        import atexit
+        # Only run scheduler once when the app is ready
         import os
-        # Prevent scheduler from running multiple times in development (runserver reload)
-        if os.environ.get('RUN_MAIN', None) != 'true':
-            return
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(
-            lambda: call_command('daily_networth_snapshot'),
-            'interval',
-            hours=6,
-            next_run_time=None  # avoids running immediately on startup
-        )
-        scheduler.start()
-        atexit.register(lambda: scheduler.shutdown())
+        if os.environ.get('DJANGO_SETTINGS_MODULE') == 'config.settings':
+            try:
+                from apscheduler.schedulers.background import BackgroundScheduler
+                from django.core.management import call_command
+                import atexit
+                
+                # Check if scheduler is already running
+                if not hasattr(self, '_scheduler_started'):
+                    scheduler = BackgroundScheduler()
+                    scheduler.add_job(
+                        lambda: call_command('daily_networth_snapshot'),
+                        'interval',
+                        hours=6,
+                        next_run_time=None,  # avoids running immediately on startup
+                        id='networth_snapshot_job'
+                    )
+                    scheduler.start()
+                    self._scheduler_started = True
+                    atexit.register(lambda: scheduler.shutdown())
+                    print("Net worth snapshot scheduler started - will run every 6 hours")
+            except Exception as e:
+                print(f"Failed to start scheduler: {e}")
