@@ -457,7 +457,7 @@
     <nav>
         <div class="nav-left">
             <span>Logged as: <strong>{{ username }}</strong></span>
-            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span> ₿{{ btc_equivalent|floatformat:2 }}</span>
+            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span> <span class="btc-equivalent">₿{{ btc_equivalent|floatformat:2 }}</span></span>
         </div>
         <div class="nav-center">
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
@@ -597,10 +597,20 @@
     });
     function setPrivacyMode(on) {
         const sensitives = document.querySelectorAll('.sensitive-value');
+        const btcElements = document.querySelectorAll('.btc-equivalent');
         sensitives.forEach(el => {
             if (on) {
                 el.classList.add('privacy-hidden');
                 el.textContent = '****';
+            } else {
+                el.classList.remove('privacy-hidden');
+                location.reload();
+            }
+        });
+        btcElements.forEach(el => {
+            if (on) {
+                el.classList.add('privacy-hidden');
+                el.textContent = '₿****';
             } else {
                 el.classList.remove('privacy-hidden');
                 location.reload();
