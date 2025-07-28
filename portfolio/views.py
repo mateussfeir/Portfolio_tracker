@@ -167,30 +167,6 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            # Create default assets for the new user
-            from .models import Asset
-            from decimal import Decimal
-            default_assets = [
-                {"type": "crypto", "ticker": "BTC", "amount": Decimal("1"), "currency": None},
-                {"type": "crypto", "ticker": "ETH", "amount": Decimal("7"), "currency": None},
-                {"type": "stock", "ticker": "TSLA", "amount": Decimal("12"), "currency": None},
-                {"type": "stock", "ticker": "SPYI", "amount": Decimal("700"), "currency": None},
-                {"type": "stock", "ticker": "AAPL", "amount": Decimal("700"), "currency": None},
-                {"type": "cash", "ticker": "CASH", "amount": Decimal("13000"), "currency": "USD"},
-                {"type": "cash", "ticker": "BMO Bank", "amount": Decimal("27000"), "currency": "CAD"},
-                {"type": "real_estate", "ticker": "Florida house", "amount": Decimal("220000"), "currency": "USD"},
-                {"type": "real_estate", "ticker": "Toronto apartment", "amount": Decimal("470000"), "currency": "CAD"},
-                {"type": "other", "ticker": "Sales Business", "amount": Decimal("3000"), "currency": "USD"},
-                {"type": "other", "ticker": "Audi A3", "amount": Decimal("12000"), "currency": "USD"},
-            ]
-            for asset in default_assets:
-                Asset.objects.create(
-                    owner=user,
-                    type=asset["type"],
-                    ticker=asset["ticker"],
-                    amount=asset["amount"],
-                    currency=asset["currency"]
-                )
             return redirect('general')  # Redirect to the General tab after signup
     else:
         form = SignUpForm()
