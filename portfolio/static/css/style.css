@@ -471,3 +471,27 @@ div {
     max-width: 100% !important;
 }
 
+/* Position text styling to prevent overlap with fixed navigation */
+.position-text {
+    margin-top: 80px !important; /* Adjust based on navigation height */
+    margin-bottom: 12px;
+    font-size: 1.2em;
+    color: #4caf50;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Mobile responsive adjustments for position text */
+@media (max-width: 768px) {
+    .position-text {
+        margin-top: 60px !important; /* Slightly less margin on mobile */
+    }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+    .position-text {
+        margin-top: 50px !important;
+    }
+}
+
