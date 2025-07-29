@@ -609,7 +609,8 @@
         @media (max-width: 768px) {
             .hamburger {
                 display: block;
-                order: 2;
+                order: 3;
+                margin-left: auto;
             }
             
             nav {
@@ -629,10 +630,11 @@
                 margin-bottom: 0 !important;
                 min-width: 0;
                 overflow: hidden;
+                margin-right: 10px;
             }
             
             .nav-center {
-                order: 3;
+                order: 4;
                 display: none;
                 flex-direction: column;
                 width: 100%;
@@ -659,12 +661,40 @@
                 border-bottom: none;
             }
             
+            /* Style logout button in dropdown */
+            .nav-center .logout-form {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+            
+            .nav-center .logout-link {
+                width: 100%;
+                padding: 12px 20px;
+                text-align: center;
+                background: none;
+                border: none;
+                color: #4caf50;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 1em;
+                cursor: pointer;
+                border-top: 1px solid #333;
+                margin: 0;
+            }
+            
+            .nav-center .logout-link:hover {
+                background-color: #222;
+                color: #66bb6a;
+            }
+            
             .nav-right {
-                order: 4;
+                order: 2;
                 justify-content: flex-end;
                 margin-bottom: 0 !important;
                 width: auto;
                 flex-shrink: 0;
+                margin-left: auto;
             }
             
             /* Container and content fixes */
@@ -789,6 +819,10 @@
             <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
             <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
             <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+            <form action="{% url 'logout' %}" method="post" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-link">Logout</button>
+            </form>
         </div>
         <div class="nav-right">
             <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #4caf50; border: 1px solid #4caf50; border-radius: 4px; padding: 2px 8px; font-size: 0.95em; width: 80px; min-width: 60px; max-width: 100px; text-align: center;">
@@ -797,10 +831,6 @@
                 {% endfor %}
             </select>
             <button id="privacy-toggle-btn" type="button" style="margin-left: 12px; background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background 0.18s, color 0.18s, transform 0.18s;">Privacy Mode: Off</button>
-            <form action="{% url 'logout' %}" method="post" class="logout-form">
-                {% csrf_token %}
-                <button type="submit" class="logout-link">Logout</button>
-            </form>
         </div>
     </nav>
 </header>
