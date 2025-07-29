@@ -549,6 +549,34 @@
                 color: #66bb6a;
             }
             
+            /* Style mobile privacy button in dropdown */
+            .mobile-privacy-btn {
+                width: 100%;
+                padding: 12px 20px;
+                text-align: center;
+                background: none;
+                border: none;
+                color: #4caf50;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 1em;
+                cursor: pointer;
+                border-top: 1px solid #333;
+                border-bottom: 1px solid #333;
+                margin: 0;
+                transition: background-color 0.2s ease;
+            }
+            
+            .mobile-privacy-btn:hover {
+                background-color: #222;
+                color: #66bb6a;
+            }
+            
+            /* Hide desktop privacy button on mobile */
+            #privacy-toggle-btn {
+                display: none;
+            }
+            
             .nav-right {
                 order: 2;
                 justify-content: flex-end;
@@ -662,6 +690,7 @@
             <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
             <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
             <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+            <button id="privacy-toggle-btn-mobile" type="button" class="mobile-privacy-btn">Privacy Mode: Off</button>
             <form action="{% url 'logout' %}" method="post" class="logout-form">
                 {% csrf_token %}
                 <button type="submit" class="logout-link">Logout</button>
@@ -811,17 +840,43 @@
                 location.reload();
             }
         });
-        document.getElementById('privacy-toggle-btn').textContent = 'Privacy Mode: ' + (on ? 'On' : 'Off');
+        
+        // Update both desktop and mobile privacy buttons
+        const desktopBtn = document.getElementById('privacy-toggle-btn');
+        const mobileBtn = document.getElementById('privacy-toggle-btn-mobile');
+        const buttonText = 'Privacy Mode: ' + (on ? 'On' : 'Off');
+        
+        if (desktopBtn) {
+            desktopBtn.textContent = buttonText;
+        }
+        if (mobileBtn) {
+            mobileBtn.textContent = buttonText;
+        }
+        
         localStorage.setItem('privacyMode', on ? 'on' : 'off');
     }
     document.addEventListener('DOMContentLoaded', function() {
         const privacyBtn = document.getElementById('privacy-toggle-btn');
+        const mobilePrivacyBtn = document.getElementById('privacy-toggle-btn-mobile');
         const privacyState = localStorage.getItem('privacyMode');
+        
         if (privacyState === 'on') setPrivacyMode(true);
-        privacyBtn.addEventListener('click', function() {
-            const isOn = localStorage.getItem('privacyMode') === 'on';
-            setPrivacyMode(!isOn);
-        });
+        
+        // Desktop privacy button event listener
+        if (privacyBtn) {
+            privacyBtn.addEventListener('click', function() {
+                const isOn = localStorage.getItem('privacyMode') === 'on';
+                setPrivacyMode(!isOn);
+            });
+        }
+        
+        // Mobile privacy button event listener
+        if (mobilePrivacyBtn) {
+            mobilePrivacyBtn.addEventListener('click', function() {
+                const isOn = localStorage.getItem('privacyMode') === 'on';
+                setPrivacyMode(!isOn);
+            });
+        }
     });
     
     // Hamburger menu toggle function
