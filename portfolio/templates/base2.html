@@ -449,6 +449,100 @@
             padding: 0 !important;
             margin: 0 !important;
         }
+        /* Hamburger button styles */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #4caf50;
+            cursor: pointer;
+            padding: 8px;
+            margin: 0;
+            transition: color 0.2s ease;
+        }
+        
+        .hamburger:hover {
+            color: #66bb6a;
+        }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+                order: 2;
+            }
+            
+            nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 20px !important;
+            }
+            
+            .nav-left {
+                order: 1;
+                flex: 1;
+                justify-content: flex-start;
+                margin-bottom: 0 !important;
+            }
+            
+            .nav-center {
+                order: 3;
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: #111;
+                margin-top: 10px;
+                padding: 10px 0;
+                border-radius: 4px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+            }
+            
+            .nav-center.active {
+                display: flex;
+            }
+            
+            .nav-center a {
+                padding: 12px 20px;
+                text-align: center;
+                border-bottom: 1px solid #333;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .nav-center a:last-child {
+                border-bottom: none;
+            }
+            
+            .nav-right {
+                order: 4;
+                justify-content: flex-end;
+                margin-bottom: 0 !important;
+                width: auto;
+            }
+            
+            /* Hide nav-right elements on very small screens */
+            @media (max-width: 480px) {
+                .nav-right select,
+                .nav-right button {
+                    font-size: 0.8em;
+                    padding: 2px 4px;
+                }
+                
+                .nav-left span {
+                    font-size: 0.85em;
+                }
+            }
+        }
+        
+        /* Ensure nav-center is visible on desktop */
+        @media (min-width: 769px) {
+            .nav-center {
+                display: flex !important;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -459,7 +553,11 @@
             <span>Logged as: <strong>{{ username }}</strong></span>
             <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span> <span class="btc-equivalent">₿{{ btc_equivalent|floatformat:2 }}</span></span>
         </div>
-        <div class="nav-center">
+        
+        <!-- Hamburger menu button for mobile -->
+        <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
+        
+        <div class="nav-center" id="navLinks">
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
             <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
             <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
@@ -626,6 +724,27 @@
         privacyBtn.addEventListener('click', function() {
             const isOn = localStorage.getItem('privacyMode') === 'on';
             setPrivacyMode(!isOn);
+        });
+    });
+    
+    // Hamburger menu toggle function
+    function toggleMenu() {
+        const navLinks = document.getElementById('navLinks');
+        navLinks.classList.toggle('active');
+    }
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('click', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.querySelector('.hamburger');
+            
+            // Close menu if clicking outside of nav and hamburger
+            if (navLinks.classList.contains('active') && 
+                !navLinks.contains(event.target) && 
+                !hamburger.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
         });
     });
 </script>

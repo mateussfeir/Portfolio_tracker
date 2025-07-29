@@ -15,19 +15,92 @@
     <meta name="msapplication-TileImage" content="{% static 'images/favicon_32x32.png' %}">
     <meta name="msapplication-TileColor" content="#000000">
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+        /* Hamburger button styles */
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: #4caf50;
+            cursor: pointer;
+            padding: 8px;
+            margin: 0;
+            transition: color 0.2s ease;
+        }
+        
+        .hamburger:hover {
+            color: #66bb6a;
+        }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+            
+            nav {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 10px 20px;
+            }
+            
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: #111;
+                margin-top: 10px;
+                padding: 10px 0;
+                border-radius: 4px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links a {
+                padding: 12px 20px;
+                text-align: center;
+                border-bottom: 1px solid #333;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .nav-links a:last-child {
+                border-bottom: none;
+            }
+        }
+        
+        /* Ensure nav-links is visible on desktop */
+        @media (min-width: 769px) {
+            .nav-links {
+                display: flex !important;
+                flex-direction: row;
+                gap: 15px;
+            }
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     {% block main_nav %}
     <nav>
-        <a href="{% url 'login' %}">Home</a> 
-        <a href="{% url 'resume' %}">Resume</a>
-        <a href="{% url 'bio' %}">Bio</a>
-        <a href="{% url 'projects' %}">Projects</a>
-        <a href="https://github.com/mateussfeir" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.linkedin.com/in/mateus-sfeir-b65393152/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://docs.python.org/3/" target="_blank" rel="noopener noreferrer">Python Docs</a>
-        <a href="https://docs.djangoproject.com/en/stable/" target="_blank" rel="noopener noreferrer">Django Docs</a>
+        <!-- Hamburger menu button for mobile -->
+        <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
+        
+        <div class="nav-links" id="navLinks">
+            <a href="{% url 'login' %}">Home</a> 
+            <a href="{% url 'resume' %}">Resume</a>
+            <a href="{% url 'bio' %}">Bio</a>
+            <a href="{% url 'projects' %}">Projects</a>
+            <a href="https://github.com/mateussfeir" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://www.linkedin.com/in/mateus-sfeir-b65393152/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="https://docs.python.org/3/" target="_blank" rel="noopener noreferrer">Python Docs</a>
+            <a href="https://docs.djangoproject.com/en/stable/" target="_blank" rel="noopener noreferrer">Django Docs</a>
+        </div>
     </nav>
     {% endblock %}
 
@@ -35,5 +108,28 @@
         {% block content %}
         {% endblock %}
     </div>
+    
+    <script>
+        // Hamburger menu toggle function
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(event) {
+                const navLinks = document.getElementById('navLinks');
+                const hamburger = document.querySelector('.hamburger');
+                
+                // Close menu if clicking outside of nav and hamburger
+                if (navLinks.classList.contains('active') && 
+                    !navLinks.contains(event.target) && 
+                    !hamburger.contains(event.target)) {
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
