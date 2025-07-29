@@ -255,12 +255,9 @@ def home(request):
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
         'EUR': 'Euro',
-        'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc',
         'VND': 'Vietnamese Dong',
     }
 
@@ -690,12 +687,9 @@ def stocks(request):
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
         'EUR': 'Euro',
-        'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc',
         'VND': 'Vietnamese Dong',
     }
 
@@ -862,12 +856,9 @@ def real_estate(request):
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
         'EUR': 'Euro',
-        'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc',
         'VND': 'Vietnamese Dong',
     }
     
@@ -1035,12 +1026,9 @@ def vehicles(request):
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
         'EUR': 'Euro',
-        'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc',
         'VND': 'Vietnamese Dong',
     }
     
@@ -1224,12 +1212,9 @@ def cash(request):
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
         'EUR': 'Euro',
-        'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc',
         'VND': 'Vietnamese Dong',
     }
     
@@ -1397,12 +1382,9 @@ def other(request):
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
         'EUR': 'Euro',
-        'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc',
         'VND': 'Vietnamese Dong',
     }
     
@@ -1553,12 +1535,9 @@ def general(request):
         'CAD': 'Canadian Dollar',
         'BRL': 'Brazilian Real',
         'KRW': 'Korean Won',
-        'INR': 'Indian Rupee',
         'EUR': 'Euro',
-        'GBP': 'British Pound',
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
-        'CHF': 'Swiss Franc',
         'VND': 'Vietnamese Dong',
     }
 
@@ -2118,13 +2097,10 @@ CURRENCY_SYMBOLS = {
     'USD': '$',
     'BRL': 'R$',
     'EUR': '€',
-    'GBP': '£',
     'CAD': 'C$',
     'KRW': '₩',
-    'INR': '₹',
     'JPY': '¥',
     'AUD': 'A$',
-    'CHF': 'Fr.',
     'VND': '₫',
 }
 
