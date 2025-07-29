@@ -4,6 +4,57 @@ body {
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Global responsive fixes */
+* {
+    box-sizing: border-box;
+}
+
+/* Prevent horizontal overflow on all elements */
+body, html, div, nav, header, footer, main, section, article, aside {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+    body, html {
+        overflow-x: hidden;
+        width: 100%;
+    }
+    
+    /* Ensure all containers respect viewport width */
+    .container, .dashboard-section, .card, .table-card, .chart-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+    
+    /* Table responsiveness */
+    table {
+        min-width: 300px !important;
+        max-width: 100% !important;
+        font-size: 14px;
+    }
+    
+    /* Chart responsiveness */
+    .js-plotly-plot, #pie-chart-div, #bar-chart-div {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
 }
 
 /*

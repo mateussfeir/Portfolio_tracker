@@ -479,6 +479,8 @@
                 align-items: center;
                 justify-content: space-between;
                 padding: 10px 20px !important;
+                width: 100%;
+                box-sizing: border-box;
             }
             
             .nav-left {
@@ -486,6 +488,8 @@
                 flex: 1;
                 justify-content: flex-start;
                 margin-bottom: 0 !important;
+                min-width: 0;
+                overflow: hidden;
             }
             
             .nav-center {
@@ -521,6 +525,61 @@
                 justify-content: flex-end;
                 margin-bottom: 0 !important;
                 width: auto;
+                flex-shrink: 0;
+            }
+            
+            /* Container and content fixes */
+            .container {
+                padding: 0 10px !important;
+                margin-top: 20px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+            
+            .dashboard-section {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box;
+            }
+            
+            .table-card, .chart-card {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                padding: 0 10px !important;
+                box-sizing: border-box;
+            }
+            
+            /* Table responsiveness */
+            .table-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: auto;
+                box-sizing: border-box;
+            }
+            
+            table {
+                min-width: 300px !important;
+                max-width: 100% !important;
+                font-size: 14px;
+            }
+            
+            /* Chart responsiveness */
+            #pie-chart-div, #bar-chart-div {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box;
+            }
+            
+            .js-plotly-plot {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
             }
             
             /* Hide nav-right elements on very small screens */
@@ -533,6 +592,14 @@
                 
                 .nav-left span {
                     font-size: 0.85em;
+                }
+                
+                .container {
+                    padding: 0 5px !important;
+                }
+                
+                .table-card, .chart-card {
+                    padding: 0 5px !important;
                 }
             }
         }

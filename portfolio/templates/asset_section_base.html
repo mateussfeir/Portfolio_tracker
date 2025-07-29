@@ -92,6 +92,8 @@
                 align-items: center;
                 justify-content: space-between;
                 padding: 10px 20px !important;
+                width: 100%;
+                box-sizing: border-box;
             }
             
             .nav-left {
@@ -99,6 +101,8 @@
                 flex: 1;
                 justify-content: flex-start;
                 margin-bottom: 0 !important;
+                min-width: 0;
+                overflow: hidden;
             }
             
             .nav-center {
@@ -134,6 +138,49 @@
                 justify-content: flex-end;
                 margin-bottom: 0 !important;
                 width: auto;
+                flex-shrink: 0;
+            }
+            
+            /* Container and content fixes */
+            .container {
+                padding: 0 10px !important;
+                margin: 20px 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+            
+            .card {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                padding: 15px !important;
+                box-sizing: border-box;
+                margin: 10px 0 !important;
+            }
+            
+            /* Table responsiveness */
+            table {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 300px !important;
+                font-size: 14px;
+                box-sizing: border-box;
+            }
+            
+            /* Chart responsiveness */
+            #pie-chart-div, #bar-chart-div {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box;
+            }
+            
+            .js-plotly-plot {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
             }
             
             /* Hide nav-right elements on very small screens */
@@ -146,6 +193,14 @@
                 
                 .nav-left span {
                     font-size: 0.85em;
+                }
+                
+                .container {
+                    padding: 0 5px !important;
+                }
+                
+                .card {
+                    padding: 10px !important;
                 }
             }
         }
