@@ -261,6 +261,7 @@ def home(request):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
 
     # Prepare pie and bar charts for crypto
@@ -424,6 +425,7 @@ def edit_holding(request, pk):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
     if request.method == 'POST':
         form = AddAssetForm(request.POST, instance=asset, asset_type=asset.type)
@@ -694,6 +696,7 @@ def stocks(request):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
 
     # Calculate BTC equivalent
@@ -865,6 +868,7 @@ def real_estate(request):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
     
     # Calculate BTC equivalent
@@ -1037,6 +1041,7 @@ def vehicles(request):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
     
     # Calculate BTC equivalent
@@ -1225,6 +1230,7 @@ def cash(request):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
     
     # Calculate BTC equivalent
@@ -1397,6 +1403,7 @@ def other(request):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
     
     # Calculate BTC equivalent
@@ -1552,6 +1559,7 @@ def general(request):
         'JPY': 'Japanese Yen',
         'AUD': 'Australian Dollar',
         'CHF': 'Swiss Franc',
+        'VND': 'Vietnamese Dong',
     }
 
     # Calculate percentages based on the true total net worth
@@ -2117,6 +2125,7 @@ CURRENCY_SYMBOLS = {
     'JPY': '¥',
     'AUD': 'A$',
     'CHF': 'Fr.',
+    'VND': '₫',
 }
 
 def safe_decimal(val):
