@@ -444,71 +444,145 @@
             });
         }
     });
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleBtn = document.getElementById('toggle-chart-btn');
-        const pieDiv = document.getElementById('pie-chart-div');
-        const barDiv = document.getElementById('bar-chart-div');
-        let showingPie = false;
-        
-        // Check if device is mobile (screen width <= 768px)
-        const isMobile = window.innerWidth <= 768;
-        
-        if (isMobile) {
-            // On mobile, show only pie chart and hide toggle button
-            pieDiv.style.display = 'block';
-            barDiv.style.display = 'none';
-            if (toggleBtn) {
-                toggleBtn.style.display = 'none';
+    </script>
+    <script>
+        // Comprehensive chart resize fix for layout timing issues
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to force chart resize
+            function resizeCharts() {
+                if (typeof Plotly !== 'undefined') {
+                    const plotElements = document.querySelectorAll('.js-plotly-plot');
+                    plotElements.forEach(function(element) {
+                        if (element && element.layout) {
+                            Plotly.Plots.resize(element);
+                        }
+                    });
+                }
             }
-        } else {
-            // On desktop, show bar chart by default and enable toggle
-            pieDiv.style.display = 'none';
-            barDiv.style.display = 'block';
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', function() {
-                    showingPie = !showingPie;
-                    if (showingPie) {
-                        pieDiv.style.display = 'block';
-                        barDiv.style.display = 'none';
-                        toggleBtn.textContent = 'Show Bar Chart';
-                    } else {
-                        pieDiv.style.display = 'none';
-                        barDiv.style.display = 'block';
-                        toggleBtn.textContent = 'Show Pie Chart';
+
+            // Function to make charts visible and resize them
+            function showAndResizeCharts() {
+                const chartContainers = document.querySelectorAll('#pie-chart-div, #bar-chart-div');
+                chartContainers.forEach(function(container) {
+                    if (container) {
+                        container.style.visibility = 'visible';
+                        container.style.opacity = '1';
                     }
                 });
+                
+                // Force resize after making visible
+                setTimeout(resizeCharts, 100);
+                setTimeout(resizeCharts, 300);
+                setTimeout(resizeCharts, 500);
             }
+
+            // Initially hide charts to prevent layout issues
+            const chartContainers = document.querySelectorAll('#pie-chart-div, #bar-chart-div');
+            chartContainers.forEach(function(container) {
+                if (container) {
+                    container.style.visibility = 'hidden';
+                    container.style.opacity = '0';
+                    container.style.transition = 'opacity 0.3s ease-in-out';
+                }
+            });
+
+            // Show charts after page is fully loaded
+            window.addEventListener('load', function() {
+                setTimeout(showAndResizeCharts, 200);
+            });
+
+            // Also show charts if load event doesn't fire (fallback)
+            setTimeout(showAndResizeCharts, 1000);
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                setTimeout(resizeCharts, 100);
+            });
+
+            // Use IntersectionObserver for charts that might be in hidden sections
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            setTimeout(resizeCharts, 100);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                chartContainers.forEach(function(container) {
+                    observer.observe(container);
+                });
+            }
+
+            const toggleBtn = document.getElementById('toggle-chart-btn');
+            const pieDiv = document.getElementById('pie-chart-div');
+            const barDiv = document.getElementById('bar-chart-div');
+            let showingPie = false;
+            
+            // Check if device is mobile (screen width <= 768px)
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // On mobile, show only pie chart and hide toggle button
+                pieDiv.style.display = 'block';
+                barDiv.style.display = 'none';
+                if (toggleBtn) {
+                    toggleBtn.style.display = 'none';
+                }
+            } else {
+                // On desktop, show bar chart by default and enable toggle
+                pieDiv.style.display = 'none';
+                barDiv.style.display = 'block';
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', function() {
+                        showingPie = !showingPie;
+                        if (showingPie) {
+                            pieDiv.style.display = 'block';
+                            barDiv.style.display = 'none';
+                            toggleBtn.textContent = 'Show Bar Chart';
+                        } else {
+                            pieDiv.style.display = 'none';
+                            barDiv.style.display = 'block';
+                            toggleBtn.textContent = 'Show Pie Chart';
+                        }
+                        // Resize charts after toggle
+                        setTimeout(resizeCharts, 100);
+                    });
+                }
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const newIsMobile = window.innerWidth <= 768;
+                if (newIsMobile !== isMobile) {
+                    // Reload page when switching between mobile and desktop
+                    location.reload();
+                }
+            });
+        });
+        
+        </script>
+        
+        <script>
+        // Hamburger menu toggle function
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
         }
         
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            const newIsMobile = window.innerWidth <= 768;
-            if (newIsMobile !== isMobile) {
-                // Reload page when switching between mobile and desktop
-                location.reload();
-            }
+        // Close mobile menu when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(event) {
+                const navLinks = document.getElementById('navLinks');
+                const hamburger = document.querySelector('.hamburger');
+                
+                // Close menu if clicking outside of nav and hamburger
+                if (navLinks.classList.contains('active') && 
+                    !navLinks.contains(event.target) && 
+                    !hamburger.contains(event.target)) {
+                    navLinks.classList.remove('active');
+                }
+            });
         });
-    });
-    
-    // Hamburger menu toggle function
-    function toggleMenu() {
-        const navLinks = document.getElementById('navLinks');
-        navLinks.classList.toggle('active');
-    }
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('DOMContentLoaded', function() {
-        document.addEventListener('click', function(event) {
-            const navLinks = document.getElementById('navLinks');
-            const hamburger = document.querySelector('.hamburger');
-            
-            // Close menu if clicking outside of nav and hamburger
-            if (navLinks.classList.contains('active') && 
-                !navLinks.contains(event.target) && 
-                !hamburger.contains(event.target)) {
-                navLinks.classList.remove('active');
-            }
-        });
-    });
-</script>
+        </script>
 {% endblock %} 
