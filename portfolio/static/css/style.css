@@ -473,7 +473,7 @@ div {
 
 /* Position text styling to prevent overlap with fixed navigation */
 .position-text {
-    padding-top: 100px !important; /* Use padding instead of margin to avoid conflicts */
+    padding-top: 150px !important; /* Much larger padding to ensure visibility */
     margin-bottom: 12px !important;
     font-size: 1.2em !important;
     color: #4caf50 !important;
@@ -497,7 +497,7 @@ div {
 /* Mobile responsive adjustments for position text */
 @media (max-width: 768px) {
     .position-text {
-        padding-top: 80px !important; /* Slightly less padding on mobile */
+        padding-top: 120px !important; /* Slightly less padding on mobile but still substantial */
     }
     
     .non-general-page .container {
@@ -516,7 +516,7 @@ div {
 /* Very small screens */
 @media (max-width: 480px) {
     .position-text {
-        padding-top: 70px !important;
+        padding-top: 100px !important;
     }
     
     .non-general-page .container {
