@@ -473,25 +473,62 @@ div {
 
 /* Position text styling to prevent overlap with fixed navigation */
 .position-text {
-    margin-top: 80px !important; /* Adjust based on navigation height */
-    margin-bottom: 12px;
-    font-size: 1.2em;
-    color: #4caf50;
-    font-weight: bold;
-    text-align: center;
+    padding-top: 100px !important; /* Use padding instead of margin to avoid conflicts */
+    margin-bottom: 12px !important;
+    font-size: 1.2em !important;
+    color: #4caf50 !important;
+    font-weight: bold !important;
+    text-align: center !important;
+}
+
+/* Specific styling for non-General pages to fix position text overlap */
+.non-general-page .container {
+    margin-top: 20px !important;
+}
+
+.non-general-page .dashboard-section {
+    margin-top: 20px !important;
+}
+
+.non-general-page .chart-card {
+    padding-top: 20px !important;
 }
 
 /* Mobile responsive adjustments for position text */
 @media (max-width: 768px) {
     .position-text {
-        margin-top: 60px !important; /* Slightly less margin on mobile */
+        padding-top: 80px !important; /* Slightly less padding on mobile */
+    }
+    
+    .non-general-page .container {
+        margin-top: 15px !important;
+    }
+    
+    .non-general-page .dashboard-section {
+        margin-top: 15px !important;
+    }
+    
+    .non-general-page .chart-card {
+        padding-top: 15px !important;
     }
 }
 
 /* Very small screens */
 @media (max-width: 480px) {
     .position-text {
-        margin-top: 50px !important;
+        padding-top: 70px !important;
+    }
+    
+    .non-general-page .container {
+        margin-top: 10px !important;
+    }
+    
+    .non-general-page .dashboard-section {
+        margin-top: 10px !important;
+    }
+    
+    .non-general-page .chart-card {
+        padding-top: 10px !important;
     }
 }
 
