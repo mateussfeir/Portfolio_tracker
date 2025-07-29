@@ -190,6 +190,13 @@
                 display: none;
             }
             
+            /* Hide mobile privacy button on desktop */
+            @media (min-width: 769px) {
+                #privacy-toggle-btn-mobile {
+                    display: none !important;
+                }
+            }
+            
             .nav-right {
                 order: 2;
                 justify-content: flex-end;

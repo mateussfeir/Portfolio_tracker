@@ -721,6 +721,13 @@
                 display: block;
             }
             
+            /* Ensure mobile privacy button shows on mobile */
+            @media (max-width: 768px) {
+                #privacy-toggle-btn-mobile {
+                    display: block !important;
+                }
+            }
+            
             .nav-right {
                 order: 2;
                 justify-content: flex-end;
@@ -856,6 +863,16 @@
             padding: 0 !important;
             margin: 0 !important;
         }
+
+            /* Hide mobile privacy button on desktop */
+            @media (min-width: 769px) {
+                #privacy-toggle-btn-mobile {
+                    display: none !important;
+                }
+                .mobile-privacy-container {
+                    display: none !important;
+                }
+            }
     </style>
 </head>
 <body>
