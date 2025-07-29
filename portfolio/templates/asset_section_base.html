@@ -185,16 +185,15 @@
                 color: #66bb6a;
             }
             
+            /* Override general button styling for mobile privacy button */
+            .mobile-privacy-btn {
+                background-color: transparent !important;
+                color: #4caf50 !important;
+            }
+            
             /* Hide desktop privacy button on mobile */
             #privacy-toggle-btn {
                 display: none;
-            }
-            
-            /* Hide mobile privacy button on desktop */
-            @media (min-width: 769px) {
-                #privacy-toggle-btn-mobile {
-                    display: none !important;
-                }
             }
             
             .nav-right {
@@ -267,6 +266,13 @@
                 .card {
                     padding: 10px !important;
                 }
+            }
+        }
+        
+        /* Hide mobile privacy button on desktop */
+        @media (min-width: 769px) {
+            #privacy-toggle-btn-mobile {
+                display: none !important;
             }
         }
         
