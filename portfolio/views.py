@@ -1813,7 +1813,7 @@ def general(request):
                     linecolor='rgba(255,255,255,0.2)',
                     linewidth=1
                 ),
-                # Modern y-axis styling
+                # Modern y-axis styling - initially show values, will be hidden by JavaScript if privacy mode is on
                 yaxis=dict(
                     tickfont=dict(size=11, color='#cccccc'),
                     tickformat=',',
@@ -1859,6 +1859,32 @@ def general(request):
                     }
                 }
             )
+            
+            # Add JavaScript to handle privacy mode for the chart
+            privacy_script = """
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Check if privacy mode is enabled and apply to chart
+                const privacyState = localStorage.getItem('privacyMode');
+                if (privacyState === 'on' && typeof Plotly !== 'undefined') {
+                    const plotElements = document.querySelectorAll('.js-plotly-plot');
+                    plotElements.forEach(function(element) {
+                        if (element && element.layout) {
+                            // Hide Y-axis tick labels when privacy mode is on
+                            Plotly.relayout(element, {
+                                'yaxis.showticklabels': false,
+                                'yaxis.tickformat': '',
+                                'yaxis.title': ''
+                            });
+                        }
+                    });
+                }
+            });
+            </script>
+            """
+            
+            # Append the privacy script to the chart HTML
+            networth_line_chart += privacy_script
             
         except Exception as e:
             print(f"ERROR generating chart: {e}")

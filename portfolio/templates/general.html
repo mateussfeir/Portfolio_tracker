@@ -1129,6 +1129,30 @@
             }
         });
         
+        // Handle chart privacy - hide Y-axis values when privacy mode is on
+        if (typeof Plotly !== 'undefined') {
+            const plotElements = document.querySelectorAll('.js-plotly-plot');
+            plotElements.forEach(function(element) {
+                if (element && element.layout) {
+                    if (on) {
+                        // Hide Y-axis tick labels when privacy mode is on
+                        Plotly.relayout(element, {
+                            'yaxis.showticklabels': false,
+                            'yaxis.tickformat': '',
+                            'yaxis.title': ''
+                        });
+                    } else {
+                        // Show Y-axis tick labels when privacy mode is off
+                        Plotly.relayout(element, {
+                            'yaxis.showticklabels': true,
+                            'yaxis.tickformat': ',',
+                            'yaxis.title': null
+                        });
+                    }
+                }
+            });
+        }
+        
         // Update both desktop and mobile privacy buttons
         const desktopBtn = document.getElementById('privacy-toggle-btn');
         const mobileBtn = document.getElementById('privacy-toggle-btn-mobile');
