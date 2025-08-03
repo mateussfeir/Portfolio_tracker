@@ -1584,11 +1584,15 @@ def general(request):
             hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'  # No decimals in hover too
         )])
         fig_pie.update_layout(
-            title="Portfolio Distribution",
+            title=dict(
+                text="Portfolio Distribution",
+                x=0.5,  # Center horizontally
+                xanchor='center',  # Anchor point for centering
+                font=dict(color="#e0e0e0")
+            ),
             margin=dict(t=50, b=20, l=0, r=0),  # Reduced bottom margin since no legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
             # Center the pie chart
             xaxis=dict(
                 domain=[0.1, 0.9],  # Use 80% of width, centered
