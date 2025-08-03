@@ -1570,11 +1570,21 @@ def general(request):
     chart_labels = [t['type'] for t in totals]
     chart_values = [float(t['value']) for t in totals]
     if chart_labels and chart_values:
-        # Pie chart (percent only)
-        fig_pie = go.Figure(data=[go.Pie(labels=chart_labels, values=chart_values, textinfo='none', showlegend=True)])
+        # Pie chart with labels and percentages on slices
+        fig_pie = go.Figure(data=[go.Pie(
+            labels=chart_labels, 
+            values=chart_values, 
+            textinfo='label+percent',
+            texttemplate='%{label}<br>%{percent:.1f}%',
+            textposition='inside',
+            insidetextorientation='radial',
+            showlegend=False,
+            textfont=dict(size=14, color='white'),
+            hovertemplate='%{label}<br>%{percent:.1f}%<extra></extra>'
+        )])
         fig_pie.update_layout(
             title="Portfolio Distribution",
-            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
+            margin=dict(t=50, b=20, l=0, r=0),  # Reduced bottom margin since no legend
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
@@ -1587,27 +1597,17 @@ def general(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                domain=[0.1, 0.9],  # Use more height since no legend needed
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Position legend below the chart
-            showlegend=True,
-            legend=dict(
-                orientation="h",  # Horizontal legend
-                y=-0.35,  # Position further below the chart
-                x=0.5,
-                xanchor="center",
-                yanchor="top",
-                bgcolor='rgba(0,0,0,0)',
-                bordercolor='rgba(0,0,0,0)',
-                font=dict(size=12)
-            ),
+            # No legend needed
+            showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Increased height to accommodate legend
+            height=350,  # Reduced height since no legend
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         
