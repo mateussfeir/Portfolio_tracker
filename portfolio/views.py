@@ -1569,18 +1569,19 @@ def general(request):
     # Build labels and values from sorted totals for charts
     chart_labels = [t['type'] for t in totals]
     chart_values = [float(t['value']) for t in totals]
+    chart_percentages = [t['percent'] for t in totals]  # Use the same percentages as the table
     if chart_labels and chart_values:
         # Pie chart with labels and percentages on slices
         fig_pie = go.Figure(data=[go.Pie(
             labels=chart_labels, 
-            values=chart_values, 
+            values=chart_percentages,  # Use percentages instead of raw values
             textinfo='label+percent',
-            texttemplate='%{label}<br>%{percent:.1f}%',
+            texttemplate='%{label}<br>%{value:.0f}%',  # No decimals - round to whole numbers
             textposition='inside',
             insidetextorientation='radial',
             showlegend=False,
             textfont=dict(size=14, color='white'),
-            hovertemplate='%{label}<br>%{percent:.1f}%<extra></extra>'
+            hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'  # No decimals in hover too
         )])
         fig_pie.update_layout(
             title="Portfolio Distribution",
