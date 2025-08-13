@@ -548,6 +548,37 @@
             }
         });
         
+        // Handle chart privacy - hide Y-axis values and title when privacy mode is on
+        if (typeof Plotly !== 'undefined') {
+            const plotElements = document.querySelectorAll('.js-plotly-plot');
+            plotElements.forEach(function(element) {
+                if (element && element.layout) {
+                    // Store original title if not already stored
+                    if (!element.hasAttribute('data-original-title')) {
+                        element.setAttribute('data-original-title', element.layout.title.text || 'Net Worth Over Time');
+                    }
+                    
+                    if (on) {
+                        // Hide Y-axis tick labels and title when privacy mode is on
+                        Plotly.relayout(element, {
+                            'yaxis.showticklabels': false,
+                            'yaxis.tickformat': '',
+                            'yaxis.title': '',
+                            'title.text': 'Net Worth Over Time'
+                        });
+                    } else {
+                        // Show Y-axis tick labels and full title when privacy mode is off
+                        Plotly.relayout(element, {
+                            'yaxis.showticklabels': true,
+                            'yaxis.tickformat': ',',
+                            'yaxis.title': null,
+                            'title.text': element.getAttribute('data-original-title')
+                        });
+                    }
+                }
+            });
+        }
+        
         // Update both desktop and mobile privacy buttons
         const desktopBtn = document.getElementById('privacy-toggle-btn');
         const mobileBtn = document.getElementById('privacy-toggle-btn-mobile');
@@ -567,7 +598,27 @@
         const mobilePrivacyBtn = document.getElementById('privacy-toggle-btn-mobile');
         const privacyState = localStorage.getItem('privacyMode');
         
-        if (privacyState === 'on') setPrivacyMode(true);
+        if (privacyState === 'on') {
+            setPrivacyMode(true);
+            // Also hide chart titles immediately if privacy mode is on
+            if (typeof Plotly !== 'undefined') {
+                setTimeout(() => {
+                    const plotElements = document.querySelectorAll('.js-plotly-plot');
+                    plotElements.forEach(function(element) {
+                        if (element && element.layout) {
+                            // Store original title if not already stored
+                            if (!element.hasAttribute('data-original-title')) {
+                                element.setAttribute('data-original-title', element.layout.title.text || 'Net Worth Over Time');
+                            }
+                            // Hide title immediately
+                            Plotly.relayout(element, {
+                                'title.text': 'Net Worth Over Time'
+                            });
+                        }
+                    });
+                }, 500); // Small delay to ensure charts are loaded
+            }
+        }
         
         // Desktop privacy button event listener
         if (privacyBtn) {
