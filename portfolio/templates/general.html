@@ -1338,8 +1338,14 @@
         
         // Handle chart privacy - hide Y-axis values and title when privacy mode is on
         if (typeof Plotly !== 'undefined') {
+            // Handle both .js-plotly-plot elements and Django-generated charts
             const plotElements = document.querySelectorAll('.js-plotly-plot');
-            plotElements.forEach(function(element) {
+            const djangoCharts = document.querySelectorAll('.plotly-graph-div');
+            
+            // Combine both types of chart elements
+            const allCharts = [...plotElements, ...djangoCharts];
+            
+            allCharts.forEach(function(element) {
                 if (element && element.layout) {
                     // Store original title if not already stored
                     if (!element.hasAttribute('data-original-title')) {
@@ -1382,7 +1388,7 @@
         localStorage.setItem('privacyMode', on ? 'on' : 'off');
     }
     
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
         const privacyBtn = document.getElementById('privacy-toggle-btn');
         const mobilePrivacyBtn = document.getElementById('privacy-toggle-btn-mobile');
         const privacyState = localStorage.getItem('privacyMode');
@@ -1391,9 +1397,15 @@
             setPrivacyMode(true);
             // Also hide chart titles immediately if privacy mode is on
             if (typeof Plotly !== 'undefined') {
-                setTimeout(() => {
+                // Function to hide chart titles
+                function hideChartTitles() {
                     const plotElements = document.querySelectorAll('.js-plotly-plot');
-                    plotElements.forEach(function(element) {
+                    const djangoCharts = document.querySelectorAll('.plotly-graph-div');
+                    
+                    // Combine both types of chart elements
+                    const allCharts = [...plotElements, ...djangoCharts];
+                    
+                    allCharts.forEach(function(element) {
                         if (element && element.layout) {
                             // Store original title if not already stored
                             if (!element.hasAttribute('data-original-title')) {
@@ -1405,8 +1417,54 @@
                             });
                         }
                     });
-                }, 500); // Small delay to ensure charts are loaded
+                }
+                
+                // Try multiple times to ensure charts are loaded
+                setTimeout(hideChartTitles, 500);
+                setTimeout(hideChartTitles, 1000);
+                setTimeout(hideChartTitles, 2000);
             }
+        }
+        
+        // Set up mutation observer to watch for new charts being added
+        if (typeof Plotly !== 'undefined' && privacyState === 'on') {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === Node.ELEMENT_NODE) {
+                                // Check if the added node is a chart or contains charts
+                                const charts = node.querySelectorAll ? 
+                                    [...node.querySelectorAll('.js-plotly-plot'), ...node.querySelectorAll('.plotly-graph-div')] :
+                                    [];
+                                
+                                if (charts.length > 0 || 
+                                    node.classList.contains('js-plotly-plot') || 
+                                    node.classList.contains('plotly-graph-div')) {
+                                    // New chart detected, apply privacy mode
+                                    setTimeout(() => {
+                                        const allCharts = document.querySelectorAll('.js-plotly-plot, .plotly-graph-div');
+                                        allCharts.forEach(function(element) {
+                                            if (element && element.layout && !element.hasAttribute('data-original-title')) {
+                                                element.setAttribute('data-original-title', element.layout.title.text || 'Net Worth Over Time');
+                                                Plotly.relayout(element, {
+                                                    'title.text': 'Net Worth Over Time'
+                                                });
+                                            }
+                                        });
+                                    }, 100);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Start observing
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
         }
         
         // Desktop privacy button event listener

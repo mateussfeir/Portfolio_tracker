@@ -319,7 +319,7 @@ def home(request):
             autosize=True,
             height=400,  # Increased height to accommodate legend
         )
-        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     # --- Only cache and reuse bar_chart_html ---
     if not bar_chart_html:
         if assets_with_value:
@@ -376,7 +376,7 @@ def home(request):
                 height=200,
                 autosize=True
             )
-            bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+            bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
             cache.set(cache_key, bar_chart_html, timeout=180)
         else:
             bar_chart_html = None
@@ -672,7 +672,7 @@ def stocks(request):
                 height=200,
                 autosize=True
             )
-            bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+            bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
         else:
             pie_chart_html = None
             bar_chart_html = None
@@ -850,7 +850,7 @@ def real_estate(request):
             height=200,
             autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -1019,7 +1019,7 @@ def vehicles(request):
             height=200,
             autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     available_currencies = {
         'USD': 'US Dollar',
         
@@ -1205,7 +1205,7 @@ def cash(request):
             height=200,
             autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     available_currencies = {
         'USD': 'US Dollar',
         
@@ -1375,7 +1375,7 @@ def other(request):
             height=200,
             autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     available_currencies = {
         'USD': 'US Dollar',
         
@@ -1614,7 +1614,7 @@ def general(request):
             autosize=True,
             height=350,  # Reduced height since no legend
         )
-        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
+        pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
         
         # Stacked bar chart (single bar, 6 segments)
         bar_segments = []
@@ -1649,7 +1649,7 @@ def general(request):
             height=200,
             autosize=True
         )
-        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True})
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     else:
         pie_chart_html = None
         bar_chart_html = None
