@@ -2138,7 +2138,7 @@ COINGECKO_TICKER_MAPPING = {
     'bch': 'bitcoin-cash',
     'leo': 'leo-token',
     'wld': 'worldcoin-wld',
-    'inj': 'injective',
+    'inj': 'injective-protocol',
     'ldo': 'lido-dao',
     'sei': 'sei-network',
     'pyth': 'pyth-network',
