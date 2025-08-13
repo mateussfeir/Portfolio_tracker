@@ -28,15 +28,19 @@ body, html, div, nav, header, footer, main, section, article, aside {
 
 /* Ensure navbar elements are never clipped */
 nav {
-    overflow: visible !important;
+    overflow-x: auto;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 nav > * {
     overflow: visible !important;
     min-width: 0;
+    flex-shrink: 0;
 }
 
 /* Ensure privacy button and currency selector are never clipped */

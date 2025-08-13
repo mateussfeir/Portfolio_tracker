@@ -685,6 +685,7 @@
         /* Ensure nav elements are never clipped */
         nav {
           display: flex;
+          flex-wrap: nowrap;
           align-items: center;
           justify-content: space-between;
           padding: 10px 20px !important;
@@ -694,7 +695,8 @@
           background: #000000;
           width: 100%;
           box-sizing: border-box;
-          overflow: visible !important;
+          overflow-x: auto;
+          white-space: nowrap;
           min-width: 0;
         }
         
@@ -702,6 +704,7 @@
         nav > * {
           overflow: visible !important;
           min-width: 0;
+          flex-shrink: 0;
         }
         
         .nav-left,
