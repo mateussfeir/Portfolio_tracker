@@ -860,6 +860,12 @@
             visibility: visible;
         }
         
+        /* Privacy mode styling */
+        .privacy-hidden {
+            color: transparent !important;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3) !important;
+        }
+        
         /* Ensure charts are properly sized on all devices */
         .js-plotly-plot {
             width: 100% !important;
@@ -1301,41 +1307,55 @@
         const btcElements = document.querySelectorAll('.btc-equivalent');
         sensitives.forEach(el => {
             if (on) {
+                // Store original text before hiding
+                if (!el.hasAttribute('data-original-text')) {
+                    el.setAttribute('data-original-text', el.textContent);
+                }
                 el.classList.add('privacy-hidden');
                 el.textContent = '****';
             } else {
                 el.classList.remove('privacy-hidden');
-                location.reload();
+                // Restore original text content
+                const originalText = el.getAttribute('data-original-text') || '0';
+                el.textContent = originalText;
             }
         });
         btcElements.forEach(el => {
             if (on) {
+                // Store original text before hiding
+                if (!el.hasAttribute('data-original-text')) {
+                    el.setAttribute('data-original-text', el.textContent.replace('₿', ''));
+                }
                 el.classList.add('privacy-hidden');
                 el.textContent = '₿****';
             } else {
                 el.classList.remove('privacy-hidden');
-                location.reload();
+                // Restore original text content
+                const originalText = el.getAttribute('data-original-text') || '0';
+                el.textContent = '₿' + originalText;
             }
         });
         
-        // Handle chart privacy - hide Y-axis values when privacy mode is on
+        // Handle chart privacy - hide Y-axis values and title when privacy mode is on
         if (typeof Plotly !== 'undefined') {
             const plotElements = document.querySelectorAll('.js-plotly-plot');
             plotElements.forEach(function(element) {
                 if (element && element.layout) {
                     if (on) {
-                        // Hide Y-axis tick labels when privacy mode is on
+                        // Hide Y-axis tick labels and title when privacy mode is on
                         Plotly.relayout(element, {
                             'yaxis.showticklabels': false,
                             'yaxis.tickformat': '',
-                            'yaxis.title': ''
+                            'yaxis.title': '',
+                            'title.text': 'Net Worth Over Time'
                         });
                     } else {
-                        // Show Y-axis tick labels when privacy mode is off
+                        // Show Y-axis tick labels and full title when privacy mode is off
                         Plotly.relayout(element, {
                             'yaxis.showticklabels': true,
                             'yaxis.tickformat': ',',
-                            'yaxis.title': null
+                            'yaxis.title': null,
+                            'title.text': element.layout.title.text || 'Net Worth Over Time'
                         });
                     }
                 }

@@ -56,6 +56,12 @@
             background-color: transparent !important;
             color: #4caf50 !important;
         }
+        
+        /* Privacy mode styling */
+        .privacy-hidden {
+            color: transparent !important;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3) !important;
+        }
         a { color: #4caf50; text-decoration: none; }
         a:hover { text-decoration: underline; }
         .pie-chart-container { text-align: center; }
@@ -948,20 +954,32 @@
         const btcElements = document.querySelectorAll('.btc-equivalent');
         sensitives.forEach(el => {
             if (on) {
+                // Store original text before hiding
+                if (!el.hasAttribute('data-original-text')) {
+                    el.setAttribute('data-original-text', el.textContent);
+                }
                 el.classList.add('privacy-hidden');
                 el.textContent = '****';
             } else {
                 el.classList.remove('privacy-hidden');
-                location.reload();
+                // Restore original text content
+                const originalText = el.getAttribute('data-original-text') || '0';
+                el.textContent = originalText;
             }
         });
         btcElements.forEach(el => {
             if (on) {
+                // Store original text before hiding
+                if (!el.hasAttribute('data-original-text')) {
+                    el.setAttribute('data-original-text', el.textContent.replace('₿', ''));
+                }
                 el.classList.add('privacy-hidden');
                 el.textContent = '₿****';
             } else {
                 el.classList.remove('privacy-hidden');
-                location.reload();
+                // Restore original text content
+                const originalText = el.getAttribute('data-original-text') || '0';
+                el.textContent = '₿' + originalText;
             }
         });
         
