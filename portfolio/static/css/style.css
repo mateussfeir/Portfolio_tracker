@@ -59,6 +59,23 @@ nav > * {
     min-width: 0;
 }
 
+/* Ensure proper separation between nav sections */
+.nav-left {
+    margin-right: 20px !important;
+    flex-shrink: 0;
+}
+
+.nav-center {
+    margin-left: 20px !important;
+    padding-left: 20px !important;
+    flex-shrink: 0;
+}
+
+/* Prevent inline flow between nav sections */
+nav {
+    gap: 20px;
+}
+
 /* Additional safety measures for very small screens */
 @media (max-width: 480px) {
     .nav-right {
