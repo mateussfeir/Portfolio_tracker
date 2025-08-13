@@ -1756,6 +1756,38 @@ def general(request):
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     
+    # Calculate performance metrics
+    performance_info = ""
+    if len(values) >= 2:
+        first_value = values[0]
+        last_value = values[-1]
+        difference = last_value - first_value
+        percentage_change = (difference / first_value) * 100 if first_value != 0 else 0
+        
+        # Format the difference with proper sign and currency
+        if difference >= 0:
+            sign = "+"
+            color = "#4caf50"  # Green for gains
+        else:
+            sign = ""
+            color = "#f44336"  # Red for losses
+        
+        # Format the amount with proper currency symbol
+        formatted_difference = f"{sign}{difference:,.0f}"
+        
+        # Get the time period label
+        time_period_map = {
+            '1w': '1W',
+            '1m': '1M', 
+            '3m': '3M',
+            '1y': '1Y',
+            'all': 'All'
+        }
+        time_period = time_period_map.get(selected_range, selected_range.upper())
+        
+        # Create performance info string
+        performance_info = f": {formatted_difference}{currency_symbol} ({percentage_change:+.1f}%) [{time_period}]"
+    
     networth_line_chart = None
     if dates and values:
         try:
@@ -1786,7 +1818,7 @@ def general(request):
             # Modern layout configuration
             fig.update_layout(
                 title=dict(
-                    text=f"Net Worth Over Time ({selected_currency})",
+                    text=f"Net Worth Over Time{performance_info}",
                     font=dict(size=20, color='#ffffff', family='Arial, sans-serif'),
                     x=0.5,
                     xanchor='center'
@@ -1978,13 +2010,33 @@ def performance(request):
     dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
     values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
 
+    # Calculate performance metrics for performance view
+    performance_info = ""
+    if len(values) >= 2:
+        first_value = values[0]
+        last_value = values[-1]
+        difference = last_value - first_value
+        percentage_change = (difference / first_value) * 100 if first_value != 0 else 0
+        
+        # Format the difference with proper sign and currency
+        if difference >= 0:
+            sign = "+"
+        else:
+            sign = ""
+        
+        # Format the amount with proper currency symbol
+        formatted_difference = f"{sign}{difference:,.0f}"
+        
+        # Create performance info string (no time period for performance view)
+        performance_info = f": {formatted_difference}{currency_symbol} ({percentage_change:+.1f}%)"
+
     # --- Plotly line chart ---
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
     
     # Responsive layout configuration
     fig.update_layout(
-        title=f"Net Worth Over Time ({selected_currency})",
+        title=f"Net Worth Over Time{performance_info}",
         xaxis_title="Date",
         yaxis_title=f"Net Worth ({currency_symbol})",
         paper_bgcolor="#121212",

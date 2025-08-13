@@ -1242,6 +1242,48 @@
                         setTimeout(resizeCharts, 100);
                     });
                 }
+                
+                // Enhance performance information display
+                function enhancePerformanceDisplay() {
+                    if (typeof Plotly !== 'undefined') {
+                        const plotElements = document.querySelectorAll('.js-plotly-plot');
+                        plotElements.forEach(function(element) {
+                            if (element && element.layout && element.layout.title) {
+                                const title = element.layout.title.text;
+                                
+                                // Check if title contains performance information
+                                if (title.includes('+') || title.includes('-')) {
+                                    // Find the performance part and style it
+                                    const titleElement = element.querySelector('.gtitle text');
+                                    if (titleElement) {
+                                        // Ensure the title is visible and properly styled
+                                        titleElement.style.fontSize = '20px';
+                                        titleElement.style.fontFamily = 'Arial, sans-serif';
+                                        titleElement.style.fill = '#ffffff';
+                                        
+                                        // Add performance-specific styling
+                                        if (title.includes('+')) {
+                                            titleElement.classList.add('performance-positive');
+                                        } else if (title.includes('-')) {
+                                            titleElement.classList.add('performance-negative');
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                
+                // Call performance enhancement after charts are loaded
+                setTimeout(enhancePerformanceDisplay, 500);
+                setTimeout(enhancePerformanceDisplay, 1000);
+                
+                // Also enhance when charts are resized
+                const originalResizeCharts = resizeCharts;
+                resizeCharts = function() {
+                    originalResizeCharts();
+                    setTimeout(enhancePerformanceDisplay, 100);
+                };
             });
         </script>
     </div>

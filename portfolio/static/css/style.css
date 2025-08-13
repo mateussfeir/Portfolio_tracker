@@ -654,3 +654,33 @@ div {
     }
 }
 
+/* Smooth transitions for better UX */
+.nav-center a,
+.more-trigger,
+.more-menu a {
+    transition: all 0.2s ease;
+}
+
+/* Chart Performance Information Styling */
+.js-plotly-plot .gtitle {
+    font-size: 20px !important;
+    font-family: 'Arial, sans-serif' !important;
+    color: #ffffff !important;
+}
+
+/* Ensure performance info is visible and properly styled */
+.js-plotly-plot .gtitle text {
+    font-size: 20px !important;
+    font-family: 'Arial, sans-serif' !important;
+    fill: #ffffff !important;
+}
+
+/* Performance indicators styling */
+.performance-positive {
+    color: #4caf50 !important;
+}
+
+.performance-negative {
+    color: #f44336 !important;
+}
+
