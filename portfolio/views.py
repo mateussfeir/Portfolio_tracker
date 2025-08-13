@@ -2156,7 +2156,7 @@ COINGECKO_TICKER_MAPPING = {
     'tkx': 'tokenize-xchange',
     'fet': 'fetch-ai',
     'dai': 'dai',
-    'virtual': 'virtuals-protocol',
+    'virtual': 'virtual-protocol',
     'arb': 'arbitrum',
     'xrp': 'ripple',
     'icp': 'internet-computer',
