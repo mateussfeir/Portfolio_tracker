@@ -109,7 +109,7 @@
             
             .nav-center {
                 order: 4;
-                display: none;
+                display: none !important;
                 flex-direction: column;
                 width: 100%;
                 background-color: #111;
@@ -117,10 +117,11 @@
                 padding: 10px 0;
                 border-radius: 4px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+                overflow: visible !important;
             }
             
             .nav-center.active {
-                display: flex;
+                display: flex !important;
             }
             
             .nav-center a {

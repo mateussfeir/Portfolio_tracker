@@ -105,6 +105,22 @@ header {
     max-width: 100%;
 }
 
+/* Ensure mobile navigation menu is properly hidden by default */
+@media (max-width: 768px) {
+    .nav-center {
+        display: none !important;
+    }
+    
+    .nav-center.active {
+        display: flex !important;
+    }
+    
+    /* Ensure hamburger button is visible on mobile */
+    .hamburger {
+        display: block !important;
+    }
+}
+
 /* Mobile-first responsive design */
 @media (max-width: 768px) {
     body, html {
