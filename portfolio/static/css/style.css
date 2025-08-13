@@ -23,7 +23,86 @@ html {
 /* Prevent horizontal overflow on all elements */
 body, html, div, nav, header, footer, main, section, article, aside {
     max-width: 100vw;
-    overflow-x: hidden;
+    overflow-x: visible;
+}
+
+/* Ensure navbar elements are never clipped */
+nav {
+    overflow: visible !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+nav > * {
+    overflow: visible !important;
+    min-width: 0;
+}
+
+/* Ensure privacy button and currency selector are never clipped */
+#privacy-toggle-btn,
+#currency-selector {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    min-width: max-content !important;
+}
+
+/* Ensure nav-right section is never clipped */
+.nav-right {
+    overflow: visible !important;
+    flex-shrink: 0 !important;
+    min-width: 0;
+}
+
+/* Additional safety measures for very small screens */
+@media (max-width: 480px) {
+    .nav-right {
+        padding-right: 12px !important;
+        margin-right: 0 !important;
+    }
+    
+    #privacy-toggle-btn {
+        font-size: 0.8em !important;
+        padding: 2px 6px !important;
+        margin-right: 4px !important;
+    }
+    
+    #currency-selector {
+        font-size: 0.8em !important;
+        padding: 2px 4px !important;
+    }
+}
+
+/* Ensure the navbar container never clips its children */
+header nav {
+    overflow: visible !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-right: 16px !important;
+}
+
+/* Force the privacy button to be fully visible */
+#privacy-toggle-btn {
+    position: relative !important;
+    z-index: 10 !important;
+    overflow: visible !important;
+}
+
+/* Ensure body and html never clip navbar content */
+body, html {
+    overflow-x: visible !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Additional navbar overflow protection */
+header {
+    overflow: visible !important;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Mobile-first responsive design */

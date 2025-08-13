@@ -629,7 +629,7 @@
                 justify-content: flex-start;
                 margin-bottom: 0 !important;
                 min-width: 0;
-                overflow: hidden;
+                overflow: visible !important;
                 margin-right: 10px;
             }
             
@@ -733,8 +733,11 @@
                 justify-content: flex-end;
                 margin-bottom: 0 !important;
                 width: auto;
-                flex-shrink: 0;
+                flex-shrink: 0 !important;
                 margin-left: auto;
+                overflow: visible !important;
+                padding-right: 8px !important;
+                min-width: 0;
             }
             
             /* Container and content fixes */
@@ -744,7 +747,7 @@
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box;
-                overflow-x: hidden;
+                overflow-x: visible !important;
             }
             
             .dashboard-section {
@@ -873,6 +876,79 @@
                     display: none !important;
                 }
             }
+        /* Ensure nav elements are never clipped */
+        nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 20px !important;
+          margin: 0 !important;
+          height: auto !important;
+          line-height: normal;
+          background: #000000;
+          width: 100%;
+          box-sizing: border-box;
+          overflow: visible !important;
+          min-width: 0;
+        }
+        
+        /* Prevent any clipping of nav children */
+        nav > * {
+          overflow: visible !important;
+          min-width: 0;
+        }
+        
+        .nav-left,
+        .nav-center,
+        .nav-right {
+          display: flex;
+          align-items: center;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: visible !important;
+          min-width: 0;
+        }
+        .nav-left {
+          margin: 0 !important;
+          padding: 0px 0 !important;
+          font-size: 14px;
+          overflow: visible !important;
+          flex-shrink: 1;
+          min-width: 0;
+        }
+        select,
+        button {
+          margin: 0 !important;
+          padding: 4px 8px;
+        }
+        .nav-center {
+            justify-content: center;
+            flex-grow: 1;
+            flex-wrap: wrap;
+            overflow: visible !important;
+            min-width: 0;
+        }
+        .nav-right {
+            justify-content: flex-end;
+            overflow: visible !important;
+            flex-shrink: 0 !important;
+            min-width: 0;
+            padding-right: 8px !important;
+        }
+        
+        /* Ensure privacy button is never clipped */
+        #privacy-toggle-btn {
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+            min-width: max-content !important;
+        }
+        
+        /* Ensure currency selector is never clipped */
+        #currency-selector {
+            flex-shrink: 0 !important;
+            overflow: visible !important;
+        }
     </style>
 </head>
 <body>
@@ -906,7 +982,7 @@
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
                 {% endfor %}
             </select>
-            <button id="privacy-toggle-btn" type="button" style="margin-left: 12px; background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background 0.18s, color 0.18s, transform 0.18s;">Privacy Mode: Off</button>
+            <button id="privacy-toggle-btn" type="button" style="margin-left: 12px; margin-right: 8px; background: #222; color: #4caf50; border: 1.5px solid #4caf50; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background 0.18s, color 0.18s, transform 0.18s; white-space: nowrap; flex-shrink: 0;">Privacy Mode: Off</button>
         </div>
     </nav>
 </header>
