@@ -2140,7 +2140,7 @@ COINGECKO_TICKER_MAPPING = {
     'wld': 'worldcoin-wld',
     'inj': 'injective',
     'ldo': 'lido-dao',
-    'sei': 'sei',
+    'sei': 'sei-network',
     'pyth': 'pyth-network',
     'ltc': 'litecoin',
     'uni': 'uniswap',
