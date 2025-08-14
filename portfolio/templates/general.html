@@ -806,6 +806,13 @@
                 color: #66bb6a;
             }
             
+            /* Hide Bitcoin equivalent on mobile */
+            @media (max-width: 768px) {
+                .btc-equivalent {
+                    display: none !important;
+                }
+            }
+            
             /* Hide close button on desktop */
             @media (min-width: 769px) {
                 .close-menu-btn {
