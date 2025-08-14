@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to Bitbalance{% endblock %}
+
+{% block extra_css %}
+<style>
+    .intro-container {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .intro-title {
+        font-size: 3.5rem;
+        font-weight: bold;
+        color: #4caf50;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+    }
+
+    .intro-subtitle {
+        font-size: 1.5rem;
+        color: #e0e0e0;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+        max-width: 600px;
+    }
+
+    .intro-description {
+        font-size: 1.1rem;
+        color: #aaa;
+        margin-bottom: 3rem;
+        line-height: 1.8;
+        max-width: 500px;
+    }
+
+    .button-container {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 3rem;
+    }
+
+    .intro-button {
+        padding: 1rem 2.5rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        display: inline-block;
+        min-width: 160px;
+        text-align: center;
+    }
+
+    .signup-button {
+        background: linear-gradient(135deg, #4caf50, #66bb6a);
+        color: white;
+        border: 2px solid #4caf50;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+
+    .signup-button:hover {
+        background: linear-gradient(135deg, #45a049, #4caf50);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .login-button {
+        background: transparent;
+        color: #4caf50;
+        border: 2px solid #4caf50;
+    }
+
+    .login-button:hover {
+        background: #4caf50;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        text-decoration: none;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+        max-width: 800px;
+    }
+
+    .feature-card {
+        background: rgba(42, 42, 42, 0.6);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(76, 175, 80, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(76, 175, 80, 0.5);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .feature-title {
+        color: #4caf50;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-description {
+        color: #aaa;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .footer-note {
+        margin-top: 3rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .intro-container {
+            padding: 1rem;
+            min-height: 70vh;
+        }
+
+        .intro-title {
+            font-size: 2.5rem;
+        }
+
+        .intro-subtitle {
+            font-size: 1.2rem;
+        }
+
+        .intro-description {
+            font-size: 1rem;
+        }
+
+        .button-container {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .intro-button {
+            min-width: 200px;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .intro-title {
+            font-size: 2rem;
+        }
+
+        .intro-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .intro-button {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="intro-container">
+    <h1 class="intro-title">Bitbalance</h1>
+    
+    <p class="intro-subtitle">
+        Your Personal Portfolio Tracker
+    </p>
+    
+    <p class="intro-description">
+        Take control of your financial future with our comprehensive portfolio management platform. 
+        Track cryptocurrencies, stocks, real estate, and more in one secure, easy-to-use dashboard.
+    </p>
+    
+    <div class="button-container">
+        <a href="{% url 'signup' %}" class="intro-button signup-button">
+            Sign Up
+        </a>
+        <a href="{% url 'login' %}" class="intro-button login-button">
+            Log In
+        </a>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon">📊</span>
+            <div class="feature-title">Real-time Tracking</div>
+            <div class="feature-description">
+                Monitor your portfolio performance with live updates and interactive charts
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">🔒</span>
+            <div class="feature-title">Privacy First</div>
+            <div class="feature-description">
+                Your financial data stays private with our secure, encrypted platform
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">📱</span>
+            <div class="feature-title">Multi-Platform</div>
+            <div class="feature-description">
+                Access your portfolio from anywhere - desktop, tablet, or mobile
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">💡</span>
+            <div class="feature-title">Smart Insights</div>
+            <div class="feature-description">
+                Get intelligent analysis and recommendations for your investments
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-note">
+        Start your financial journey today with Bitbalance
+    </div>
+</div>
+{% endblock %}
