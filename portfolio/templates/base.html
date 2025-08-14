@@ -16,6 +16,38 @@
     <meta name="msapplication-TileColor" content="#000000">
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <style>
+        /* Base navigation styles */
+        nav {
+            background-color: #1a1a1a;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .nav-links a:hover {
+            background-color: #333;
+            color: #4caf50;
+        }
+        
         /* Hamburger button styles */
         .hamburger {
             display: none;
@@ -43,7 +75,7 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding: 10px 20px;
+                padding: 8px 20px;
                 width: 100%;
                 box-sizing: border-box;
             }
@@ -53,8 +85,8 @@
                 flex-direction: column;
                 width: 100%;
                 background-color: #111;
-                margin-top: 10px;
-                padding: 10px 0;
+                margin-top: 8px;
+                padding: 8px 0;
                 border-radius: 4px;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.7);
             }
@@ -64,7 +96,7 @@
             }
             
             .nav-links a {
-                padding: 12px 20px;
+                padding: 8px 20px;
                 text-align: center;
                 border-bottom: 1px solid #333;
                 width: 100%;
@@ -100,7 +132,12 @@
             /* Very small screens */
             @media (max-width: 480px) {
                 nav {
-                    padding: 10px 10px;
+                    padding: 6px 10px;
+                }
+                
+                .nav-links a {
+                    padding: 6px 16px;
+                    font-size: 13px;
                 }
                 
                 div {
@@ -122,7 +159,7 @@
             .nav-links {
                 display: flex !important;
                 flex-direction: row;
-                gap: 15px;
+                gap: 20px;
             }
         }
     </style>
