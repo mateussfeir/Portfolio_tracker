@@ -472,6 +472,8 @@
             padding: 8px;
             margin: 0;
             transition: color 0.2s ease;
+            z-index: 1001;
+            position: relative;
         }
         
         .hamburger:hover {
@@ -484,6 +486,8 @@
                 display: block;
                 order: 3;
                 margin-left: auto;
+                z-index: 1001;
+                position: relative;
             }
             
             nav {
@@ -494,6 +498,8 @@
                 padding: 10px 20px !important;
                 width: 100%;
                 box-sizing: border-box;
+                position: relative;
+                z-index: 1000;
             }
             
             .nav-left {
@@ -557,9 +563,23 @@
                 margin: 0;
             }
             
-            .nav-center .logout-link:hover {
-                background-color: #222;
-                color: #66bb6a;
+            /* Style mobile privacy button */
+            .nav-center #privacy-toggle-btn-mobile {
+                background-color: #2196f3;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 15px 20px;
+                width: 100%;
+                max-width: 300px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                margin: 20px 0 0 0;
+            }
+            
+            .nav-center #privacy-toggle-btn-mobile:hover {
+                background-color: #1976d2;
             }
             
             /* Style mobile privacy button in dropdown */
@@ -597,6 +617,25 @@
                 width: auto;
                 flex-shrink: 0;
                 margin-left: auto;
+            }
+            
+            /* Close menu button */
+            .close-menu-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: none;
+                border: none;
+                color: #4caf50;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 10px;
+                transition: color 0.3s ease;
+                z-index: 1002;
+            }
+            
+            .close-menu-btn:hover {
+                color: #66bb6a;
             }
             
             /* Container and content fixes */
@@ -813,6 +852,7 @@
         <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
         
         <div class="nav-center" id="navLinks">
+            <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
             <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
             <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
@@ -1147,6 +1187,16 @@
                 !navLinks.contains(event.target) && 
                 !hamburger.contains(event.target)) {
                 navLinks.classList.remove('active');
+            }
+        });
+        
+        // Add escape key functionality to close menu
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const navLinks = document.getElementById('navLinks');
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                }
             }
         });
     });

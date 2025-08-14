@@ -117,14 +117,21 @@
             .nav-center {
                 order: 4;
                 display: none !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.95);
+                margin: 0;
+                padding: 80px 20px 20px 20px;
+                border-radius: 0;
+                box-shadow: none;
+                overflow-y: auto;
+                z-index: 999;
                 flex-direction: column;
-                width: 100%;
-                background-color: #111;
-                margin-top: 10px;
-                padding: 10px 0;
-                border-radius: 4px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-                overflow: visible !important;
+                justify-content: flex-start;
+                align-items: center;
             }
             
             .nav-center.active {
@@ -132,11 +139,21 @@
             }
             
             .nav-center a {
-                padding: 12px 20px;
+                padding: 20px;
                 text-align: center;
                 border-bottom: 1px solid #333;
                 width: 100%;
+                max-width: 300px;
                 box-sizing: border-box;
+                font-size: 18px;
+                color: #4caf50;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+            
+            .nav-center a:hover {
+                background-color: rgba(76, 175, 80, 0.1);
+                color: #66bb6a;
             }
             
             .nav-center a:last-child {
@@ -145,58 +162,45 @@
             
             /* Style logout button in dropdown */
             .nav-center .logout-form {
-                margin: 0;
+                margin: 20px 0 0 0;
                 padding: 0;
                 width: 100%;
+                max-width: 300px;
             }
             
             .nav-center .logout-link {
-                width: 100%;
-                padding: 12px 20px;
-                text-align: center;
-                background: none;
+                background-color: #f44336;
+                color: white;
                 border: none;
-                color: #4caf50;
-                text-decoration: none;
-                font-weight: bold;
-                font-size: 1em;
+                border-radius: 4px;
+                padding: 15px 20px;
+                width: 100%;
+                font-size: 16px;
                 cursor: pointer;
-                border-top: 1px solid #333;
-                margin: 0;
+                transition: background-color 0.3s ease;
             }
             
             .nav-center .logout-link:hover {
-                background-color: #222;
-                color: #66bb6a;
+                background-color: #d32f2f;
             }
             
             /* Style mobile privacy button in dropdown */
-            .mobile-privacy-btn {
-                width: 100%;
-                padding: 12px 20px;
-                text-align: center;
-                background: none;
+            .nav-center #privacy-toggle-btn-mobile {
+                background-color: #2196f3;
+                color: white;
                 border: none;
-                color: #4caf50;
-                text-decoration: none;
-                font-weight: bold;
-                font-size: 1em;
+                border-radius: 4px;
+                padding: 15px 20px;
+                width: 100%;
+                max-width: 300px;
+                font-size: 16px;
                 cursor: pointer;
-                border-top: 1px solid #333;
-                border-bottom: 1px solid #333;
-                margin: 0;
-                transition: background-color 0.2s ease;
+                transition: background-color 0.3s ease;
+                margin: 20px 0 0 0;
             }
             
-            .mobile-privacy-btn:hover {
-                background-color: #222;
-                color: #66bb6a;
-            }
-            
-            /* Override general button styling for mobile privacy button */
-            .mobile-privacy-btn {
-                background-color: transparent !important;
-                color: #4caf50 !important;
+            .nav-center #privacy-toggle-btn-mobile:hover {
+                background-color: #1976d2;
             }
             
             /* Hide desktop privacy button on mobile */
@@ -214,6 +218,25 @@
                 overflow: visible !important;
                 padding-right: 8px !important;
                 min-width: 0;
+            }
+            
+            /* Close menu button */
+            .close-menu-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: none;
+                border: none;
+                color: #4caf50;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 10px;
+                transition: color 0.3s ease;
+                z-index: 1002;
+            }
+            
+            .close-menu-btn:hover {
+                color: #66bb6a;
             }
             
             /* Container and content fixes */
@@ -419,6 +442,7 @@
         <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
         
         <div class="nav-center" id="navLinks">
+            <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
             <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
             <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
@@ -773,6 +797,16 @@
                     !navLinks.contains(event.target) && 
                     !hamburger.contains(event.target)) {
                     navLinks.classList.remove('active');
+                }
+            });
+            
+            // Add escape key functionality to close menu
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const navLinks = document.getElementById('navLinks');
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                    }
                 }
             });
         });
