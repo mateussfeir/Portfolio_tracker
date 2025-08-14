@@ -235,6 +235,18 @@
                 color: #66bb6a;
             }
             
+            /* Hide close button on desktop */
+            @media (min-width: 769px) {
+                .close-menu-btn {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                    position: absolute !important;
+                    left: -9999px !important;
+                }
+            }
+            
             /* Container and content fixes */
             .container {
                 padding: 0 10px !important;
@@ -310,6 +322,16 @@
         @media (min-width: 769px) {
             .nav-center {
                 display: flex !important;
+            }
+            
+            /* Hide close button on desktop */
+            .close-menu-btn {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                position: absolute !important;
+                left: -9999px !important;
             }
         }
         body, html {
