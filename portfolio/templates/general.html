@@ -641,16 +641,17 @@
                 left: 0 !important;
                 width: 100vw !important;
                 height: 100vh !important;
-                background-color: rgba(0, 0, 0, 0.95) !important;
+                background-color: rgba(0, 0, 0, 0.92) !important;
                 margin: 0 !important;
-                padding: 80px 20px 20px 20px !important;
+                padding: 100px 20px 40px 20px !important;
                 border-radius: 0 !important;
                 box-shadow: none !important;
                 overflow-y: auto !important;
-                z-index: 999 !important;
+                z-index: 9999 !important;
                 flex-direction: column !important;
                 justify-content: flex-start !important;
                 align-items: center !important;
+                backdrop-filter: blur(10px) !important;
             }
             
             .nav-center.active {
@@ -660,31 +661,41 @@
                 left: 0 !important;
                 width: 100vw !important;
                 height: 100vh !important;
-                background-color: rgba(0, 0, 0, 0.95) !important;
+                background-color: rgba(0, 0, 0, 0.92) !important;
                 margin: 0 !important;
-                padding: 80px 20px 20px 20px !important;
+                padding: 100px 20px 40px 20px !important;
                 border-radius: 0 !important;
                 box-shadow: none !important;
                 overflow-y: auto !important;
-                z-index: 999 !important;
+                z-index: 9999 !important;
             }
             
             .nav-center a {
-                padding: 20px;
+                padding: 24px 20px;
                 text-align: center;
-                border-bottom: 1px solid #333;
+                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
                 width: 100%;
-                max-width: 300px;
+                max-width: 320px;
                 box-sizing: border-box;
                 font-size: 18px;
+                font-weight: 500;
                 color: #4caf50;
                 text-decoration: none;
                 transition: all 0.3s ease;
+                margin: 0;
+                border-radius: 8px;
             }
             
             .nav-center a:hover {
-                background-color: rgba(76, 175, 80, 0.1);
+                background-color: rgba(76, 175, 80, 0.15);
                 color: #66bb6a;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+            }
+            
+            .nav-center a:last-child {
+                border-bottom: none;
+                margin-bottom: 20px;
             }
             
             .nav-center a:last-child {
@@ -696,22 +707,33 @@
                 margin: 0;
                 padding: 0;
                 width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
             
             .nav-center .logout-link {
                 background-color: #f44336;
                 color: white;
                 border: none;
-                border-radius: 4px;
-                padding: 15px 20px;
+                border-radius: 8px;
+                padding: 20px;
                 width: 100%;
+                max-width: 320px;
                 font-size: 16px;
+                font-weight: 500;
                 cursor: pointer;
-                transition: background-color 0.3s ease;
+                transition: all 0.3s ease;
+                margin: 8px auto;
+                box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+                display: block;
+                text-align: center;
             }
             
             .nav-center .logout-link:hover {
                 background-color: #d32f2f;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
             }
             
             /* Style mobile privacy button */
@@ -790,20 +812,30 @@
             /* Close menu button */
             .close-menu-btn {
                 position: absolute;
-                top: 20px;
-                right: 20px;
-                background: none;
-                border: none;
+                top: 30px;
+                right: 30px;
+                background: rgba(0, 0, 0, 0.8);
+                border: 2px solid #4caf50;
+                border-radius: 50%;
                 color: #4caf50;
-                font-size: 24px;
+                font-size: 20px;
                 cursor: pointer;
-                padding: 10px;
-                transition: color 0.3s ease;
-                z-index: 1002;
+                padding: 12px;
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                z-index: 10002;
+                backdrop-filter: blur(10px);
             }
             
             .close-menu-btn:hover {
-                color: #66bb6a;
+                background-color: #4caf50;
+                color: #000;
+                transform: scale(1.1);
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
             }
             
             /* Hide Bitcoin equivalent on mobile */
@@ -1582,7 +1614,18 @@
     // Hamburger menu toggle function
     function toggleMenu() {
         const navLinks = document.getElementById('navLinks');
-        navLinks.classList.toggle('active');
+        const isActive = navLinks.classList.toggle('active');
+        
+        // Prevent body scroll when menu is open
+        if (isActive) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+        } else {
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+        }
     }
     
     // Close mobile menu when clicking outside
