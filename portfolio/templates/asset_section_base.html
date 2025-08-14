@@ -185,39 +185,67 @@
             
             /* Style logout button in dropdown */
             .nav-center .logout-form {
-                margin: 0;
+                margin: 0 auto;
                 padding: 0;
                 width: 100%;
+                max-width: 320px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
             }
             
             .nav-center .logout-link {
-                background-color: #f44336;
-                color: white;
+                background-color: transparent;
+                color: #4caf50;
                 border: none;
                 border-radius: 8px;
-                padding: 20px;
+                padding: 24px 20px;
                 width: 100%;
                 max-width: 320px;
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: 500;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                margin: 8px auto;
-                box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+                margin: 0 auto;
+                box-shadow: none;
                 display: block;
                 text-align: center;
+                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
             }
             
             .nav-center .logout-link:hover {
-                background-color: #d32f2f;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+                background-color: rgba(139, 0, 0, 0.1);
+                color: #8b0000;
+                transform: translateX(5px);
+                box-shadow: 0 2px 8px rgba(139, 0, 0, 0.2);
             }
             
-
+            /* Style mobile privacy button in dropdown */
+            .mobile-privacy-btn {
+                background-color: transparent;
+                color: #4caf50;
+                border: none;
+                border-radius: 8px;
+                padding: 24px 20px;
+                width: 100%;
+                max-width: 320px;
+                font-size: 18px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin: 0 auto;
+                box-shadow: none;
+                display: block;
+                text-align: center;
+                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            }
+            
+            .mobile-privacy-btn:hover {
+                background-color: rgba(76, 175, 80, 0.1);
+                color: #66bb6a;
+                transform: translateX(5px);
+                box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+            }
             
             /* Hide desktop privacy button on mobile */
             #privacy-toggle-btn {

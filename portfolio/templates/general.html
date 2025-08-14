@@ -704,78 +704,68 @@
             
             /* Style logout button in dropdown */
             .nav-center .logout-form {
-                margin: 0;
+                margin: 0 auto;
                 padding: 0;
                 width: 100%;
+                max-width: 320px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
             }
             
             .nav-center .logout-link {
-                background-color: #f44336;
-                color: white;
+                background-color: transparent;
+                color: #4caf50;
                 border: none;
                 border-radius: 8px;
-                padding: 20px;
+                padding: 24px 20px;
                 width: 100%;
                 max-width: 320px;
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: 500;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                margin: 8px auto;
-                box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+                margin: 0 auto;
+                box-shadow: none;
                 display: block;
                 text-align: center;
+                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
             }
             
             .nav-center .logout-link:hover {
-                background-color: #d32f2f;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+                background-color: rgba(139, 0, 0, 0.1);
+                color: #8b0000;
+                transform: translateX(5px);
+                box-shadow: 0 2px 8px rgba(139, 0, 0, 0.2);
             }
             
-            /* Style mobile privacy button */
-            .nav-center #privacy-toggle-btn-mobile {
-                background-color: #2196f3;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 15px 20px;
-                width: 100%;
-                max-width: 300px;
-                font-size: 16px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-                margin: 20px 0 0 0;
-            }
-            
-            .nav-center #privacy-toggle-btn-mobile:hover {
-                background-color: #1976d2;
-            }
+
             
             /* Style mobile privacy button in dropdown */
             .mobile-privacy-btn {
-                width: 100%;
-                padding: 12px 20px;
-                text-align: center;
-                background: none;
-                border: none;
+                background-color: transparent;
                 color: #4caf50;
-                text-decoration: none;
-                font-weight: bold;
-                font-size: 1em;
+                border: none;
+                border-radius: 8px;
+                padding: 24px 20px;
+                width: 100%;
+                max-width: 320px;
+                font-size: 18px;
+                font-weight: 500;
                 cursor: pointer;
-                border-top: 1px solid #333;
-                border-bottom: 1px solid #333;
-                margin: 0;
-                transition: background-color 0.2s ease;
+                transition: all 0.3s ease;
+                margin: 0 auto;
+                box-shadow: none;
+                display: block;
+                text-align: center;
+                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
             }
             
             .mobile-privacy-btn:hover {
-                background-color: #222;
+                background-color: rgba(76, 175, 80, 0.1);
                 color: #66bb6a;
+                transform: translateX(5px);
+                box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
             }
             
             /* Hide desktop privacy button on mobile */
@@ -783,17 +773,7 @@
                 display: none;
             }
             
-            /* Show mobile privacy button on mobile */
-            #privacy-toggle-btn-mobile {
-                display: block;
-            }
-            
-            /* Ensure mobile privacy button shows on mobile */
-            @media (max-width: 768px) {
-                #privacy-toggle-btn-mobile {
-                    display: block !important;
-                }
-            }
+
             
             .nav-right {
                 order: 2;
@@ -958,10 +938,7 @@
                 display: flex !important;
             }
             
-            /* Hide mobile privacy button on desktop */
-            #privacy-toggle-btn-mobile {
-                display: none !important;
-            }
+
             
             /* Hide close button on desktop */
             .close-menu-btn {
@@ -974,10 +951,7 @@
             }
         }
         
-        /* Hide mobile privacy button by default (will be shown on mobile via media query) */
-        #privacy-toggle-btn-mobile {
-            display: none;
-        }
+
         
         /* Chart container initial styling for layout fix */
         #pie-chart-div, #bar-chart-div, .chart-responsive-container {
@@ -1000,15 +974,7 @@
             margin: 0 !important;
         }
 
-            /* Hide mobile privacy button on desktop */
-            @media (min-width: 769px) {
-                #privacy-toggle-btn-mobile {
-                    display: none !important;
-                }
-                .mobile-privacy-container {
-                    display: none !important;
-                }
-            }
+
         /* Ensure nav elements are never clipped */
         nav {
           display: flex;
