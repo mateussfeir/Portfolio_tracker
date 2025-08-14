@@ -431,6 +431,22 @@
                 margin: 0 !important;
                 width: 100% !important;
             }
+            
+            /* Mobile title styling */
+            .desktop-title {
+                display: none !important;
+            }
+            .mobile-title {
+                display: inline !important;
+            }
+        }
+        
+        /* Desktop title styling */
+        .mobile-title {
+            display: none !important;
+        }
+        .desktop-title {
+            display: inline !important;
         }
         
         /* Global chart responsiveness */
@@ -1043,7 +1059,10 @@
           </div>
         {# Only show Net Worth Over Time card if block is not empty #}
         {% block networth_over_time_card %}
-        <div class="section-header">Net Worth Over Time</div>
+        <div class="section-header">
+            <span class="desktop-title">Net Worth Over Time</span>
+            <span class="mobile-title">Networth Over Time</span>
+        </div>
         {% block networth_over_time %}{% endblock %}
         {% endblock %}
     </div>
@@ -1122,14 +1141,31 @@
                     
                     if (on) {
                         // Hide Y-axis tick labels and title when privacy mode is on
+                        const mobileTitle = window.innerWidth <= 768 ? 'Networth Over Time' : 'Net Worth Over Time';
                         Plotly.relayout(element, {
                             'yaxis.showticklabels': false,
                             'yaxis.tickformat': '',
                             'yaxis.title': '',
-                            'title.text': 'Net Worth Over Time'
+                            'title.text': mobileTitle
                         });
                     } else {
                         // Show Y-axis tick labels and full title when privacy mode is off
+                        // Check if we should show simplified mobile title
+                        if (window.innerWidth <= 768) {
+                            const currentTitle = element.getAttribute('data-original-title') || 'Net Worth Over Time';
+                            if (currentTitle.includes('Net Worth Over Time')) {
+                                // Always show simplified mobile title without performance info
+                                Plotly.relayout(element, {
+                                    'yaxis.showticklabels': true,
+                                    'yaxis.tickformat': '',
+                                    'yaxis.title': null,
+                                    'title.text': 'Networth Over Time'
+                                });
+                                return; // Skip the default behavior
+                            }
+                        }
+                        
+                        // Default behavior for desktop or when mobile logic doesn't apply
                         Plotly.relayout(element, {
                             'yaxis.showticklabels': true,
                             'yaxis.tickformat': '',
@@ -1179,8 +1215,9 @@
                                 element.setAttribute('data-original-title', element.layout.title.text || 'Net Worth Over Time');
                             }
                             // Hide title immediately
+                            const mobileTitle = window.innerWidth <= 768 ? 'Networth Over Time' : 'Net Worth Over Time';
                             Plotly.relayout(element, {
-                                'title.text': 'Net Worth Over Time'
+                                'title.text': mobileTitle
                             });
                         }
                     });
@@ -1214,8 +1251,9 @@
                                         allCharts.forEach(function(element) {
                                             if (element && element.layout && !element.hasAttribute('data-original-title')) {
                                                 element.setAttribute('data-original-title', element.layout.title.text || 'Net Worth Over Time');
+                                                const mobileTitle = window.innerWidth <= 768 ? 'Networth Over Time' : 'Net Worth Over Time';
                                                 Plotly.relayout(element, {
-                                                    'title.text': 'Net Worth Over Time'
+                                                    'title.text': mobileTitle
                                                 });
                                             }
                                         });
@@ -1292,6 +1330,38 @@
             }
         });
         
+    });
+    
+    // Function to simplify chart titles on mobile
+    function simplifyChartTitlesForMobile() {
+        if (window.innerWidth <= 768) {
+            const charts = document.querySelectorAll('.js-plotly-plot, .plotly-graph-div');
+            charts.forEach(function(chart) {
+                if (chart && chart.layout && chart.layout.title && chart.layout.title.text) {
+                    const currentTitle = chart.layout.title.text;
+                    
+                    // Check if this is a Net Worth Over Time chart
+                    if (currentTitle.includes('Net Worth Over Time')) {
+                        // Always show simplified mobile title without performance info
+                        Plotly.relayout(chart, {
+                            'title.text': 'Networth Over Time'
+                        });
+                    }
+                }
+            });
+        }
+    }
+    
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wait a bit for charts to load, then simplify titles
+        setTimeout(simplifyChartTitlesForMobile, 1000);
+        setTimeout(simplifyChartTitlesForMobile, 2000);
+    });
+    
+    // Run on window resize
+    window.addEventListener('resize', function() {
+        setTimeout(simplifyChartTitlesForMobile, 100);
     });
 </script>
 </body>
