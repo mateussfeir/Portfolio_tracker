@@ -394,6 +394,11 @@
         
         /* Mobile-specific chart improvements */
         @media only screen and (max-width: 768px) {
+            /* Hide desktop privacy button on mobile */
+            #privacy-toggle-btn {
+                display: none !important;
+            }
+            
             /* Ensure charts are responsive on mobile */
             .js-plotly-plot {
                 width: 100% !important;
@@ -938,7 +943,25 @@
                 display: flex !important;
             }
             
-
+            /* Hide mobile privacy button on desktop */
+            #privacy-toggle-btn-mobile {
+                display: none !important;
+            }
+            
+            /* Also hide the mobile privacy button container on desktop */
+            .nav-center #privacy-toggle-btn-mobile {
+                display: none !important;
+            }
+            
+            /* Ensure mobile privacy button is completely hidden on desktop */
+            .nav-center button[id="privacy-toggle-btn-mobile"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                position: absolute !important;
+                left: -9999px !important;
+            }
             
             /* Hide close button on desktop */
             .close-menu-btn {

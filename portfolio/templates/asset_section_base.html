@@ -88,6 +88,11 @@
         
         /* Mobile responsive styles */
         @media (max-width: 768px) {
+            /* Hide desktop privacy button on mobile */
+            #privacy-toggle-btn {
+                display: none !important;
+            }
+            
             .hamburger {
                 display: block;
                 order: 3;
@@ -382,6 +387,21 @@
         @media (min-width: 769px) {
             #privacy-toggle-btn-mobile {
                 display: none !important;
+            }
+            
+            /* Also hide the mobile privacy button container on desktop */
+            .nav-center #privacy-toggle-btn-mobile {
+                display: none !important;
+            }
+            
+            /* Ensure mobile privacy button is completely hidden on desktop */
+            .nav-center button[id="privacy-toggle-btn-mobile"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                position: absolute !important;
+                left: -9999px !important;
             }
         }
         
