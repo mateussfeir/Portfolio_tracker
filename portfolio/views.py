@@ -2179,6 +2179,7 @@ COINGECKO_TICKER_MAPPING = {
     'mina': 'mina-protocol',
     'croge': 'crogecoin',
     'brett' : 'based-brett',
+    'aster' : 'aster-2'
 }
 
 CURRENCY_SYMBOLS = {
