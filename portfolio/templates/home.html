@@ -141,19 +141,19 @@
           const toggleBtn = document.getElementById('toggle-chart-btn');
           const pieDiv = document.getElementById('pie-chart-div');
           const barDiv = document.getElementById('bar-chart-div');
-          let showingPie = false;
+          let showingPie = true;
           const isMobile = window.innerWidth <= 768;
           if (isMobile) {
-              // On mobile, show bar chart by default and hide toggle button
-              pieDiv.style.display = 'none';
-              barDiv.style.display = 'block';
+              // On mobile, show pie chart by default and hide toggle button
+              pieDiv.style.display = 'block';
+              barDiv.style.display = 'none';
               if (toggleBtn) {
                   toggleBtn.style.display = 'none';
               }
           
-              // On desktop, show bar chart by default and enable toggle
-              pieDiv.style.display = 'none';
-              barDiv.style.display = 'block';
+              // On desktop, show pie chart by default and enable toggle
+              pieDiv.style.display = 'block';
+              barDiv.style.display = 'none';
               if (toggleBtn) {
                   toggleBtn.addEventListener('click', function() {
                       showingPie = !showingPie;

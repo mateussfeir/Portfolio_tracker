@@ -595,6 +595,9 @@
         <div class="card pie-chart-container" style="flex: 1 1 45%; min-width: 350px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                 <h2 style="margin: 0;">{% block chart_title %}Portfolio Distribution{% endblock %}</h2>
+                <div style="flex-shrink: 0;">
+                    <button id="toggle-chart-btn" class="btn btn-outline-success">Show Pie Chart</button>
+                </div>
             </div>
             <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
                 {% if pie_chart %}
@@ -607,9 +610,6 @@
                 {% if bar_chart %}
                     {{ bar_chart|safe }}
                 {% endif %}
-            </div>
-            <div class="text-center mt-3">
-                <button id="toggle-chart-btn" class="btn btn-outline-success">Show Pie Chart</button>
             </div>
         </div>
     </div>
@@ -838,7 +838,7 @@
             const toggleBtn = document.getElementById('toggle-chart-btn');
             const pieDiv = document.getElementById('pie-chart-div');
             const barDiv = document.getElementById('bar-chart-div');
-            let showingPie = false;
+            let showingPie = true;
             
             // Check if device is mobile (screen width <= 768px)
             const isMobile = window.innerWidth <= 768;
@@ -851,9 +851,9 @@
                     toggleBtn.style.display = 'none';
                 }
             } else {
-                // On desktop, show bar chart by default and enable toggle
-                pieDiv.style.display = 'none';
-                barDiv.style.display = 'block';
+                // On desktop, show pie chart by default and enable toggle
+                pieDiv.style.display = 'block';
+                barDiv.style.display = 'none';
                 if (toggleBtn) {
                     toggleBtn.addEventListener('click', function() {
                         showingPie = !showingPie;

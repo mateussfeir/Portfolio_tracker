@@ -277,18 +277,38 @@ def home(request):
             else:
                 labels_with_other = [asset['ticker'] for asset in assets_with_value]
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels_with_other, 
+                values=pie_values_with_other, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         else:
             section_sum = sum([safe_float(asset['value']) for asset in assets_with_value])
             pie_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
-            fig_pie = go.Figure(data=[go.Pie(labels=[asset['ticker'] for asset in assets_with_value], values=pie_values, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=[asset['ticker'] for asset in assets_with_value], 
+                values=pie_values, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         fig_pie.update_layout(
             title="Crypto Portfolio Distribution",
-            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
+            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
-            # Center the pie chart
+            # Center the donut chart
             xaxis=dict(
                 domain=[0.1, 0.9],  # Use 80% of width, centered
                 showgrid=False,
@@ -297,27 +317,17 @@ def home(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                domain=[0.1, 0.9],  # Use 80% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Position legend below the chart
-            showlegend=True,
-            legend=dict(
-                orientation="h",  # Horizontal legend
-                y=-0.35,  # Position further below the chart
-                x=0.5,
-                xanchor="center",
-                yanchor="top",
-                bgcolor='rgba(0,0,0,0)',
-                bordercolor='rgba(0,0,0,0)',
-                font=dict(size=12)
-            ),
+            # No legend needed since labels are outside
+            showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Increased height to accommodate legend
+            height=400,  # Height for donut chart with external labels
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     # --- Only cache and reuse bar_chart_html ---
@@ -371,7 +381,7 @@ def home(request):
                     automargin=True,
                     range=[-0.5, 0.5]  # Start from min value with some padding
                 ),
-                showlegend=True,
+                showlegend=False,
                 legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
                 height=200,
                 autosize=True
@@ -581,16 +591,36 @@ def stocks(request):
             else:
                 labels_with_other = labels
                 values_with_other = values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=values_with_other, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels_with_other, 
+                values=values_with_other, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         else:
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels, 
+                values=values, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         fig_pie.update_layout(
             title="Stock Portfolio Distribution",
-            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
+            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
-            # Center the pie chart
+            # Center the donut chart
             xaxis=dict(
                 domain=[0.1, 0.9],  # Use 80% of width, centered
                 showgrid=False,
@@ -599,27 +629,17 @@ def stocks(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                domain=[0.1, 0.9],  # Use 80% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Position legend below the chart
-            showlegend=True,
-            legend=dict(
-                orientation="h",  # Horizontal legend
-                y=-0.35,  # Position further below the chart
-                x=0.5,
-                xanchor="center",
-                yanchor="top",
-                bgcolor='rgba(0,0,0,0)',
-                bordercolor='rgba(0,0,0,0)',
-                font=dict(size=12)
-            ),
+            # No legend needed since labels are outside
+            showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Increased height to accommodate legend
+            height=400,  # Height for donut chart with external labels
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
         # --- STOCKS BAR CHART LOGIC ---
@@ -667,7 +687,7 @@ def stocks(request):
                     automargin=True,
                     range=[-0.5, 0.5]  # Start from min value with some padding
                 ),
-                showlegend=True,
+                showlegend=False,
                 legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
                 height=200,
                 autosize=True
@@ -771,14 +791,34 @@ def real_estate(request):
             else:
                 labels_with_other = labels
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels_with_other, 
+                values=pie_values_with_other, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         else:
             section_sum = sum(values)
             pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels, 
+                values=pie_values, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         fig_pie.update_layout(
             title="Real Estate Portfolio Distribution",
-            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
+            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
@@ -791,14 +831,14 @@ def real_estate(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                domain=[0.1, 0.9],  # Use 80% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             # Position legend below the chart
-            showlegend=True,
+            showlegend=False,
             legend=dict(
                 orientation="h",  # Horizontal legend
                 y=-0.35,  # Position further below the chart
@@ -811,7 +851,7 @@ def real_estate(request):
             ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Increased height to accommodate legend
+            height=400,  # Height for donut chart with external labels
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -845,7 +885,7 @@ def real_estate(request):
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
-            showlegend=True,
+            showlegend=False,
             legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
@@ -940,14 +980,34 @@ def vehicles(request):
             else:
                 labels_with_other = labels
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels_with_other, 
+                values=pie_values_with_other, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         else:
             section_sum = sum(values)
             pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels, 
+                values=pie_values, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         fig_pie.update_layout(
             title="Vehicle Portfolio Distribution",
-            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
+            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
@@ -960,14 +1020,14 @@ def vehicles(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                domain=[0.1, 0.9],  # Use 80% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             # Position legend below the chart
-            showlegend=True,
+            showlegend=False,
             legend=dict(
                 orientation="h",  # Horizontal legend
                 y=-0.35,  # Position further below the chart
@@ -980,7 +1040,7 @@ def vehicles(request):
             ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Increased height to accommodate legend
+            height=400,  # Height for donut chart with external labels
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -1014,7 +1074,7 @@ def vehicles(request):
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
-            showlegend=True,
+            showlegend=False,
             legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
@@ -1110,14 +1170,34 @@ def cash(request):
             else:
                 labels_with_other = labels
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels_with_other, 
+                values=pie_values_with_other, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         else:
             section_sum = sum(values)
             pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels, 
+                values=pie_values, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         fig_pie.update_layout(
             title="Cash/Fixed Income Portfolio Distribution",
-            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
+            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
@@ -1130,14 +1210,14 @@ def cash(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                domain=[0.1, 0.9],  # Use 80% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             # Position legend below the chart
-            showlegend=True,
+            showlegend=False,
             legend=dict(
                 orientation="h",  # Horizontal legend
                 y=-0.35,  # Position further below the chart
@@ -1150,7 +1230,7 @@ def cash(request):
             ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Increased height to accommodate legend
+            height=400,  # Height for donut chart with external labels
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -1200,7 +1280,7 @@ def cash(request):
                 automargin=True,
                 range=[-0.5, 0.5]  # Fixed range for horizontal bar chart
             ),
-            showlegend=True,
+            showlegend=False,
             legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
@@ -1296,14 +1376,34 @@ def other(request):
             else:
                 labels_with_other = labels
                 pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(labels=labels_with_other, values=pie_values_with_other, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels_with_other, 
+                values=pie_values_with_other, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         else:
             section_sum = sum(values)
             pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(labels=labels, values=pie_values, textinfo='none', showlegend=True)])
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=labels, 
+                values=pie_values, 
+                textinfo='label+percent',
+                texttemplate='%{label}<br>%{value:.0f}%',
+                textposition='outside',
+                showlegend=False,
+                hole=0.6,  # Creates slim donut chart
+                textfont=dict(size=12, color='white'),
+                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+            )])
         fig_pie.update_layout(
             title="Other Portfolio Distribution",
-            margin=dict(t=50, b=100, l=0, r=0),  # Increased bottom margin for legend
+            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="#e0e0e0"),
@@ -1316,14 +1416,14 @@ def other(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.8],  # Use 70% of height, leave space for legend
+                domain=[0.1, 0.9],  # Use 80% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             # Position legend below the chart
-            showlegend=True,
+            showlegend=False,
             legend=dict(
                 orientation="h",  # Horizontal legend
                 y=-0.35,  # Position further below the chart
@@ -1336,7 +1436,7 @@ def other(request):
             ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Increased height to accommodate legend
+            height=400,  # Height for donut chart with external labels
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -1370,7 +1470,7 @@ def other(request):
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, xaxis_max], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
-            showlegend=True,
+            showlegend=False,
             legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
@@ -1571,16 +1671,16 @@ def general(request):
     chart_values = [float(t['value']) for t in totals]
     chart_percentages = [t['percent'] for t in totals]  # Use the same percentages as the table
     if chart_labels and chart_values:
-        # Pie chart with labels and percentages on slices
+        # Donut chart with labels outside and connected with lines
         fig_pie = go.Figure(data=[go.Pie(
             labels=chart_labels, 
             values=chart_percentages,  # Use percentages instead of raw values
             textinfo='label+percent',
             texttemplate='%{label}<br>%{value:.0f}%',  # No decimals - round to whole numbers
-            textposition='inside',
-            insidetextorientation='radial',
+            textposition='outside',
             showlegend=False,
-            textfont=dict(size=14, color='white'),
+            hole=0.4,  # Creates donut chart
+            textfont=dict(size=12, color='white'),
             hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'  # No decimals in hover too
         )])
         fig_pie.update_layout(
@@ -1590,10 +1690,10 @@ def general(request):
                 xanchor='center',  # Anchor point for centering
                 font=dict(color="#e0e0e0")
             ),
-            margin=dict(t=50, b=20, l=0, r=0),  # Reduced bottom margin since no legend
+            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            # Center the pie chart
+            # Center the donut chart
             xaxis=dict(
                 domain=[0.1, 0.9],  # Use 80% of width, centered
                 showgrid=False,
@@ -1602,17 +1702,17 @@ def general(request):
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use more height since no legend needed
+                domain=[0.1, 0.9],  # Use 80% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # No legend needed
+            # No legend needed since labels are outside
             showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=350,  # Reduced height since no legend
+            height=400,  # Height for donut chart with external labels
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
         
@@ -1644,7 +1744,7 @@ def general(request):
             font=dict(color="#e0e0e0"),
             xaxis=dict(title=None, range=[0, 100], ticksuffix='%', ticklen=4, tickwidth=1),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
-            showlegend=True,
+            showlegend=False,
             legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
