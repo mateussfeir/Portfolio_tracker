@@ -404,11 +404,6 @@
         .nav-left span, .nav-center a, .nav-left strong, .nav-left .sensitive-value {
           color: #00ffff !important;
         }
-        #toggle-chart-btn:hover {
-          background: #4caf50;
-          color: white;
-          transform: scale(1.05);
-        }
         #privacy-toggle-btn:hover {
           background: #4caf50;
           color: white;
@@ -453,7 +448,7 @@
           max-width: 1000px;
           width: 100%;
           background-color: transparent;
-          padding: 4px 0 4px 0;
+          padding: 0;
           border-radius: 0;
           border: none;
           box-shadow: none;
@@ -505,6 +500,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          overflow: visible;
         }
         #bar-chart-div {
           width: 100%;
@@ -552,7 +548,7 @@
           }
           .chart-card {
             margin-bottom: 20px !important;
-            padding: 8px 0 !important;
+            padding: 0 !important;
             margin-top: 10px !important; /* Additional margin for chart card on mobile */
           }
           .table-card {
@@ -779,6 +775,7 @@
             /* Ensure chart card starts after mobile navigation */
             .chart-card {
                 margin-top: 15px !important;
+                padding: 0 !important;
             }
             
             /* Additional spacing for general page charts */
@@ -877,14 +874,10 @@
             
             /* Ensure chart fits within mobile viewport */
             .chart-card {
-                padding: 15px !important;
+                padding: 0 !important;
                 margin: 10px 0 !important;
             }
             
-            /* Hide toggle button on mobile to save space */
-            #toggle-chart-btn {
-                display: none !important;
-            }
             
             /* Show pie chart by default on mobile */
             #pie-chart-div {
@@ -1594,8 +1587,8 @@
     <div style="width: 100%; max-width: 1800px; margin: 0 auto;">
         <div class="dashboard-section">
             <div class="chart-card">
-                <div style="display: flex; align-items: flex-start; gap: 15px;">
-                    <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: flex-start; gap: 0;">
+                    <div style="flex: 1; min-width: 0; padding: 0;">
                         <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
                             {% if pie_chart %}
                                 {{ pie_chart|safe }}
@@ -1609,55 +1602,17 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div style="flex-shrink: 0; padding-top: 10px;">
-                        <button id="toggle-chart-btn" class="btn btn-outline-success">Show Pie Chart</button>
-                    </div>
                 </div>
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        const toggleBtn = document.getElementById('toggle-chart-btn');
                         const pieDiv = document.getElementById('pie-chart-div');
                         const barDiv = document.getElementById('bar-chart-div');
-                        let showingPie = true;
                         
-                        // Check if device is mobile (screen width <= 768px)
-                        const isMobile = window.innerWidth <= 768;
-                        
-                        if (isMobile) {
-                            // On mobile, show pie chart by default and hide toggle button
+                        // Always show pie chart (donut chart) by default
+                        if (pieDiv && barDiv) {
                             pieDiv.style.display = 'block';
                             barDiv.style.display = 'none';
-                            if (toggleBtn) {
-                                toggleBtn.style.display = 'none';
-                            }
-                        } else {
-                            // On desktop, show pie chart by default and enable toggle
-                            pieDiv.style.display = 'block';
-                            barDiv.style.display = 'none';
-                            if (toggleBtn) {
-                                toggleBtn.addEventListener('click', function() {
-                                    showingPie = !showingPie;
-                                    if (showingPie) {
-                                        pieDiv.style.display = 'block';
-                                        barDiv.style.display = 'none';
-                                        toggleBtn.textContent = 'Show Bar Chart';
-                                    } else {
-                                        pieDiv.style.display = 'none';
-                                        barDiv.style.display = 'block';
-                                        toggleBtn.textContent = 'Show Pie Chart';
-                                    }
-                                });
-                            }
                         }
-                        
-                        // Handle window resize
-                        window.addEventListener('resize', function() {
-                            const newIsMobile = window.innerWidth <= 768;
-                            if (newIsMobile !== isMobile) {
-                                // Reload page when switching between mobile and desktop
-                                location.reload();
-                            }
-                        });
                     });
                 </script>
             </div>
@@ -1911,13 +1866,6 @@
                     }
                 }
 
-                // Handle chart toggle button clicks
-                const toggleBtn = document.getElementById('toggle-chart-btn');
-                if (toggleBtn) {
-                    toggleBtn.addEventListener('click', function() {
-                        setTimeout(resizeCharts, 100);
-                    });
-                }
                 
                 // Enhance performance information display
                 function enhancePerformanceDisplay() {

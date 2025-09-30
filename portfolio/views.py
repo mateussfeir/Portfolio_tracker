@@ -1715,19 +1715,19 @@ def general(request):
                 xanchor='center',  # Anchor point for centering
                 font=dict(color="#00ffff")
             ),
-            margin=dict(t=40, b=40, l=30, r=30),  # Reduced margins for mobile optimization
+            margin=dict(t=20, b=20, l=10, r=10),  # Minimal margins for maximum space usage
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            # Center the donut chart
+            # Use more space for the donut chart
             xaxis=dict(
-                domain=[0.15, 0.85],  # Use 70% of width, centered
+                domain=[0.05, 0.95],  # Use 90% of width, minimal padding
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.15, 0.85],  # Use 70% of height for donut chart
+                domain=[0.05, 0.95],  # Use 90% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
@@ -1737,7 +1737,7 @@ def general(request):
             showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=350,  # Reduced height for better mobile fit
+            height=400,  # Increased height for better visibility
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
         
