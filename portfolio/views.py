@@ -1976,7 +1976,8 @@ def general(request):
                     showgrid=True,
                     gridcolor='rgba(0, 255, 255, 0.2)',
                     showline=True,
-                    linecolor='#00ffff'
+                    linecolor='#00ffff',
+                    range=[min(values) * 0.98, max(values) * 1.02]  # Fit to data with small padding
                 ),
                 showlegend=False,
                 hovermode='x unified',
