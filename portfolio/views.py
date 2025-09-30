@@ -1681,9 +1681,17 @@ def general(request):
             '#ffff00'   # Neon Yellow - for Others
         ]
         
+        # Create mobile-friendly labels (break Cash/Fixed Income into two lines)
+        mobile_labels = []
+        for label in chart_labels:
+            if label == 'Cash/Fixed Income':
+                mobile_labels.append('Cash/<br>Fixed Income')
+            else:
+                mobile_labels.append(label)
+        
         # Enhanced donut chart with futuristic styling
         fig_pie = go.Figure(data=[go.Pie(
-            labels=chart_labels, 
+            labels=mobile_labels, 
             values=chart_percentages,  # Use percentages instead of raw values
             textinfo='label+percent',
             texttemplate='<b style="color:#ffffff; text-shadow: 0 0 10px #00ffff;">%{label}</b><br><span style="color:#00ffff; font-size:14px; text-shadow: 0 0 8px #00ffff;">%{value:.0f}%</span>',
