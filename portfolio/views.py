@@ -1686,11 +1686,11 @@ def general(request):
             labels=chart_labels, 
             values=chart_percentages,  # Use percentages instead of raw values
             textinfo='label+percent',
-            texttemplate='<b style="color:#ffffff; text-shadow: 0 0 10px #00ffff;">%{label}</b><br><span style="color:#00ffff; font-size:16px; text-shadow: 0 0 8px #00ffff;">%{value:.0f}%</span>',
+            texttemplate='<b style="color:#ffffff; text-shadow: 0 0 10px #00ffff;">%{label}</b><br><span style="color:#00ffff; font-size:14px; text-shadow: 0 0 8px #00ffff;">%{value:.0f}%</span>',
             textposition='outside',
             showlegend=False,
             hole=0.6,  # Larger hole for futuristic look
-            textfont=dict(size=14, color='white', family='Courier New, monospace'),
+            textfont=dict(size=12, color='white', family='Courier New, monospace'),
             hovertemplate='<b style="color:#ffffff;">%{label}</b><br><span style="color:#00ffff;">%{value:.0f}%</span><extra></extra>',
             marker=dict(
                 colors=futuristic_colors,
@@ -1702,24 +1702,24 @@ def general(request):
         )])
         fig_pie.update_layout(
             title=dict(
-                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:20px; text-shadow: 0 0 15px #00ffff;'>PORTFOLIO DISTRIBUTION</span>",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
                 font=dict(color="#00ffff")
             ),
-            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
+            margin=dict(t=40, b=40, l=30, r=30),  # Reduced margins for mobile optimization
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             # Center the donut chart
             xaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of width, centered
+                domain=[0.15, 0.85],  # Use 70% of width, centered
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of height for donut chart
+                domain=[0.15, 0.85],  # Use 70% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
@@ -1729,7 +1729,7 @@ def general(request):
             showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Height for donut chart with external labels
+            height=350,  # Reduced height for better mobile fit
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
         

@@ -580,6 +580,59 @@
             transform: translateX(-20px) !important;  /* Shift pie chart to the left */
         }
         
+        /* Mobile-specific Portfolio Distribution chart optimizations */
+        @media only screen and (max-width: 768px) {
+            /* Optimize chart container for mobile */
+            #pie-chart-div, #bar-chart-div {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+            }
+            
+            /* Mobile chart sizing */
+            .js-plotly-plot {
+                width: 100% !important;
+                height: 320px !important;
+                max-height: 320px !important;
+                min-height: 320px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            /* Adjust chart margins for mobile */
+            .plot-container {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Optimize text labels for mobile readability */
+            .pielayer text {
+                font-size: 11px !important;
+            }
+            
+            /* Ensure chart fits within mobile viewport */
+            .chart-card {
+                padding: 15px !important;
+                margin: 10px 0 !important;
+            }
+            
+            /* Hide toggle button on mobile to save space */
+            #toggle-chart-btn {
+                display: none !important;
+            }
+            
+            /* Show pie chart by default on mobile */
+            #pie-chart-div {
+                display: block !important;
+            }
+            
+            #bar-chart-div {
+                display: none !important;
+            }
+        }
+        
         /* Ensure pie chart container uses full width */
         .plot-container {
             width: 100% !important;
