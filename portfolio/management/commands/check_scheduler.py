@@ -13,8 +13,8 @@ class Command(BaseCommand):
             
             if hasattr(portfolio_config, '_scheduler_started'):
                 self.stdout.write(self.style.SUCCESS('✓ Scheduler is running'))
-                self.stdout.write('  - Net worth snapshots will be taken every 6 hours')
-                self.stdout.write('  - Next run will be 6 hours from the last execution')
+                self.stdout.write('  - Net worth snapshots will be taken daily at midnight')
+                self.stdout.write('  - Next run will be at midnight today/tomorrow')
             else:
                 self.stdout.write(self.style.WARNING('⚠ Scheduler is not running'))
                 self.stdout.write('  - This might be because the app is not fully loaded')

@@ -19,14 +19,14 @@ class PortfolioConfig(AppConfig):
                     scheduler = BackgroundScheduler()
                     scheduler.add_job(
                         lambda: call_command('daily_networth_snapshot'),
-                        'interval',
-                        hours=6,
-                        next_run_time=None,  # avoids running immediately on startup
+                        'cron',
+                        hour=0,  # Run at midnight
+                        minute=0,  # Run at midnight
                         id='networth_snapshot_job'
                     )
                     scheduler.start()
                     self._scheduler_started = True
                     atexit.register(lambda: scheduler.shutdown())
-                    print("Net worth snapshot scheduler started - will run every 6 hours")
+                    print("Net worth snapshot scheduler started - will run daily at midnight")
             except Exception as e:
                 print(f"Failed to start scheduler: {e}")

@@ -5,6 +5,10 @@ from portfolio.views import get_user_total_net_worth
 from datetime import date, datetime
 from django.utils import timezone
 from datetime import timedelta
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = 'Take daily net worth snapshot for all users'
@@ -14,7 +18,8 @@ class Command(BaseCommand):
         today = date.today()
         users = User.objects.all()
         
-        self.stdout.write(f'Starting net worth snapshots for {users.count()} users on {today}')
+        self.stdout.write(f'Starting daily net worth snapshots for {users.count()} users on {today}')
+        logger.info(f'Daily snapshot job started for {users.count()} users on {today}')
         
         success_count = 0
         error_count = 0
@@ -77,12 +82,19 @@ class Command(BaseCommand):
                         skipped_count += 1
                 
             except Exception as e:
+                error_msg = f'Error processing {user.username}: {e}'
                 self.stdout.write(
-                    self.style.ERROR(f'✗ Error processing {user.username}: {e}')
+                    self.style.ERROR(f'✗ {error_msg}')
                 )
+                logger.error(error_msg)
                 error_count += 1
         
-        self.stdout.write(f'\nSummary: {success_count} successful, {skipped_count} skipped (new users), {error_count} errors')
+        summary_msg = f'Summary: {success_count} successful, {skipped_count} skipped (new users), {error_count} errors'
+        self.stdout.write(f'\n{summary_msg}')
+        logger.info(summary_msg)
+        
+        completion_msg = f'Net worth snapshots completed at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
         self.stdout.write(
-            self.style.SUCCESS(f'Net worth snapshots completed at {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
-        ) 
+            self.style.SUCCESS(completion_msg)
+        )
+        logger.info(completion_msg) 
