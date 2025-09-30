@@ -303,7 +303,12 @@ def home(request):
                 hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
             )])
         fig_pie.update_layout(
-            title="Crypto Portfolio Distribution",
+            title=dict(
+                text="Crypto Portfolio Distribution",
+                x=0.5,  # Center horizontally
+                xanchor='center',  # Anchor point for centering
+                font=dict(size=14, color='#e0e0e0')
+            ),
             margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -615,7 +620,12 @@ def stocks(request):
                 hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
             )])
         fig_pie.update_layout(
-            title="Stock Portfolio Distribution",
+            title=dict(
+                text="Stock Portfolio Distribution",
+                x=0.5,  # Center horizontally
+                xanchor='center',  # Anchor point for centering
+                font=dict(size=14, color='#e0e0e0')
+            ),
             margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -817,7 +827,12 @@ def real_estate(request):
                 hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
             )])
         fig_pie.update_layout(
-            title="Real Estate Portfolio Distribution",
+            title=dict(
+                text="Real Estate Portfolio Distribution",
+                x=0.5,  # Center horizontally
+                xanchor='center',  # Anchor point for centering
+                font=dict(size=14, color='#e0e0e0')
+            ),
             margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -1006,7 +1021,12 @@ def vehicles(request):
                 hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
             )])
         fig_pie.update_layout(
-            title="Vehicle Portfolio Distribution",
+            title=dict(
+                text="Vehicle Portfolio Distribution",
+                x=0.5,  # Center horizontally
+                xanchor='center',  # Anchor point for centering
+                font=dict(size=14, color='#e0e0e0')
+            ),
             margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -1196,7 +1216,12 @@ def cash(request):
                 hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
             )])
         fig_pie.update_layout(
-            title="Cash/Fixed Income Portfolio Distribution",
+            title=dict(
+                text="Cash/Fixed Income Portfolio Distribution",
+                x=0.5,  # Center horizontally
+                xanchor='center',  # Anchor point for centering
+                font=dict(size=14, color='#e0e0e0')
+            ),
             margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -1402,7 +1427,12 @@ def other(request):
                 hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
             )])
         fig_pie.update_layout(
-            title="Other Portfolio Distribution",
+            title=dict(
+                text="Other Portfolio Distribution",
+                x=0.5,  # Center horizontally
+                xanchor='center',  # Anchor point for centering
+                font=dict(size=14, color='#e0e0e0')
+            ),
             margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -1741,7 +1771,7 @@ def general(request):
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
         
-        # Bar chart generation removed - only using pie chart now
+         # Bar chart generation removed - only using pie chart now
         bar_chart_html = None
     else:
         pie_chart_html = None

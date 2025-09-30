@@ -58,14 +58,14 @@
 {% block networth_over_time_card %}{% endblock %} 
 
 {% block chart %}
-  <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 120px; height: auto;">
+  <div id="pie-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
       {% if pie_chart %}
           {{ pie_chart|safe }}
       {% else %}
           <p style="color: #aaa;">No chart data available.</p>
       {% endif %}
   </div>
-  <div id="bar-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 120px; height: auto;">
+  <div id="bar-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
       {% if bar_chart %}
           {{ bar_chart|safe }}
       {% endif %}
