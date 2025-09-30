@@ -1671,24 +1671,41 @@ def general(request):
     chart_values = [float(t['value']) for t in totals]
     chart_percentages = [t['percent'] for t in totals]  # Use the same percentages as the table
     if chart_labels and chart_values:
-        # Donut chart with labels outside and connected with lines
+        # Futuristic color palette with neon-like colors
+        futuristic_colors = [
+            '#0080ff',  # Electric Blue - for Real Estate
+            '#ff6b00',  # Neon Orange - for Vehicles  
+            '#00ff88',  # Neon Green - for Stocks
+            '#ff00ff',  # Magenta - for Crypto
+            '#00ff88',  # Neon Green - for Cash/Fixed Income
+            '#ffff00'   # Neon Yellow - for Others
+        ]
+        
+        # Enhanced donut chart with futuristic styling
         fig_pie = go.Figure(data=[go.Pie(
             labels=chart_labels, 
             values=chart_percentages,  # Use percentages instead of raw values
             textinfo='label+percent',
-            texttemplate='%{label}<br>%{value:.0f}%',  # No decimals - round to whole numbers
+            texttemplate='<b style="color:#ffffff; text-shadow: 0 0 10px #00ffff;">%{label}</b><br><span style="color:#00ffff; font-size:16px; text-shadow: 0 0 8px #00ffff;">%{value:.0f}%</span>',
             textposition='outside',
             showlegend=False,
-            hole=0.4,  # Creates donut chart
-            textfont=dict(size=12, color='white'),
-            hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'  # No decimals in hover too
+            hole=0.6,  # Larger hole for futuristic look
+            textfont=dict(size=14, color='white', family='Courier New, monospace'),
+            hovertemplate='<b style="color:#ffffff;">%{label}</b><br><span style="color:#00ffff;">%{value:.0f}%</span><extra></extra>',
+            marker=dict(
+                colors=futuristic_colors,
+                line=dict(
+                    color='#ffffff',
+                    width=3
+                )
+            )
         )])
         fig_pie.update_layout(
             title=dict(
-                text="Portfolio Distribution",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:20px; text-shadow: 0 0 15px #00ffff;'>PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
-                font=dict(color="#e0e0e0")
+                font=dict(color="#00ffff")
             ),
             margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
             paper_bgcolor="rgba(0,0,0,0)",
@@ -1716,9 +1733,10 @@ def general(request):
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
         
-        # Stacked bar chart (single bar, 6 segments)
+        # Futuristic stacked bar chart
         bar_segments = []
-        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63", "#00bcd4"]
+        # Use the same futuristic color palette
+        bar_colors = futuristic_colors
         # Use the same percentages from the table for consistency
         table_percentages = [t['percent'] for t in totals]
         int_percentages = [int(round(p)) for p in table_percentages]
@@ -1728,24 +1746,42 @@ def general(request):
                 y=[""],
                 name=label,
                 orientation='h',
-                marker=dict(color=colors[i % len(colors)]),
-                text=[f"{label}\n{percent}%"],
+                marker=dict(
+                    color=bar_colors[i % len(bar_colors)],
+                    line=dict(
+                        color='#ffffff',
+                        width=2
+                    )
+                ),
+                text=[f"<b style='color:#ffffff; text-shadow: 0 0 5px #00ffff;'>{label}</b><br><span style='color:#00ffff; font-size:14px;'>{percent}%</span>"],
                 textposition='inside',
                 insidetextanchor='middle',
-                hovertemplate=f"{label}: {{x}}%<extra></extra>",
+                textfont=dict(color='white', size=12, family='Courier New, monospace'),
+                hovertemplate=f"<b style='color:#ffffff;'>{label}</b><br><span style='color:#00ffff;'>{{x}}%</span><extra></extra>",
             ))
         fig_bar = go.Figure(data=bar_segments)
         fig_bar.update_layout(
             barmode='stack',
-            title='Portfolio Distribution (stacked bar)',
+            title=dict(
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:18px; text-shadow: 0 0 12px #00ffff;'>PORTFOLIO DISTRIBUTION [BAR]</span>",
+                x=0.5,
+                xanchor='center',
+                font=dict(color="#00ffff")
+            ),
             margin=dict(t=50, b=0, l=0, r=0),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            xaxis=dict(title=None, range=[0, 100], ticksuffix='%', ticklen=4, tickwidth=1),
+            font=dict(color="#00ffff", family='Courier New, monospace'),
+            xaxis=dict(
+                title=None, 
+                range=[0, 100], 
+                ticksuffix='%', 
+                ticklen=4, 
+                tickwidth=1,
+                tickfont=dict(color='#00ffff', size=10, family='Courier New, monospace')
+            ),
             yaxis=dict(title=None, showticklabels=False, showgrid=False, zeroline=False, visible=False, ticklen=4, tickwidth=1),
             showlegend=False,
-            legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
             height=200,
             autosize=True
         )
