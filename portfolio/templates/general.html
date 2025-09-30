@@ -43,11 +43,229 @@
           color: #e0e0e0;
           margin: 16px 0;
         }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #333; text-align: center; vertical-align: middle; }
-        th { background-color: #2a2a2a; }
-        td { background-color: #1e1e1e; }
-        th:last-child, td:last-child { width: 50px; padding: 4px; }
+        /* Futuristic Net Worth Composition Table Styling */
+        .table-card table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 
+            0 0 30px rgba(0, 255, 255, 0.3),
+            inset 0 0 30px rgba(0, 255, 255, 0.1);
+          border: 2px solid #00ffff;
+          position: relative;
+        }
+        
+        .table-card table::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffff00, #00ffff);
+          border-radius: 14px;
+          z-index: -1;
+          animation: borderGlow 3s linear infinite;
+        }
+        
+        @keyframes borderGlow {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        .table-card th, .table-card td { 
+          padding: 15px 12px; 
+          text-align: center; 
+          vertical-align: middle;
+          position: relative;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .table-card th { 
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          color: #00ffff;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+          border-bottom: 2px solid #00ffff;
+          box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .table-card td { 
+          background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+          color: #ffffff;
+          font-family: 'Courier New', monospace;
+          font-size: 13px;
+          border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+          position: relative;
+        }
+        
+        .table-card td:hover {
+          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
+          color: #00ffff;
+          text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+        
+        .table-card tr:hover {
+          background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.05) 50%, transparent 100%);
+        }
+        
+        .table-card th:last-child, .table-card td:last-child { 
+          width: 80px; 
+          padding: 15px 8px; 
+        }
+        
+        /* Futuristic link styling for asset types */
+        .table-card td a {
+          color: #00ff88;
+          text-decoration: none;
+          font-weight: bold;
+          text-shadow: 0 0 5px rgba(0, 255, 136, 0.6);
+          transition: all 0.3s ease;
+          position: relative;
+        }
+        
+        .table-card td a:hover {
+          color: #00ffff;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+          transform: scale(1.05);
+        }
+        
+        .table-card td a::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #00ffff, #ff00ff);
+          transition: width 0.3s ease;
+        }
+        
+        .table-card td a:hover::after {
+          width: 100%;
+        }
+        
+        /* Sensitive value styling with neon effect */
+        .table-card .sensitive-value {
+          color: #ffff00;
+          font-weight: bold;
+          text-shadow: 0 0 8px rgba(255, 255, 0, 0.6);
+          font-family: 'Courier New', monospace;
+        }
+        
+        /* Percentage styling */
+        .table-card td:last-child {
+          color: #00ff88;
+          font-weight: bold;
+          text-shadow: 0 0 6px rgba(0, 255, 136, 0.5);
+        }
+        
+        /* Table header glow effect */
+        .table-card .section-header {
+          color: #00ffff;
+          text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          margin-bottom: 20px;
+          position: relative;
+        }
+        
+        .table-card .section-header::after {
+          content: '';
+          position: absolute;
+          bottom: -5px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 60px;
+          height: 3px;
+          background: linear-gradient(90deg, transparent, #00ffff, transparent);
+          border-radius: 2px;
+        }
+        
+        /* Subtle pulse animation for futuristic effect */
+        .table-card table {
+          animation: tablePulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes tablePulse {
+          0%, 100% { 
+            box-shadow: 
+              0 0 30px rgba(0, 255, 255, 0.3),
+              inset 0 0 30px rgba(0, 255, 255, 0.1);
+          }
+          50% { 
+            box-shadow: 
+              0 0 40px rgba(0, 255, 255, 0.5),
+              inset 0 0 40px rgba(0, 255, 255, 0.2);
+          }
+        }
+        
+        /* Data visualization bars for percentages */
+        .table-card td:last-child {
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .table-card td:last-child::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: linear-gradient(90deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.3));
+          width: var(--percentage, 0%);
+          z-index: 0;
+          transition: width 1s ease-out;
+        }
+        
+        .table-card td:last-child span {
+          position: relative;
+          z-index: 1;
+        }
+        
+        /* Add percentage bars dynamically via JavaScript */
+        .table-card tr[data-percentage] td:last-child::before {
+          width: var(--percentage);
+        }
+        
+        /* Glowing effect for high-value items */
+        .table-card tr[data-high-value="true"] {
+          background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 0, 0.05) 50%, transparent 100%);
+          animation: highValueGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes highValueGlow {
+          0% { background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 0, 0.05) 50%, transparent 100%); }
+          100% { background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 0, 0.1) 50%, transparent 100%); }
+        }
+        
+        /* Responsive adjustments for mobile */
+        @media (max-width: 768px) {
+          .table-card table {
+            font-size: 12px;
+            animation: none; /* Disable pulse on mobile for performance */
+          }
+          .table-card th, .table-card td {
+            padding: 10px 8px;
+          }
+          .table-card th {
+            font-size: 12px;
+          }
+          .table-card table::before {
+            animation: none; /* Disable border glow on mobile */
+          }
+        }
         button { cursor: pointer; background-color: whitesmoke; color: black; border: none; border-radius: 4px; padding: 4px 8px; transition: background-color 0.2s ease; }
         button:hover { background-color: #ff1a1a; }
         a { color: #4caf50; text-decoration: none; }
@@ -1286,7 +1504,7 @@
                             <tr>
                                 <td><a href="{% url t.url %}?currency={{ selected_currency }}">{{ t.type }}</a></td>
                                 <td><span class="sensitive-value">{{ t.value|currency:currency_symbol }}</span></td>
-                                <td>{{ t.percent|floatformat:2 }}%</td>
+                                <td><span>{{ t.percent|floatformat:2 }}%</span></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -1294,6 +1512,66 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Futuristic Table Enhancement Script -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add futuristic data attributes and percentage bars to table rows
+            const tableRows = document.querySelectorAll('.table-card tbody tr');
+            
+            tableRows.forEach(function(row, index) {
+                const percentageCell = row.querySelector('td:last-child');
+                const percentageText = percentageCell.textContent.trim();
+                const percentage = parseFloat(percentageText.replace('%', ''));
+                
+                if (!isNaN(percentage)) {
+                    // Add data attribute for percentage
+                    row.setAttribute('data-percentage', percentage);
+                    
+                    // Set CSS custom property for percentage bar
+                    percentageCell.style.setProperty('--percentage', percentage + '%');
+                    
+                    // Add high-value glow effect for items over 20%
+                    if (percentage > 20) {
+                        row.setAttribute('data-high-value', 'true');
+                    }
+                    
+                    // Add staggered animation delay for futuristic effect
+                    row.style.animationDelay = (index * 0.1) + 's';
+                    row.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateY(20px)';
+                }
+            });
+            
+            // Add fade-in animation keyframes
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add hover sound effect simulation (visual feedback)
+            tableRows.forEach(function(row) {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+        </script>
         
         <!-- New User Message -->
         {% if show_new_user_message %}
