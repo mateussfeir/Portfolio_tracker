@@ -1696,7 +1696,7 @@ def general(request):
                 colors=futuristic_colors,
                 line=dict(
                     color='#ffffff',
-                    width=3
+                    width=1
                 )
             )
         )])
@@ -1750,7 +1750,7 @@ def general(request):
                     color=bar_colors[i % len(bar_colors)],
                     line=dict(
                         color='#ffffff',
-                        width=2
+                        width=1
                     )
                 ),
                 text=[f"<b style='color:#ffffff; text-shadow: 0 0 5px #00ffff;'>{label}</b><br><span style='color:#00ffff; font-size:14px;'>{percent}%</span>"],
