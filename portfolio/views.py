@@ -267,19 +267,33 @@ def home(request):
     # --- Always generate pie_chart_html ---
     pie_chart_html = None
     if assets_with_value:
+        # Sort assets by value (descending) and take top 5
+        sorted_assets = sorted(assets_with_value, key=lambda x: safe_float(x['value']), reverse=True)
+        top_5_assets = sorted_assets[:5]
+        other_assets = sorted_assets[5:]
+        
         # Pie chart values: use correct basis depending on percent_mode
         if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [safe_float(asset['value']) / true_total_net_worth_float * 100 for asset in assets_with_value]
-            sum_crypto_pct = sum(pie_values)
-            if sum_crypto_pct < 100:
-                labels_with_other = [asset['ticker'] for asset in assets_with_value] + ['Other']
-                pie_values_with_other = pie_values + [100 - sum_crypto_pct]
+            # Calculate percentages for top 5
+            top_5_values = [safe_float(asset['value']) / true_total_net_worth_float * 100 for asset in top_5_assets]
+            top_5_labels = [asset['ticker'] for asset in top_5_assets]
+            
+            # Calculate "Others" percentage if there are more than 5 assets
+            others_value = 0
+            if other_assets:
+                others_value = sum([safe_float(asset['value']) / true_total_net_worth_float * 100 for asset in other_assets])
+            
+            # Combine top 5 with Others
+            if others_value > 0:
+                chart_labels = top_5_labels + ['Others']
+                chart_values = top_5_values + [others_value]
             else:
-                labels_with_other = [asset['ticker'] for asset in assets_with_value]
-                pie_values_with_other = pie_values
+                chart_labels = top_5_labels
+                chart_values = top_5_values
+                
             fig_pie = go.Figure(data=[go.Pie(
-                labels=labels_with_other, 
-                values=pie_values_with_other, 
+                labels=chart_labels, 
+                values=chart_values, 
                 textinfo='label+percent',
                 texttemplate='%{label}<br>%{value:.0f}%',
                 textposition='outside',
@@ -290,10 +304,26 @@ def home(request):
             )])
         else:
             section_sum = sum([safe_float(asset['value']) for asset in assets_with_value])
-            pie_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in assets_with_value]
+            # Calculate percentages for top 5
+            top_5_values = [safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in top_5_assets]
+            top_5_labels = [asset['ticker'] for asset in top_5_assets]
+            
+            # Calculate "Others" percentage if there are more than 5 assets
+            others_value = 0
+            if other_assets:
+                others_value = sum([safe_float(asset['value']) / section_sum * 100 if section_sum > 0 else 0 for asset in other_assets])
+            
+            # Combine top 5 with Others
+            if others_value > 0:
+                chart_labels = top_5_labels + ['Others']
+                chart_values = top_5_values + [others_value]
+            else:
+                chart_labels = top_5_labels
+                chart_values = top_5_values
+                
             fig_pie = go.Figure(data=[go.Pie(
-                labels=[asset['ticker'] for asset in assets_with_value], 
-                values=pie_values, 
+                labels=chart_labels, 
+                values=chart_values, 
                 textinfo='label+percent',
                 texttemplate='%{label}<br>%{value:.0f}%',
                 textposition='outside',
@@ -790,40 +820,21 @@ def real_estate(request):
     bar_chart_html = None
     if labels and values:
         total = sum(values)
-        if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [float(v) / true_total_net_worth_float * 100 for v in values]
-            sum_section_pct = sum(pie_values)
-            if sum_section_pct < 100:
-                labels_with_other = labels + ['Other']
-                pie_values_with_other = pie_values + [100 - sum_section_pct]
-            else:
-                labels_with_other = labels
-                pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels_with_other, 
-                values=pie_values_with_other, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
-        else:
-            section_sum = sum(values)
-            pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels, 
-                values=pie_values, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
+        
+        # Use helper function to create top 5 + Others chart data
+        chart_labels, chart_values = create_top5_chart_data(labels, values, percent_mode, true_total_net_worth_float)
+        
+        fig_pie = go.Figure(data=[go.Pie(
+            labels=chart_labels, 
+            values=chart_values, 
+            textinfo='label+percent',
+            texttemplate='%{label}<br>%{value:.0f}%',
+            textposition='outside',
+            showlegend=False,
+            hole=0.6,  # Creates slim donut chart
+            textfont=dict(size=12, color='white'),
+            hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+        )])
         fig_pie.update_layout(
             title=dict(
                 text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>REAL ESTATE PORTFOLIO DISTRIBUTION</span>",
@@ -973,40 +984,21 @@ def vehicles(request):
     bar_chart_html = None
     if labels and values:
         total = sum(values)
-        if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [float(v) / true_total_net_worth_float * 100 for v in values]
-            sum_section_pct = sum(pie_values)
-            if sum_section_pct < 100:
-                labels_with_other = labels + ['Other']
-                pie_values_with_other = pie_values + [100 - sum_section_pct]
-            else:
-                labels_with_other = labels
-                pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels_with_other, 
-                values=pie_values_with_other, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
-        else:
-            section_sum = sum(values)
-            pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels, 
-                values=pie_values, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
+        
+        # Use helper function to create top 5 + Others chart data
+        chart_labels, chart_values = create_top5_chart_data(labels, values, percent_mode, true_total_net_worth_float)
+        
+        fig_pie = go.Figure(data=[go.Pie(
+            labels=chart_labels, 
+            values=chart_values, 
+            textinfo='label+percent',
+            texttemplate='%{label}<br>%{value:.0f}%',
+            textposition='outside',
+            showlegend=False,
+            hole=0.6,  # Creates slim donut chart
+            textfont=dict(size=12, color='white'),
+            hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+        )])
         fig_pie.update_layout(
             title=dict(
                 text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>VEHICLE PORTFOLIO DISTRIBUTION</span>",
@@ -1157,40 +1149,21 @@ def cash(request):
     bar_chart_html = None
     if labels and values:
         total = sum(values)
-        if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [float(v) / true_total_net_worth_float * 100 for v in values]
-            sum_section_pct = sum(pie_values)
-            if sum_section_pct < 100:
-                labels_with_other = labels + ['Other']
-                pie_values_with_other = pie_values + [100 - sum_section_pct]
-            else:
-                labels_with_other = labels
-                pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels_with_other, 
-                values=pie_values_with_other, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
-        else:
-            section_sum = sum(values)
-            pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels, 
-                values=pie_values, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
+        
+        # Use helper function to create top 5 + Others chart data
+        chart_labels, chart_values = create_top5_chart_data(labels, values, percent_mode, true_total_net_worth_float)
+        
+        fig_pie = go.Figure(data=[go.Pie(
+            labels=chart_labels, 
+            values=chart_values, 
+            textinfo='label+percent',
+            texttemplate='%{label}<br>%{value:.0f}%',
+            textposition='outside',
+            showlegend=False,
+            hole=0.6,  # Creates slim donut chart
+            textfont=dict(size=12, color='white'),
+            hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+        )])
         fig_pie.update_layout(
             title=dict(
                 text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>CASH/FIXED INCOME PORTFOLIO DISTRIBUTION</span>",
@@ -1357,40 +1330,21 @@ def other(request):
     bar_chart_html = None
     if labels and values:
         total = sum(values)
-        if percent_mode == 'total' and true_total_net_worth_float > 0:
-            pie_values = [float(v) / true_total_net_worth_float * 100 for v in values]
-            sum_section_pct = sum(pie_values)
-            if sum_section_pct < 100:
-                labels_with_other = labels + ['Other']
-                pie_values_with_other = pie_values + [100 - sum_section_pct]
-            else:
-                labels_with_other = labels
-                pie_values_with_other = pie_values
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels_with_other, 
-                values=pie_values_with_other, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
-        else:
-            section_sum = sum(values)
-            pie_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for v in values]
-            fig_pie = go.Figure(data=[go.Pie(
-                labels=labels, 
-                values=pie_values, 
-                textinfo='label+percent',
-                texttemplate='%{label}<br>%{value:.0f}%',
-                textposition='outside',
-                showlegend=False,
-                hole=0.6,  # Creates slim donut chart
-                textfont=dict(size=12, color='white'),
-                hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
-            )])
+        
+        # Use helper function to create top 5 + Others chart data
+        chart_labels, chart_values = create_top5_chart_data(labels, values, percent_mode, true_total_net_worth_float)
+        
+        fig_pie = go.Figure(data=[go.Pie(
+            labels=chart_labels, 
+            values=chart_values, 
+            textinfo='label+percent',
+            texttemplate='%{label}<br>%{value:.0f}%',
+            textposition='outside',
+            showlegend=False,
+            hole=0.6,  # Creates slim donut chart
+            textfont=dict(size=12, color='white'),
+            hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+        )])
         fig_pie.update_layout(
             title=dict(
                 text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>OTHER PORTFOLIO DISTRIBUTION</span>",
@@ -2206,6 +2160,53 @@ def safe_decimal(val):
         return Decimal(str(val))
     except (InvalidOperation, TypeError, ValueError):
         return Decimal('0')
+
+def create_top5_chart_data(labels, values, percent_mode, true_total_net_worth_float):
+    """
+    Helper function to create chart data with top 5 assets + Others grouping
+    """
+    # Sort assets by value (descending) and take top 5
+    sorted_assets = sorted(zip(labels, values), key=lambda x: x[1], reverse=True)
+    top_5_assets = sorted_assets[:5]
+    other_assets = sorted_assets[5:]
+    
+    if percent_mode == 'total' and true_total_net_worth_float > 0:
+        # Calculate percentages for top 5
+        top_5_values = [float(v) / true_total_net_worth_float * 100 for _, v in top_5_assets]
+        top_5_labels = [label for label, _ in top_5_assets]
+        
+        # Calculate "Others" percentage if there are more than 5 assets
+        others_value = 0
+        if other_assets:
+            others_value = sum([float(v) / true_total_net_worth_float * 100 for _, v in other_assets])
+        
+        # Combine top 5 with Others
+        if others_value > 0:
+            chart_labels = top_5_labels + ['Others']
+            chart_values = top_5_values + [others_value]
+        else:
+            chart_labels = top_5_labels
+            chart_values = top_5_values
+    else:
+        section_sum = sum(values)
+        # Calculate percentages for top 5
+        top_5_values = [float(v) / section_sum * 100 if section_sum > 0 else 0 for _, v in top_5_assets]
+        top_5_labels = [label for label, _ in top_5_assets]
+        
+        # Calculate "Others" percentage if there are more than 5 assets
+        others_value = 0
+        if other_assets:
+            others_value = sum([float(v) / section_sum * 100 if section_sum > 0 else 0 for _, v in other_assets])
+        
+        # Combine top 5 with Others
+        if others_value > 0:
+            chart_labels = top_5_labels + ['Others']
+            chart_values = top_5_values + [others_value]
+        else:
+            chart_labels = top_5_labels
+            chart_values = top_5_values
+    
+    return chart_labels, chart_values
 
 def safe_float(val):
     try:
