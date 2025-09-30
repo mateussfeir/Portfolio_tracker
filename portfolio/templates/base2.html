@@ -408,6 +408,19 @@
           }
         }
         */
+        .table-title {
+          color: #00ffff;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          font-size: 1.1em;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+          text-align: center;
+          margin-bottom: 16px;
+          padding: 12px 0;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+        
         .page-title {
           color: #00ffff;
           font-family: 'Courier New', monospace;
@@ -1163,6 +1176,9 @@
         
         <div class="dashboard-section">
             <div class="table-card">
+              <div class="table-title">
+                {% block table_title %}{% block table_positions_title %}Your Positions{% endblock %} Composition{% endblock %}
+              </div>
               {% block percent_buttons %}{% endblock %}
               {% block table %}{% endblock %}
               {% block add_new %}
