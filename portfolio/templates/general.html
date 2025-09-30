@@ -1589,32 +1589,20 @@
             <div class="chart-card">
                 <div style="display: flex; align-items: flex-start; gap: 0;">
                     <div style="flex: 1; min-width: 0; padding: 0;">
-                        <div id="pie-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+                        <div id="pie-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
                             {% if pie_chart %}
                                 {{ pie_chart|safe }}
                             {% else %}
                                 <p style="color: #aaa;">No chart data available.</p>
                             {% endif %}
                         </div>
-                        <div id="bar-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+                        <div id="bar-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
                             {% if bar_chart %}
                                 {{ bar_chart|safe }}
                             {% endif %}
                         </div>
                     </div>
                 </div>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const pieDiv = document.getElementById('pie-chart-div');
-                        const barDiv = document.getElementById('bar-chart-div');
-                        
-                        // Always show pie chart (donut chart) by default
-                        if (pieDiv && barDiv) {
-                            pieDiv.style.display = 'block';
-                            barDiv.style.display = 'none';
-                        }
-                    });
-                </script>
             </div>
             <div class="table-card">
                 <div class="section-header">Net Worth Composition</div>
