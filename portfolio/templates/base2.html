@@ -234,11 +234,11 @@
         }
         .dashboard-section {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           justify-content: center;
-          align-items: center;
+          align-items: flex-start;
           flex-wrap: nowrap;
-          gap: 16px;
+          gap: 24px;
           margin-top: 0px;
           min-height: auto;
           height: auto;
@@ -249,12 +249,25 @@
           height: auto !important;
           min-height: auto !important;
         }
-        .table-card, .chart-card {
-          width: 100%;
-          max-width: 900px;
+        .table-card {
+          flex: 0 0 45%;
+          max-width: 600px;
           min-width: 0;
-          flex: none;
-          margin: 0 auto;
+          margin: 0;
+          padding: 0;
+          background-color: transparent;
+          border: none;
+          box-shadow: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .chart-card {
+          flex: 0 0 45%;
+          max-width: 600px;
+          min-width: 0;
+          margin: 0;
           padding: 0;
           background-color: transparent;
           border: none;
@@ -288,7 +301,7 @@
         }
         #pie-chart-div, #bar-chart-div {
           width: 100%;
-          min-height: 200px;
+          min-height: 300px;
           height: auto;
           margin: 0;
           padding: 0;
@@ -394,6 +407,20 @@
           }
         }
         */
+        .page-title {
+          color: #00ffff;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          font-size: 2em;
+          text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+          text-align: center;
+          padding: 24px 0;
+          margin-bottom: 32px;
+          position: relative;
+          text-transform: uppercase;
+          letter-spacing: 3px;
+        }
+        
         .section-header {
           margin-bottom: 2px !important;
           color: #00ffff;
@@ -1128,7 +1155,27 @@
 </header>
 <div class="container {% if request.resolver_match.url_name != 'general' %}non-general-page{% endif %}">
     <div style="width: 100%; max-width: 1800px; margin: 0 auto;">
+        <!-- Centralized Title -->
+        <div class="page-title">
+            {% block page_title %}{% block positions_title %}Your Positions{% endblock %}{% endblock %}: <span class="sensitive-value">{{ section_net_worth|currency:currency_symbol }}</span>
+        </div>
+        
         <div class="dashboard-section">
+            <div class="table-card">
+              {% block percent_buttons %}{% endblock %}
+              {% block table %}{% endblock %}
+              {% block add_new %}
+              <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
+                  <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
+                  <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
+                      {% csrf_token %}
+                      {{ form.as_p }}
+                      <button type="submit">Add Position</button>
+                      <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
+                  </form>
+              </div>
+              {% endblock %}
+            </div>
             <div class="chart-card">
               {% block chart %}
                 <div style="display: flex; align-items: flex-start; gap: 15px;">
@@ -1195,22 +1242,6 @@
                         });
                     });
                 </script>
-              {% endblock %}
-            </div>
-            <div class="table-card">
-              <div class="section-header">{% block positions_title %}Your Positions{% endblock %}</div>
-              {% block percent_buttons %}{% endblock %}
-              {% block table %}{% endblock %}
-              {% block add_new %}
-              <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
-                  <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
-                  <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">
-                      {% csrf_token %}
-                      {{ form.as_p }}
-                      <button type="submit">Add Position</button>
-                      <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
-                  </form>
-              </div>
               {% endblock %}
             </div>
           </div>
