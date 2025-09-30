@@ -304,25 +304,24 @@ def home(request):
             )])
         fig_pie.update_layout(
             title=dict(
-                text="Crypto Portfolio Distribution",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>CRYPTO PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
-                font=dict(size=14, color='#e0e0e0')
+                font=dict(color="#00ffff")
             ),
-            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
+            margin=dict(t=20, b=20, l=10, r=10),  # Minimal margins for maximum space usage
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            # Center the donut chart
+            # Use more space for the donut chart
             xaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of width, centered
+                domain=[0.05, 0.95],  # Use 90% of width, minimal padding
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of height for donut chart
+                domain=[0.05, 0.95],  # Use 90% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
@@ -332,7 +331,7 @@ def home(request):
             showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Height for donut chart with external labels
+            height=400,  # Increased height for better visibility
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
     # --- Only cache and reuse bar_chart_html ---
@@ -621,25 +620,24 @@ def stocks(request):
             )])
         fig_pie.update_layout(
             title=dict(
-                text="Stock Portfolio Distribution",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>STOCK PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
-                font=dict(size=14, color='#e0e0e0')
+                font=dict(color="#00ffff")
             ),
-            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
+            margin=dict(t=20, b=20, l=10, r=10),  # Minimal margins for maximum space usage
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            # Center the donut chart
+            # Use more space for the donut chart
             xaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of width, centered
+                domain=[0.05, 0.95],  # Use 90% of width, minimal padding
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of height for donut chart
+                domain=[0.05, 0.95],  # Use 90% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
@@ -649,7 +647,7 @@ def stocks(request):
             showlegend=False,
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Height for donut chart with external labels
+            height=400,  # Increased height for better visibility
         )
         pie_chart_html = fig_pie.to_html(full_html=False)
         # --- STOCKS BAR CHART LOGIC ---
@@ -828,45 +826,34 @@ def real_estate(request):
             )])
         fig_pie.update_layout(
             title=dict(
-                text="Real Estate Portfolio Distribution",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>REAL ESTATE PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
-                font=dict(size=14, color='#e0e0e0')
+                font=dict(color="#00ffff")
             ),
-            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
+            margin=dict(t=20, b=20, l=10, r=10),  # Minimal margins for maximum space usage
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            # Center the pie chart
+            # Use more space for the donut chart
             xaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of width, centered
+                domain=[0.05, 0.95],  # Use 90% of width, minimal padding
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of height for donut chart
+                domain=[0.05, 0.95],  # Use 90% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Position legend below the chart
+            # No legend needed since labels are outside
             showlegend=False,
-            legend=dict(
-                orientation="h",  # Horizontal legend
-                y=-0.35,  # Position further below the chart
-                x=0.5,
-                xanchor="center",
-                yanchor="top",
-                bgcolor='rgba(0,0,0,0)',
-                bordercolor='rgba(0,0,0,0)',
-                font=dict(size=12)
-            ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Height for donut chart with external labels
+            height=400,  # Increased height for better visibility
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -1022,45 +1009,34 @@ def vehicles(request):
             )])
         fig_pie.update_layout(
             title=dict(
-                text="Vehicle Portfolio Distribution",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>VEHICLE PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
-                font=dict(size=14, color='#e0e0e0')
+                font=dict(color="#00ffff")
             ),
-            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
+            margin=dict(t=20, b=20, l=10, r=10),  # Minimal margins for maximum space usage
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            # Center the pie chart
+            # Use more space for the donut chart
             xaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of width, centered
+                domain=[0.05, 0.95],  # Use 90% of width, minimal padding
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of height for donut chart
+                domain=[0.05, 0.95],  # Use 90% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Position legend below the chart
+            # No legend needed since labels are outside
             showlegend=False,
-            legend=dict(
-                orientation="h",  # Horizontal legend
-                y=-0.35,  # Position further below the chart
-                x=0.5,
-                xanchor="center",
-                yanchor="top",
-                bgcolor='rgba(0,0,0,0)',
-                bordercolor='rgba(0,0,0,0)',
-                font=dict(size=12)
-            ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Height for donut chart with external labels
+            height=400,  # Increased height for better visibility
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -1217,45 +1193,34 @@ def cash(request):
             )])
         fig_pie.update_layout(
             title=dict(
-                text="Cash/Fixed Income Portfolio Distribution",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>CASH/FIXED INCOME PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
-                font=dict(size=14, color='#e0e0e0')
+                font=dict(color="#00ffff")
             ),
-            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
+            margin=dict(t=20, b=20, l=10, r=10),  # Minimal margins for maximum space usage
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            # Center the pie chart
+            # Use more space for the donut chart
             xaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of width, centered
+                domain=[0.05, 0.95],  # Use 90% of width, minimal padding
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of height for donut chart
+                domain=[0.05, 0.95],  # Use 90% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Position legend below the chart
+            # No legend needed since labels are outside
             showlegend=False,
-            legend=dict(
-                orientation="h",  # Horizontal legend
-                y=-0.35,  # Position further below the chart
-                x=0.5,
-                xanchor="center",
-                yanchor="top",
-                bgcolor='rgba(0,0,0,0)',
-                bordercolor='rgba(0,0,0,0)',
-                font=dict(size=12)
-            ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Height for donut chart with external labels
+            height=400,  # Increased height for better visibility
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
@@ -1428,45 +1393,34 @@ def other(request):
             )])
         fig_pie.update_layout(
             title=dict(
-                text="Other Portfolio Distribution",
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>OTHER PORTFOLIO DISTRIBUTION</span>",
                 x=0.5,  # Center horizontally
                 xanchor='center',  # Anchor point for centering
-                font=dict(size=14, color='#e0e0e0')
+                font=dict(color="#00ffff")
             ),
-            margin=dict(t=50, b=50, l=50, r=50),  # Increased margins for external labels
+            margin=dict(t=20, b=20, l=10, r=10),  # Minimal margins for maximum space usage
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#e0e0e0"),
-            # Center the pie chart
+            # Use more space for the donut chart
             xaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of width, centered
+                domain=[0.05, 0.95],  # Use 90% of width, minimal padding
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
             yaxis=dict(
-                domain=[0.1, 0.9],  # Use 80% of height for donut chart
+                domain=[0.05, 0.95],  # Use 90% of height for donut chart
                 showgrid=False,
                 showticklabels=False,
                 zeroline=False,
                 showline=False,
             ),
-            # Position legend below the chart
+            # No legend needed since labels are outside
             showlegend=False,
-            legend=dict(
-                orientation="h",  # Horizontal legend
-                y=-0.35,  # Position further below the chart
-                x=0.5,
-                xanchor="center",
-                yanchor="top",
-                bgcolor='rgba(0,0,0,0)',
-                bordercolor='rgba(0,0,0,0)',
-                font=dict(size=12)
-            ),
             # Ensure responsive behavior
             autosize=True,
-            height=400,  # Height for donut chart with external labels
+            height=400,  # Increased height for better visibility
         )
         pie_chart_html = fig_pie.to_html(full_html=False, config={"responsive": True})
         # Bar chart
