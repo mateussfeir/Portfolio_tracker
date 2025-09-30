@@ -913,17 +913,22 @@
         .hamburger {
             display: none;
             font-size: 24px;
-            background: none;
-            border: none;
-            color: #4caf50;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            color: #00ffff;
             cursor: pointer;
             padding: 8px;
             margin: 0;
-            transition: color 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.6);
         }
         
         .hamburger:hover {
-            color: #66bb6a;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+            transform: scale(1.05);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
         }
         
         /* Mobile responsive styles */
@@ -994,24 +999,29 @@
             .nav-center a {
                 padding: 24px 20px;
                 text-align: center;
-                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+                border-bottom: 1px solid rgba(0, 255, 255, 0.2);
                 width: 100%;
                 max-width: 320px;
                 box-sizing: border-box;
                 font-size: 18px;
-                font-weight: 500;
-                color: #4caf50;
+                font-weight: bold;
+                color: #00ffff;
                 text-decoration: none;
+                font-family: 'Courier New', monospace;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
                 transition: all 0.3s ease;
                 margin: 0;
                 border-radius: 8px;
             }
             
             .nav-center a:hover {
-                background-color: rgba(76, 175, 80, 0.15);
-                color: #66bb6a;
+                background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0.05) 100%);
+                color: #00ffff;
+                text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
             }
             
             .nav-center a:last-child {
@@ -1314,22 +1324,36 @@
         }
 
 
-        /* Ensure nav elements are never clipped */
+        /* Futuristic Navigation Bar Styling */
         nav {
           display: flex;
           flex-wrap: nowrap;
           align-items: center;
           justify-content: space-between;
-          padding: 10px 20px !important;
+          padding: 15px 20px !important;
           margin: 0 !important;
           height: auto !important;
           line-height: normal;
-          background: #000000;
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+          border-bottom: 2px solid #00ffff;
+          box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
           width: 100%;
           box-sizing: border-box;
           overflow-x: auto;
           white-space: nowrap;
           min-width: 0;
+          position: relative;
+        }
+        
+        nav::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.05) 50%, transparent 100%);
+          pointer-events: none;
         }
         
         /* Prevent any clipping of nav children */
@@ -1348,15 +1372,35 @@
           margin: 0 !important;
           overflow: visible !important;
           min-width: 0;
+          position: relative;
+          z-index: 1;
+        }
+        
+        /* Futuristic nav-left styling */
+        .nav-left {
+          color: #00ffff;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+        
+        .nav-left .sensitive-value {
+          color: #00ffff;
+          text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        }
+        
+        .nav-left .btc-equivalent {
+          color: #00ffff;
+          text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
         }
         
         /* Ensure proper separation between nav sections */
         .nav-left {
-          margin-right: 20px !important;
+          margin-right: 8px !important;
         }
         
         .nav-center {
-          margin-left: 20px !important;
+          margin-left: 8px !important;
         }
         
         /* Force separation with more aggressive CSS */
@@ -1383,13 +1427,92 @@
         
         /* Make navigation links more compact */
         .nav-center a {
-          margin: 0 4px !important;
-          padding: 0 6px !important;
+          margin: 0 2px !important;
+          padding: 6px 8px !important;
+          color: #00ffff !important;
+          text-decoration: none !important;
+          border-radius: 6px !important;
+          font-family: 'Courier New', monospace !important;
+          font-weight: bold !important;
+          font-size: 12px !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px !important;
+          text-shadow: 0 0 5px rgba(0, 255, 255, 0.6) !important;
+          transition: all 0.3s ease !important;
+          position: relative !important;
+          border: 1px solid transparent !important;
+        }
+        
+        .nav-center a:hover {
+          background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0.05) 100%) !important;
+          border: 1px solid #00ffff !important;
+          box-shadow: 0 0 15px rgba(0, 255, 255, 0.4) !important;
+          transform: translateY(-2px) !important;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8) !important;
+        }
+        
+        .nav-center a::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #00ffff, #ff00ff);
+          transition: width 0.3s ease;
+        }
+        
+        .nav-center a:hover::after {
+          width: 80%;
         }
         
         /* Reduce spacing between nav sections even more */
         nav > div {
-          margin: 0 4px !important;
+          margin: 0 2px !important;
+        }
+        
+        /* Futuristic nav-right styling */
+        .nav-right {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-shrink: 0;
+          min-width: max-content;
+        }
+        
+        /* Futuristic button styling */
+        #currency-selector,
+        #privacy-toggle-btn,
+        .logout-link {
+          background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%) !important;
+          color: #00ffff !important;
+          border: 2px solid #00ffff !important;
+          border-radius: 6px !important;
+          padding: 6px 8px !important;
+          font-family: 'Courier New', monospace !important;
+          font-weight: bold !important;
+          font-size: 11px !important;
+          text-shadow: 0 0 5px rgba(0, 255, 255, 0.6) !important;
+          box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) !important;
+          transition: all 0.3s ease !important;
+          cursor: pointer !important;
+          text-decoration: none !important;
+          white-space: nowrap !important;
+        }
+        
+        #currency-selector:hover,
+        #privacy-toggle-btn:hover,
+        .logout-link:hover {
+          box-shadow: 0 0 25px rgba(0, 255, 255, 0.5) !important;
+          transform: scale(1.05) !important;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8) !important;
+        }
+        
+        #currency-selector:focus,
+        #privacy-toggle-btn:focus {
+          outline: none !important;
+          box-shadow: 0 0 30px rgba(0, 255, 255, 0.7) !important;
         }
         
         .nav-right {
@@ -1634,23 +1757,23 @@
               <label for="range" style="color: #00ffff; font-family: 'Courier New', monospace; font-weight: bold; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); margin-right: 10px;">SHOW:</label>
               <select name="range" id="range" onchange="document.getElementById('networth-range-form').submit();" style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); color: #00ffff; border: 2px solid #00ffff; border-radius: 8px; padding: 8px 15px; font-family: 'Courier New', monospace; font-weight: bold; text-shadow: 0 0 5px rgba(0, 255, 255, 0.6); box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);">
                 <option value="all" {% if selected_range == 'all' %}selected{% endif %}>FULL</option>
-                <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>1Y</option>
-                <option value="3m" {% if selected_range == '3m' %}selected{% endif %}>3M</option>
-                <option value="1m" {% if selected_range == '1m' %}selected{% endif %}>1M</option>
-                <option value="1w" {% if selected_range == '1w' %}selected{% endif %}>1W</option>
-              </select>
-              <input type="hidden" name="currency" value="{{ selected_currency }}">
-            </form>
-            
+            <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>1Y</option>
+            <option value="3m" {% if selected_range == '3m' %}selected{% endif %}>3M</option>
+            <option value="1m" {% if selected_range == '1m' %}selected{% endif %}>1M</option>
+            <option value="1w" {% if selected_range == '1w' %}selected{% endif %}>1W</option>
+          </select>
+          <input type="hidden" name="currency" value="{{ selected_currency }}">
+        </form>
+        
             <!-- Futuristic chart container -->
             <div class="chart-responsive-container" style="width: 100%; overflow-x: auto; padding: 0; margin: 0; position: relative;">
-                {% if networth_line_chart %}
+            {% if networth_line_chart %}
                     <div class="networth-chart-wrapper" style="width: 100%; min-width: 300px; position: relative; background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 255, 255, 0.02) 100%); border-radius: 10px; padding: 10px;">
-                        {{ networth_line_chart|safe }}
-                    </div>
-                {% else %}
+                    {{ networth_line_chart|safe }}
+                </div>
+            {% else %}
                     <p style="color: #00ffff; text-align:center; font-family: 'Courier New', monospace; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);">NO NET WORTH HISTORY DATA AVAILABLE</p>
-                {% endif %}
+            {% endif %}
             </div>
         </div>
         
