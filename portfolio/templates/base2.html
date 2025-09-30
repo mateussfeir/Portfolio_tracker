@@ -43,10 +43,79 @@
           color: #e0e0e0;
           margin: 16px 0;
         }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #333; text-align: center; vertical-align: middle; }
-        th { background-color: #2a2a2a; }
-        td { background-color: #1e1e1e; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.2),
+                inset 0 0 20px rgba(0, 255, 255, 0.05);
+            border: 2px solid #00ffff;
+            position: relative;
+        }
+        
+        table::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffff00, #00ffff);
+            border-radius: 14px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+        
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        th, td { 
+            padding: 15px 12px; 
+            text-align: center; 
+            vertical-align: middle;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        th { 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            border-bottom: 2px solid #00ffff;
+            box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        td { 
+            background: rgba(15, 20, 25, 0.6);
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+        
+        td:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(0, 200, 255, 0.08));
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        tr:hover td {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.08), rgba(0, 200, 255, 0.04));
+        }
+        
         th:last-child, td:last-child { width: 50px; padding: 4px; }
         button { cursor: pointer; background-color: whitesmoke; color: black; border: none; border-radius: 4px; padding: 4px 8px; transition: background-color 0.2s ease; }
         button:hover { background-color: #ff1a1a; }
@@ -327,6 +396,27 @@
         */
         .section-header {
           margin-bottom: 2px !important;
+          color: #00ffff;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          font-size: 1.4em;
+          text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+          text-align: center;
+          padding: 16px 0;
+          position: relative;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+        
+        /* Position text styling */
+        .position-text {
+          color: #00ffff;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          font-size: 1.2em;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+          text-align: center;
+          margin-bottom: 20px;
         }
         .networth-card {
           padding: 0 !important;
@@ -460,6 +550,35 @@
             height: auto !important;
             padding: 0 !important;
             margin: 0 !important;
+        }
+        
+        /* Futuristic chart styling */
+        .js-plotly-plot, .plotly-graph-div {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            position: relative !important;
+            overflow: visible !important;
+        }
+        
+        /* Chart title styling */
+        .js-plotly-plot .gtitle, .plotly-graph-div .gtitle {
+            color: #00ffff !important;
+            font-family: 'Courier New', monospace !important;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8) !important;
+        }
+        
+        /* Chart axes styling */
+        .js-plotly-plot .xtick, .js-plotly-plot .ytick,
+        .plotly-graph-div .xtick, .plotly-graph-div .ytick {
+            color: #00ffff !important;
+            font-family: 'Courier New', monospace !important;
+        }
+        
+        /* Chart grid styling */
+        .js-plotly-plot .xgrid, .js-plotly-plot .ygrid,
+        .plotly-graph-div .xgrid, .plotly-graph-div .ygrid {
+            stroke: rgba(0, 255, 255, 0.2) !important;
         }
         
         /* Ensure body doesn't overflow on mobile */
