@@ -1937,7 +1937,7 @@ def general(request):
         try:
             fig = go.Figure()
             
-            # Modern gradient line chart
+            # Simple working chart with futuristic colors
             fig.add_trace(go.Scatter(
                 x=dates, 
                 y=values, 
@@ -1945,127 +1945,57 @@ def general(request):
                 name='Net Worth',
                 line=dict(
                     width=3,
-                    color='#4caf50',
-                    shape='spline'  # Smooth curved lines
+                    color='#00ffff'  # Electric cyan
                 ),
                 marker=dict(
                     size=6,
-                    color='#4caf50',
-                    line=dict(width=2, color='#ffffff'),
-                    symbol='circle'
+                    color='#00ffff'
                 ),
-                fill='tonexty',  # Fill area below the line
-                fillcolor='rgba(76, 175, 80, 0.1)',  # Light green fill
-                hovertemplate='<b>%{x}</b><br>Net Worth: <b>%{y:,.0f} ' + currency_symbol + '</b><extra></extra>'
+                fill='tonexty',
+                fillcolor='rgba(0, 255, 255, 0.1)'
             ))
             
-            # Modern layout configuration
+            # Simple layout with futuristic colors
             fig.update_layout(
-                title=dict(
-                    text=f"Net Worth Over Time{performance_info}",
-                    font=dict(size=20, color='#ffffff', family='Arial, sans-serif'),
-                    x=0.5,
-                    xanchor='center'
-                ),
-                xaxis_title=None,  # Remove x-axis title for cleaner look
-                yaxis_title=None,  # Remove y-axis title for cleaner look
-                paper_bgcolor="rgba(0,0,0,0)",  # Transparent background
-                plot_bgcolor="rgba(0,0,0,0)",  # Transparent plot background
-                font=dict(color="#e0e0e0", family='Arial, sans-serif'),
-                # Responsive settings
+                title=f"Net Worth Over Time{performance_info}",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font=dict(color="#00ffff"),
                 autosize=True,
-                height=400,  # Keep same height
-                margin=dict(t=60, b=40, l=40, r=20),  # Adjusted margins for modern look
-                # Modern x-axis styling
+                height=400,
+                margin=dict(t=60, b=40, l=40, r=20),
                 xaxis=dict(
-                    tickangle=0,
-                    tickmode='auto',
-                    nticks=min(8, len(dates)),
-                    tickformat='%b %d',
-                    tickfont=dict(size=11, color='#cccccc'),
-                    tickcolor='#333333',
-                    tickwidth=1,
-                    ticklen=4,
+                    tickfont=dict(size=11, color='#00ffff'),
                     showgrid=True,
-                    gridcolor='rgba(255,255,255,0.1)',
-                    gridwidth=1,
-                    zeroline=False,
+                    gridcolor='rgba(0, 255, 255, 0.2)',
                     showline=True,
-                    linecolor='rgba(255,255,255,0.2)',
-                    linewidth=1
+                    linecolor='#00ffff'
                 ),
-                # Modern y-axis styling - initially show values, will be hidden by JavaScript if privacy mode is on
                 yaxis=dict(
-                    tickfont=dict(size=11, color='#cccccc'),
-                    tickformat=',',
-                    tickwidth=1,
-                    ticklen=4,
-                    tickcolor='#333333',
+                    tickfont=dict(size=11, color='#00ffff'),
                     showgrid=True,
-                    gridcolor='rgba(255,255,255,0.1)',
-                    gridwidth=1,
-                    zeroline=False,
+                    gridcolor='rgba(0, 255, 255, 0.2)',
                     showline=True,
-                    linecolor='rgba(255,255,255,0.2)',
-                    linewidth=1,
-                    side='left',
-                    automargin=True,
-                    range=[min(values) * 0.999, max(values) * 1.001]  # Tighter range with minimal padding
+                    linecolor='#00ffff'
                 ),
-                # Hide legend for cleaner look
                 showlegend=False,
-                # Modern hover styling
                 hovermode='x unified',
                 hoverlabel=dict(
                     bgcolor='rgba(0,0,0,0.9)',
-                    bordercolor='#4caf50',
-                    font=dict(size=12, color='#ffffff')
+                    bordercolor='#00ffff',
+                    font=dict(size=12, color='#00ffff')
                 )
             )
             
-            # Generate chart with modern config
+            # Generate chart with simple config
             networth_line_chart = fig.to_html(
                 full_html=False, 
                 config={
                     "responsive": True,
                     "displayModeBar": True,
-                    "displaylogo": False,
-                    "modeBarButtonsToRemove": ["pan2d", "lasso2d", "select2d", "zoomIn2d", "zoomOut2d"],
-                    "toImageButtonOptions": {
-                        "format": "png",
-                        "filename": "net_worth_chart",
-                        "height": 400,
-                        "width": 800,
-                        "scale": 2
-                    }
+                    "displaylogo": False
                 }
             )
-            
-            # Add JavaScript to handle privacy mode for the chart
-            privacy_script = """
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Check if privacy mode is enabled and apply to chart
-                const privacyState = localStorage.getItem('privacyMode');
-                if (privacyState === 'on' && typeof Plotly !== 'undefined') {
-                    const plotElements = document.querySelectorAll('.js-plotly-plot');
-                    plotElements.forEach(function(element) {
-                        if (element && element.layout) {
-                            // Hide Y-axis tick labels when privacy mode is on
-                            Plotly.relayout(element, {
-                                'yaxis.showticklabels': false,
-                                'yaxis.tickformat': '',
-                                'yaxis.title': ''
-                            });
-                        }
-                    });
-                }
-            });
-            </script>
-            """
-            
-            # Append the privacy script to the chart HTML
-            networth_line_chart += privacy_script
             
         except Exception as e:
             print(f"ERROR generating chart: {e}")

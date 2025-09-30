@@ -250,6 +250,45 @@
           100% { background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 0, 0.1) 50%, transparent 100%); }
         }
         
+        /* Futuristic Chart Section Styling */
+        .futuristic-chart-section {
+          animation: chartSectionPulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes chartSectionPulse {
+          0%, 100% { 
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+          }
+          50% { 
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+          }
+        }
+        
+        /* Futuristic select dropdown styling */
+        #range {
+          transition: all 0.3s ease;
+        }
+        
+        #range:hover {
+          box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+          transform: scale(1.05);
+        }
+        
+        #range:focus {
+          outline: none;
+          box-shadow: 0 0 30px rgba(0, 255, 255, 0.7);
+        }
+        
+        /* Chart wrapper enhancements */
+        .networth-chart-wrapper {
+          transition: all 0.3s ease;
+        }
+        
+        .networth-chart-wrapper:hover {
+          transform: scale(1.02);
+          box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+        
         /* Responsive adjustments for mobile */
         @media (max-width: 768px) {
           .table-card table {
@@ -264,6 +303,12 @@
           }
           .table-card table::before {
             animation: none; /* Disable border glow on mobile */
+          }
+          
+          .futuristic-chart-section {
+            animation: none; /* Disable pulse on mobile for performance */
+            margin: 20px 0;
+            padding: 15px;
           }
         }
         button { cursor: pointer; background-color: whitesmoke; color: black; border: none; border-radius: 4px; padding: 4px 8px; transition: background-color 0.2s ease; }
@@ -1582,33 +1627,79 @@
         </div>
         {% endif %}
         
-        <!-- Net Worth Over Time Section -->
-        <form method="get" id="networth-range-form" style="text-align:center; margin-bottom: 16px;">
-          <label for="range">Show:</label>
-          <select name="range" id="range" onchange="document.getElementById('networth-range-form').submit();">
-            <option value="all" {% if selected_range == 'all' %}selected{% endif %}>Full</option>
-            <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>1Y</option>
-            <option value="3m" {% if selected_range == '3m' %}selected{% endif %}>3M</option>
-            <option value="1m" {% if selected_range == '1m' %}selected{% endif %}>1M</option>
-            <option value="1w" {% if selected_range == '1w' %}selected{% endif %}>1W</option>
-          </select>
-          <input type="hidden" name="currency" value="{{ selected_currency }}">
-        </form>
-        
-        <!-- Responsive chart container -->
-        <div class="chart-responsive-container" style="width: 100%; overflow-x: auto; padding: 0; margin: 0;">
-            {% if networth_line_chart %}
-                <div class="networth-chart-wrapper" style="width: 100%; min-width: 300px;">
-                    {{ networth_line_chart|safe }}
-                </div>
-            {% else %}
-                <p style="color: #aaa; text-align:center;">No net worth history data available.</p>
-            {% endif %}
+        <!-- Futuristic Net Worth Over Time Section -->
+        <div class="futuristic-chart-section" style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%); border-radius: 15px; border: 2px solid #00ffff; box-shadow: 0 0 30px rgba(0, 255, 255, 0.3); position: relative;">
+            
+            <form method="get" id="networth-range-form" style="text-align:center; margin-bottom: 20px;">
+              <label for="range" style="color: #00ffff; font-family: 'Courier New', monospace; font-weight: bold; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); margin-right: 10px;">SHOW:</label>
+              <select name="range" id="range" onchange="document.getElementById('networth-range-form').submit();" style="background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); color: #00ffff; border: 2px solid #00ffff; border-radius: 8px; padding: 8px 15px; font-family: 'Courier New', monospace; font-weight: bold; text-shadow: 0 0 5px rgba(0, 255, 255, 0.6); box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);">
+                <option value="all" {% if selected_range == 'all' %}selected{% endif %}>FULL</option>
+                <option value="1y" {% if selected_range == '1y' %}selected{% endif %}>1Y</option>
+                <option value="3m" {% if selected_range == '3m' %}selected{% endif %}>3M</option>
+                <option value="1m" {% if selected_range == '1m' %}selected{% endif %}>1M</option>
+                <option value="1w" {% if selected_range == '1w' %}selected{% endif %}>1W</option>
+              </select>
+              <input type="hidden" name="currency" value="{{ selected_currency }}">
+            </form>
+            
+            <!-- Futuristic chart container -->
+            <div class="chart-responsive-container" style="width: 100%; overflow-x: auto; padding: 0; margin: 0; position: relative;">
+                {% if networth_line_chart %}
+                    <div class="networth-chart-wrapper" style="width: 100%; min-width: 300px; position: relative; background: linear-gradient(135deg, rgba(0, 255, 255, 0.05) 0%, rgba(0, 255, 255, 0.02) 100%); border-radius: 10px; padding: 10px;">
+                        {{ networth_line_chart|safe }}
+                    </div>
+                {% else %}
+                    <p style="color: #00ffff; text-align:center; font-family: 'Courier New', monospace; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);">NO NET WORTH HISTORY DATA AVAILABLE</p>
+                {% endif %}
+            </div>
         </div>
         
         <script>
             // Comprehensive chart resize fix for layout timing issues
             document.addEventListener('DOMContentLoaded', function() {
+                // Add futuristic chart enhancements
+                const chartSection = document.querySelector('.futuristic-chart-section');
+                const chartWrapper = document.querySelector('.networth-chart-wrapper');
+                const rangeSelect = document.getElementById('range');
+                
+                // Add hover effects to chart section
+                if (chartSection) {
+                    chartSection.addEventListener('mouseenter', function() {
+                        this.style.transform = 'scale(1.02)';
+                        this.style.boxShadow = '0 0 50px rgba(0, 255, 255, 0.6)';
+                    });
+                    
+                    chartSection.addEventListener('mouseleave', function() {
+                        this.style.transform = 'scale(1)';
+                        this.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.3)';
+                    });
+                }
+                
+                // Add futuristic loading animation for chart
+                if (chartWrapper) {
+                    chartWrapper.style.opacity = '0';
+                    chartWrapper.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        chartWrapper.style.transition = 'all 0.8s ease-out';
+                        chartWrapper.style.opacity = '1';
+                        chartWrapper.style.transform = 'translateY(0)';
+                    }, 300);
+                }
+                
+                // Add futuristic select dropdown effects
+                if (rangeSelect) {
+                    rangeSelect.addEventListener('focus', function() {
+                        this.style.transform = 'scale(1.1)';
+                        this.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.7)';
+                    });
+                    
+                    rangeSelect.addEventListener('blur', function() {
+                        this.style.transform = 'scale(1)';
+                        this.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)';
+                    });
+                }
+                
                 // Function to force chart resize
                 function resizeCharts() {
                     if (typeof Plotly !== 'undefined') {
