@@ -2112,7 +2112,7 @@ COINGECKO_TICKER_MAPPING = {
     'apt': 'aptos',
     'aave': 'aave',
     'mnt': 'mantlenetwork',
-    'pol': 'matic-network',
+    'pol': 'polygon-ecosystem-token',
     'cro': 'crypto-com-chain',
     'etc': 'ethereum-classic',
     'render': 'render-token',
