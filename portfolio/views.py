@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
@@ -88,27 +89,44 @@ _crypto_price_cache_time = {}
 # Now with 3-minute cache
 CACHE_TTL_SECONDS = 180
 
+
 def get_multiple_asset_prices(tickers):
     global _crypto_price_cache, _crypto_price_cache_time
-    ids = ','.join(sorted(tickers))  # sort to ensure consistent cache key
+
+    ids = ",".join(sorted(tickers))
     now = time.time()
-    # Check cache
+
+    # Cache check (3 minutes)
     if ids in _crypto_price_cache and (now - _crypto_price_cache_time.get(ids, 0)) < CACHE_TTL_SECONDS:
         return _crypto_price_cache[ids]
-    url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd"
+
+    url = "https://api.coingecko.com/api/v3/simple/price"
+    params = {
+        "ids": ids,
+        "vs_currencies": "usd"
+    }
+    headers = {
+        "x-cg-demo-api-key": settings.COINGECKO_API_KEY
+    }
+
     try:
-        response = requests.get(url)
+        response = requests.get(url, params=params, headers=headers, timeout=5)
         response.raise_for_status()
         data = response.json()
+
         _crypto_price_cache[ids] = data
         _crypto_price_cache_time[ids] = now
-        return data  # Returns a dictionary with prices
+        return data
+
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching prices: {e}")
-        # Return last cached value if available
+        print("CoinGecko error:", e)
+
+        # fallback to last cached value if available
         if ids in _crypto_price_cache:
             return _crypto_price_cache[ids]
+
         return {}
+
 
 # --- Stock price cache function ---
 STOCK_CACHE_TTL_SECONDS = 180  # 3 minutes
