@@ -18,6 +18,7 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
+        :root { --nav-accent-color: #00ffff; }
         header {
           padding: 0 !important;
           margin: 0 !important;
@@ -220,17 +221,44 @@
             }
         }
         .nav-left span, .nav-center a, .nav-left strong, .nav-left .sensitive-value {
-          color: #00ffff !important;
+          color: var(--nav-accent-color) !important;
         }
         #toggle-chart-btn:hover {
           background: #4caf50;
           color: white;
           transform: scale(1.05);
         }
+        #currency-selector {
+            background: #222a;
+            color: var(--nav-accent-color);
+            border: 1px solid var(--nav-accent-color);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.95em;
+            width: 80px;
+            min-width: 60px;
+            max-width: 100px;
+            text-align: center;
+        }
         #privacy-toggle-btn:hover {
           background: #4caf50;
           color: white;
           transform: scale(1.05);
+        }
+        #privacy-toggle-btn {
+            margin-left: 12px;
+            margin-right: 8px;
+            background: #222;
+            color: var(--nav-accent-color);
+            border: 1.5px solid var(--nav-accent-color);
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.18s, color 0.18s, transform 0.18s;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .dashboard-section {
           display: flex;
@@ -1074,6 +1102,25 @@
           min-width: 0;
         }
         
+        /* Futuristic nav-left styling */
+        .nav-left {
+          color: var(--nav-accent-color, #00ffff) !important;
+          font-family: 'Courier New', monospace !important;
+          font-weight: bold !important;
+          text-shadow: 0 0 8px rgba(0, 255, 255, 0.6) !important;
+        }
+        
+        .nav-left span,
+        .nav-left strong,
+        .nav-left .sensitive-value {
+          color: var(--nav-accent-color, #00ffff) !important;
+          text-shadow: 0 0 8px rgba(0, 255, 255, 0.6) !important;
+        }
+        
+        .nav-left .btc-equivalent {
+          text-shadow: 0 0 6px rgba(0, 255, 255, 0.5) !important;
+        }
+        
         .nav-center {
           margin-left: 8px !important;
           padding-left: 5px !important;
@@ -1085,15 +1132,85 @@
           min-width: 0;
         }
         
-        /* Make navigation links more compact */
+        /* Futuristic nav link styling */
         .nav-center a {
-          margin: 0 4px !important;
-          padding: 0 6px !important;
+          margin: 0 2px !important;
+          padding: 6px 8px !important;
+          color: var(--nav-accent-color, #00ffff) !important;
+          text-decoration: none !important;
+          border-radius: 6px !important;
+          font-family: 'Courier New', monospace !important;
+          font-weight: bold !important;
+          font-size: 12px !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px !important;
+          text-shadow: 0 0 5px rgba(0, 255, 255, 0.6) !important;
+          transition: all 0.3s ease !important;
+          position: relative !important;
+          border: 1px solid transparent !important;
+        }
+        
+        .nav-center a:hover {
+          background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0.05) 100%) !important;
+          border: 1px solid var(--nav-accent-color, #00ffff) !important;
+          box-shadow: 0 0 15px rgba(0, 255, 255, 0.4) !important;
+          transform: translateY(-2px) !important;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8) !important;
+        }
+        
+        .nav-center a::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #00ffff, #ff00ff);
+          transition: width 0.3s ease;
+        }
+        
+        .nav-center a:hover::after {
+          width: 80%;
         }
         
         /* Reduce spacing between nav sections even more */
         nav > div {
-          margin: 0 4px !important;
+          margin: 0 2px !important;
+        }
+        
+        /* Futuristic button styling */
+        #currency-selector,
+        #privacy-toggle-btn,
+        .logout-link {
+          background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%) !important;
+          color: var(--nav-accent-color, #00ffff) !important;
+          border: 2px solid var(--nav-accent-color, #00ffff) !important;
+          border-radius: 6px !important;
+          padding: 6px 8px !important;
+          font-family: 'Courier New', monospace !important;
+          font-weight: bold !important;
+          font-size: 11px !important;
+          text-shadow: 0 0 5px rgba(0, 255, 255, 0.6) !important;
+          box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) !important;
+          transition: all 0.3s ease !important;
+          cursor: pointer !important;
+          text-decoration: none !important;
+          white-space: nowrap !important;
+        }
+        
+        #currency-selector:hover,
+        #privacy-toggle-btn:hover,
+        .logout-link:hover {
+          box-shadow: 0 0 25px rgba(0, 255, 255, 0.5) !important;
+          transform: scale(1.05) !important;
+          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8) !important;
+        }
+        
+        #currency-selector:focus,
+        #privacy-toggle-btn:focus {
+          outline: none !important;
+          box-shadow: 0 0 30px rgba(0, 255, 255, 0.7) !important;
         }
         
         .nav-right {
@@ -1132,41 +1249,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-<header>
-    <nav>
-        <div class="nav-left">
-            <span><strong>{{ username }}</strong></span>
-            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span> <span class="btc-equivalent">₿{{ btc_equivalent|floatformat:3 }}</span></span>
-        </div>
-        
-        <!-- Hamburger menu button for mobile -->
-        <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
-        
-        <div class="nav-center" id="navLinks">
-            <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
-            <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
-            <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
-            <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
-            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
-            <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
-            <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
-            <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
-            <button id="privacy-toggle-btn-mobile" type="button" class="mobile-privacy-btn">Privacy Mode: Off</button>
-            <form action="{% url 'logout' %}" method="post" class="logout-form">
-                {% csrf_token %}
-                <button type="submit" class="logout-link">Logout</button>
-            </form>
-        </div>
-        <div class="nav-right">
-            <select id="currency-selector" onchange="changeCurrency(this.value)" style="background: #222a; color: #00ffff; border: 1px solid #00ffff; border-radius: 4px; padding: 2px 8px; font-size: 0.95em; width: 80px; min-width: 60px; max-width: 100px; text-align: center;">
-                {% for code, name in available_currencies.items %}
-                    <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
-                {% endfor %}
-            </select>
-            <button id="privacy-toggle-btn" type="button" style="margin-left: 12px; margin-right: 8px; background: #222; color: #00ffff; border: 1.5px solid #00ffff; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; font-size: 0.85em; transition: background 0.18s, color 0.18s, transform 0.18s; white-space: nowrap; flex-shrink: 0;">Privacy Mode: Off</button>
-        </div>
-    </nav>
-</header>
+{% include "includes/asset_nav.html" %}
 <div class="container {% if request.resolver_match.url_name != 'general' %}non-general-page{% endif %}">
     <div style="width: 100%; max-width: 1800px; margin: 0 auto;">
         <!-- Centralized Title -->

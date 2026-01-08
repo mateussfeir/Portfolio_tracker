@@ -1,0 +1,42 @@
+{% load humanize %}
+{% load currency_filters %}
+<header>
+    <nav>
+        <div class="nav-left">
+            <span><strong>{{ username }}</strong></span>
+            <span>
+                <strong>Net Worth:</strong>
+                <span class="sensitive-value">{{ total_net_worth|currency:currency_symbol }}</span>
+                <span class="btc-equivalent">₿{{ btc_equivalent|floatformat:3 }}</span>
+            </span>
+        </div>
+
+        <!-- Hamburger menu button for mobile -->
+        <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
+
+        <div class="nav-center" id="navLinks">
+            <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
+            <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
+            <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
+            <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
+            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
+            <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
+            <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
+            <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+            <button id="privacy-toggle-btn-mobile" type="button" class="mobile-privacy-btn">Privacy Mode: Off</button>
+            <form action="{% url 'logout' %}" method="post" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-link">Logout</button>
+            </form>
+        </div>
+
+        <div class="nav-right">
+            <select id="currency-selector" onchange="changeCurrency(this.value)">
+                {% for code, name in available_currencies.items %}
+                    <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
+                {% endfor %}
+            </select>
+            <button id="privacy-toggle-btn" type="button">Privacy Mode: Off</button>
+        </div>
+    </nav>
+</header>
