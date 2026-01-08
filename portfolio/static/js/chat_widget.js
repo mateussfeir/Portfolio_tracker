@@ -13,16 +13,48 @@
         const input = document.getElementById('portfolio-assistant-input');
         const sendBtn = document.getElementById('portfolio-assistant-send');
         const storageKey = 'portfolioAssistantChatHistory';
+        const timeframeStorageKey = 'portfolioAssistantTimeframe';
         const username = widget.dataset.username || 'there';
         const currencySymbol = widget.dataset.currencySymbol || '$';
+        let debugMode = false;
+        try {
+            debugMode = localStorage.getItem('pa_debug') === '1';
+        } catch (e) {
+            debugMode = false;
+        }
 
         let state = {
             messages: [],
-            currentTimeFilter: 'overall'
+            currentTimeFilter: 'all time'
         };
 
-        function getPortfolioSnapshot() {
+        const DEFAULT_TIMEFRAME = 'all time';
+
+        const TICKER_ALIASES = {
+            BTC: ['btc', 'bitcoin', 'xbt'],
+            ETH: ['eth', 'ethereum', 'ether'],
+            SOL: ['sol', 'solana'],
+            USDC: ['usdc', 'usd coin', 'usdcoin'],
+            CASH: ['cash', 'usd', 'cad', 'dollars']
+        };
+
+        const KEYWORDS = {
+            greeting: ['hello', 'hi', 'hey', 'yo', 'good morning', 'good evening'],
+            help: ['help', 'what can you do', 'how do you work', 'commands', 'what can you show'],
+            price: ['price', 'quote', 'rate'],
+            holdings: ['holding', 'holdings', 'position', 'positions', 'do i have', 'amount', 'bags', 'what is my position'],
+            total_value: ['total value', 'portfolio value', 'net worth', 'how much money', 'how much do i have', 'how much cash', 'how much do we have', 'total'],
+            allocation: ['allocation', 'distribution', 'weights', 'weighting', 'pie'],
+            best_asset: ['best asset', 'best coin', 'top performer', 'best performing', 'top gainer', 'biggest gain', 'highest gain', 'up the most'],
+            worst_asset: ['worst asset', 'lost the most', 'biggest loss', 'top loser', 'down the most', 'laggard', 'worst performing'],
+            performance_summary: ['performance', 'returns', 'return', 'show performance', 'how am i doing', 'results', 'pnl'],
+            asset_performance: ['performance', 'return', 'pnl', 'gain', 'loss'],
+            pnl: ['pnl', 'profit', 'loss']
+        };
+
+        function getPortfolioSnapshot(range = state.currentTimeFilter) {
             // Placeholder data - replace with API call when available
+            void range;
             return {
                 totalValue: 1331674.82,
                 allocation: [
@@ -57,6 +89,10 @@
             try {
                 const raw = localStorage.getItem(storageKey);
                 state.messages = raw ? JSON.parse(raw) : [];
+                const storedTimeframe = localStorage.getItem(timeframeStorageKey);
+                if (storedTimeframe) {
+                    state.currentTimeFilter = storedTimeframe;
+                }
             } catch (error) {
                 state.messages = [];
             }
@@ -124,68 +160,186 @@
             }
         }
 
-        const TIME_FILTERS = [
-            { label: 'today', pattern: /\btoday\b/i },
-            { label: 'last 7 days', pattern: /(7|seven)\s*(days?|d)\b/i },
-            { label: 'last 30 days', pattern: /(30|thirty)\s*(days?|d)\b/i },
-            { label: 'this month', pattern: /\bthis\s+month\b/i }
+        const TIMEFRAME_PATTERNS = [
+            { value: 'today', patterns: [/\btoday\b/] },
+            { value: '7 days', patterns: [/\b(7|seven)\s*(days?|d)\b/, /\b7d\b/, /\blast\s+week\b/] },
+            { value: '30 days', patterns: [/\b(30|thirty)\s*(days?|d)\b/, /\b30d\b/] },
+            { value: 'this month', patterns: [/\bthis\s+month\b/, /\bcurrent\s+month\b/, /\bmonth\b/] },
+            { value: 'all time', patterns: [/\ball\s*time\b/, /\boverall\b/, /\balltime\b/] }
         ];
 
-        function extractTimeFilter(text) {
-            for (const filter of TIME_FILTERS) {
-                if (filter.pattern.test(text)) {
-                    return filter.label;
+        function normalizeMessage(message) {
+            if (!message) {
+                return '';
+            }
+            return message
+                .toLowerCase()
+                .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+                .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function parseTimeframe(normalized) {
+            if (!normalized) {
+                return null;
+            }
+            for (const entry of TIMEFRAME_PATTERNS) {
+                for (const pattern of entry.patterns) {
+                    const match = normalized.match(pattern);
+                    if (match) {
+                        return { value: entry.value, matched: match[0].trim() };
+                    }
                 }
             }
             return null;
         }
 
-        const KEYWORD_INTENTS = [
-            { intent: 'greeting', keywords: ['hello', 'hi', 'hey'] },
-            { intent: 'help', keywords: ['help', 'what can you do', 'commands'] },
-            { intent: 'total_value', keywords: ['total', 'portfolio value', 'net worth'] },
-            { intent: 'allocation', keywords: ['allocation', 'distribution', 'pie'] },
-            { intent: 'best_asset', keywords: ['best performing', 'top performer', 'top asset'] },
-            { intent: 'worst_asset', keywords: ['worst performing', 'biggest loss', 'laggard'] },
-            { intent: 'pnl', keywords: ['pnl', 'profit', 'loss'] }
-        ];
+        function extractTicker(normalized) {
+            if (!normalized) {
+                return null;
+            }
+            const matches = [];
+            Object.entries(TICKER_ALIASES).forEach(([ticker, aliases]) => {
+                aliases.forEach(alias => {
+                    const pattern = new RegExp(`\\b${alias.replace(/\s+/g, '\\s+')}\\b`, 'i');
+                    if (pattern.test(normalized)) {
+                        matches.push({ ticker, alias: alias.toLowerCase() });
+                    }
+                });
+            });
+
+            if (!matches.length) {
+                return null;
+            }
+            return {
+                ticker: matches[0].ticker,
+                alias: matches[0].alias,
+                multiple: matches.length > 1
+            };
+        }
+
+        function escapeRegExp(value) {
+            return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function containsAny(text, phrases) {
+            if (!text) {
+                return false;
+            }
+            return phrases.some(phrase => {
+                const pattern = new RegExp(`\\b${escapeRegExp(phrase).replace(/\s+/g, '\\s+')}\\b`);
+                return pattern.test(text);
+            });
+        }
 
         function detectIntent(message) {
-            const normalized = message.toLowerCase();
-            const timeFilter = extractTimeFilter(normalized);
-            const snapshot = getPortfolioSnapshot();
-            const tickers = new Set([
-                ...Object.keys(snapshot.prices),
-                ...snapshot.holdings.map(h => h.ticker)
-            ]);
+            const normalized = normalizeMessage(message);
+            const timeframeMatch = parseTimeframe(normalized);
+            const timeFilter = timeframeMatch ? timeframeMatch.value : null;
+            const timeframeOnly = timeframeMatch && normalized === timeframeMatch.matched;
+            const tickerMatch = extractTicker(normalized);
+            const ticker = tickerMatch ? tickerMatch.ticker : null;
+            const tickerAlias = tickerMatch ? tickerMatch.alias : null;
+            const tickerOnly = tickerAlias && normalized === tickerAlias;
 
-            const priceMatch = normalized.match(/price(?:\s+of)?\s+([a-z]{2,6})/i);
-            if (priceMatch) {
-                const ticker = priceMatch[1].toUpperCase();
-                if (tickers.has(ticker)) {
-                    return { intent: 'price', ticker, timeFilter };
-                }
+            const result = {
+                intent: 'unknown',
+                ticker,
+                timeFilter,
+                normalized,
+                multipleTickers: tickerMatch ? tickerMatch.multiple : false
+            };
+            const hasPriceKeyword = containsAny(normalized, KEYWORDS.price);
+            const hasHoldingsKeyword = containsAny(normalized, KEYWORDS.holdings);
+            const hasTotalKeyword = containsAny(normalized, KEYWORDS.total_value);
+            const hasAllocationKeyword = containsAny(normalized, KEYWORDS.allocation);
+            const hasBestKeyword = containsAny(normalized, KEYWORDS.best_asset);
+            const hasWorstKeyword = containsAny(normalized, KEYWORDS.worst_asset);
+            const hasPerformanceSummaryKeyword = containsAny(normalized, KEYWORDS.performance_summary);
+            const hasAssetPerformanceKeyword = containsAny(normalized, KEYWORDS.asset_performance);
+            const mentionsHowMuch = normalized.includes('how much');
+
+            const hasGreeting = containsAny(normalized, KEYWORDS.greeting);
+            if (hasGreeting) {
+                result.intent = 'greeting';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
             }
 
-            const holdingMatch = normalized.match(/(how\s+much|holdings?|amount)\s+([a-z]{2,6})/i);
-            if (holdingMatch) {
-                const ticker = holdingMatch[2].toUpperCase();
-                if (tickers.has(ticker)) {
-                    return { intent: 'holdings', ticker, timeFilter };
-                }
+            if (containsAny(normalized, KEYWORDS.help)) {
+                result.intent = 'help';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
             }
 
-            for (const mapping of KEYWORD_INTENTS) {
-                if (mapping.keywords.some(keyword => normalized.includes(keyword))) {
-                    return { intent: mapping.intent, timeFilter };
-                }
+            if (timeframeOnly) {
+                result.intent = 'time_filter_only';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (ticker && hasAssetPerformanceKeyword) {
+                result.intent = 'asset_performance';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (ticker && (tickerOnly || hasPriceKeyword)) {
+                result.intent = 'price';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (ticker && (hasHoldingsKeyword || mentionsHowMuch)) {
+                result.intent = 'holdings';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (hasHoldingsKeyword) {
+                result.intent = 'holdings';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (hasTotalKeyword) {
+                result.intent = 'total_value';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (hasAllocationKeyword) {
+                result.intent = 'allocation';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (hasBestKeyword) {
+                result.intent = 'best_asset';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (hasWorstKeyword) {
+                result.intent = 'worst_asset';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
+            }
+
+            if (hasPerformanceSummaryKeyword) {
+                result.intent = ticker ? 'asset_performance' : 'performance_summary';
+                debugMode && console.log('[PortfolioAssistant]', result);
+                return result;
             }
 
             if (timeFilter) {
-                return { intent: 'time_filter', timeFilter };
+                result.intent = 'time_filter';
             }
 
-            return { intent: 'unknown', timeFilter };
+            debugMode && console.log('[PortfolioAssistant]', result);
+            return result;
         }
 
         function allocationSummary(snapshot) {
@@ -212,16 +366,32 @@
             }, null);
         }
 
-        function handleIntent(intentResult) {
-            const snapshot = getPortfolioSnapshot();
-            const contextTime = intentResult.timeFilter || state.currentTimeFilter;
-            if (intentResult.timeFilter) {
-                state.currentTimeFilter = intentResult.timeFilter;
+        function formatPercent(value) {
+            if (typeof value !== 'number') {
+                return `${value}%`;
             }
+            return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+        }
 
-            const timeframeSuffix = state.currentTimeFilter !== 'overall'
-                ? ` for ${state.currentTimeFilter}`
+        function persistTimeframe(value) {
+            state.currentTimeFilter = value || DEFAULT_TIMEFRAME;
+            try {
+                localStorage.setItem(timeframeStorageKey, state.currentTimeFilter);
+            } catch (error) {
+                // ignore storage failures
+            }
+        }
+
+        function handleIntent(intentResult) {
+            const activeTimeframe = intentResult.timeFilter || state.currentTimeFilter || DEFAULT_TIMEFRAME;
+            if (intentResult.timeFilter) {
+                persistTimeframe(intentResult.timeFilter);
+            }
+            const snapshot = getPortfolioSnapshot(activeTimeframe);
+            const timeframeSuffix = activeTimeframe && activeTimeframe !== DEFAULT_TIMEFRAME
+                ? ` for ${activeTimeframe}`
                 : '';
+            const multiTickerSuffix = intentResult.multipleTickers ? ' (first ticker mentioned)' : '';
 
             let reply;
             switch (intentResult.intent) {
@@ -232,7 +402,7 @@
                     reply = 'Try asking things like "total value", "allocation", "best performing asset", "price of BTC", or "how much ETH do I have".';
                     break;
                 case 'total_value':
-                    reply = `Your portfolio is currently valued at ${formatCurrency(snapshot.totalValue)}${timeframeSuffix}.`;
+                    reply = `Your portfolio is currently valued at ${formatCurrency(snapshot.totalValue)}${timeframeSuffix || ''}.`;
                     break;
                 case 'allocation':
                     reply = `Allocation${timeframeSuffix}: ${allocationSummary(snapshot)}.`;
@@ -251,29 +421,53 @@
                         : 'I could not find performance data yet.';
                     break;
                 }
-                case 'pnl':
-                    reply = `Overall PnL${timeframeSuffix}: ${snapshot.pnlTotalPct >= 0 ? '+' : ''}${snapshot.pnlTotalPct}% based on your tracked assets.`;
-                    break;
                 case 'price':
                     if (intentResult.ticker && snapshot.prices[intentResult.ticker]) {
-                        reply = `Latest ${intentResult.ticker} price${timeframeSuffix || ''}: ${formatCurrency(snapshot.prices[intentResult.ticker])}.`;
+                        reply = `${intentResult.ticker} price${timeframeSuffix || ''}: ${formatCurrency(snapshot.prices[intentResult.ticker])} (mock data)${multiTickerSuffix}.`;
                     } else {
                         reply = `I only track ${Object.keys(snapshot.prices).join(', ')} for now.`;
                     }
                     break;
                 case 'holdings': {
-                    const holding = snapshot.holdings.find(h => h.ticker === intentResult.ticker);
-                    reply = holding
-                        ? `You currently hold ${holding.amount} ${intentResult.ticker}${timeframeSuffix}.`
-                        : `I don't see any ${intentResult.ticker} in your holdings yet.`;
+                    if (intentResult.ticker) {
+                        const holding = snapshot.holdings.find(h => h.ticker === intentResult.ticker);
+                        reply = holding
+                            ? `You currently hold ${holding.amount} ${intentResult.ticker}${multiTickerSuffix}.`
+                            : `I don't see any ${intentResult.ticker} in your holdings yet.`;
+                    } else {
+                        const topHoldings = snapshot.holdings
+                            .slice(0, 4)
+                            .map(h => `${h.amount} ${h.ticker}`)
+                            .join(' • ');
+                        reply = topHoldings
+                            ? `Holdings snapshot: ${topHoldings}.`
+                            : 'I could not find holdings data yet.';
+                    }
+                    break;
+                }
+                case 'performance_summary': {
+                    const perfSummary = snapshot.performance
+                        .map(asset => `${asset.ticker}: ${formatPercent(asset.pnlPct)}`)
+                        .join(' • ');
+                    reply = perfSummary
+                        ? `Performance${timeframeSuffix}: ${perfSummary}.`
+                        : 'No performance data yet.';
+                    break;
+                }
+                case 'asset_performance': {
+                    const asset = snapshot.performance.find(p => p.ticker === intentResult.ticker);
+                    reply = asset
+                        ? `${asset.ticker} performance${timeframeSuffix}: ${formatPercent(asset.pnlPct)}${multiTickerSuffix}.`
+                        : `I don't have performance data for ${intentResult.ticker} yet.`;
                     break;
                 }
                 case 'time_filter':
-                    reply = `Got it, I'll focus on ${state.currentTimeFilter} data unless you tell me otherwise.`;
+                case 'time_filter_only':
+                    reply = `Timeframe locked to ${state.currentTimeFilter}. Ask anything else when you're ready.`;
                     break;
                 case 'unknown':
                 default:
-                    reply = `I'm still learning. Try greeting me or ask about totals, allocation, or individual asset prices.`;
+                    reply = 'I can share totals, allocations, holdings, prices, or performance (e.g., "ETH price", "best asset today", "show performance").';
             }
 
             appendMessage('bot', reply);
