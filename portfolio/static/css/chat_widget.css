@@ -1,0 +1,198 @@
+/* Portfolio Assistant widget styles */
+#portfolio-assistant-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2000;
+    font-family: 'Courier New', monospace;
+    color: #e0f7ff;
+}
+
+#portfolio-assistant-widget * {
+    box-sizing: border-box;
+}
+
+#portfolio-assistant-toggle {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    background: radial-gradient(circle at 30% 30%, #19d1ff, #006d87);
+    color: #fff;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.35);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#portfolio-assistant-toggle:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.55);
+}
+
+#portfolio-assistant-toggle.has-unread::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff4da6;
+    box-shadow: 0 0 8px rgba(255, 77, 166, 0.7);
+}
+
+#portfolio-assistant-panel {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 320px;
+    max-height: 420px;
+    background: rgba(9, 14, 25, 0.97);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 18px;
+    box-shadow: 0 20px 45px rgba(4, 10, 20, 0.9);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(6px);
+}
+
+#portfolio-assistant-panel.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.assistant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: linear-gradient(90deg, rgba(0, 255, 255, 0.2), transparent);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.assistant-header h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    color: #7ce6ff;
+}
+
+.assistant-close {
+    border: none;
+    background: transparent;
+    color: #7ce6ff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.assistant-close:hover {
+    transform: scale(1.15);
+    color: #fff;
+}
+
+.assistant-messages {
+    padding: 12px 16px;
+    max-height: 240px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.assistant-message {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    box-shadow: 0 6px 18px rgba(3, 9, 18, 0.6);
+    word-break: break-word;
+}
+
+.assistant-message.bot {
+    background: rgba(0, 255, 255, 0.08);
+    align-self: flex-start;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.assistant-message.user {
+    background: rgba(148, 77, 255, 0.18);
+    align-self: flex-end;
+    border: 1px solid rgba(148, 77, 255, 0.35);
+}
+
+.assistant-message time {
+    display: block;
+    font-size: 0.7rem;
+    margin-top: 6px;
+    opacity: 0.6;
+}
+
+.assistant-input {
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+    gap: 10px;
+    border-top: 1px solid rgba(0, 255, 255, 0.2);
+    background: rgba(5, 10, 20, 0.85);
+}
+
+.assistant-input textarea {
+    flex: 1;
+    min-height: 38px;
+    max-height: 90px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+    color: #e0f7ff;
+    resize: none;
+    padding: 8px;
+    font-family: inherit;
+}
+
+.assistant-input textarea:focus {
+    outline: none;
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+.assistant-send-btn {
+    border-radius: 10px;
+    padding: 8px 12px;
+    border: none;
+    background: linear-gradient(135deg, #00bcd4, #2ebf91);
+    color: #061421;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.assistant-send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.assistant-send-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+    #portfolio-assistant-widget {
+        bottom: 12px;
+        right: 12px;
+    }
+
+    #portfolio-assistant-panel {
+        width: calc(100vw - 24px);
+        right: 0;
+    }
+}

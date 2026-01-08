@@ -1,0 +1,19 @@
+{% load static %}
+<div id="portfolio-assistant-widget"
+     data-username="{{ username|default:'there' }}"
+     data-currency-symbol="{{ currency_symbol|default:'$' }}">
+    <button id="portfolio-assistant-toggle" type="button" aria-label="Open Portfolio Assistant">
+        <span>PA</span>
+    </button>
+    <div id="portfolio-assistant-panel">
+        <div class="assistant-header">
+            <h4>Portfolio Assistant</h4>
+            <button type="button" class="assistant-close" id="portfolio-assistant-close" aria-label="Close chat">&times;</button>
+        </div>
+        <div class="assistant-messages" id="portfolio-assistant-messages"></div>
+        <form class="assistant-input" id="portfolio-assistant-form" autocomplete="off">
+            <textarea id="portfolio-assistant-input" rows="1" placeholder="Ask me about your portfolio..." required></textarea>
+            <button type="submit" class="assistant-send-btn" id="portfolio-assistant-send" disabled>Send</button>
+        </form>
+    </div>
+</div>

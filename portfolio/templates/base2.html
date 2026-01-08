@@ -15,6 +15,7 @@
     <meta name="msapplication-TileImage" content="{% static 'images/favicon_32x32.png' %}">
     <meta name="msapplication-TileColor" content="#000000">
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/chat_widget.css' %}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
@@ -1598,5 +1599,7 @@
         setTimeout(simplifyChartTitlesForMobile, 100);
     });
 </script>
+{% include "includes/chat_widget.html" %}
+<script src="{% static 'js/chat_widget.js' %}"></script>
 </body>
 </html> 
