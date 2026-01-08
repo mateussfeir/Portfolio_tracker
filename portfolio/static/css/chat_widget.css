@@ -1,9 +1,9 @@
 /* Portfolio Assistant widget styles */
 #portfolio-assistant-widget {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 2000;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
     font-family: 'Courier New', monospace;
     color: #e0f7ff;
 }
@@ -187,11 +187,11 @@
 
 @media (max-width: 600px) {
     #portfolio-assistant-widget {
-        bottom: 12px;
-        right: 12px;
-    }
+    bottom: 16px;
+    right: 16px;
+}
 
-    #portfolio-assistant-panel {
+#portfolio-assistant-panel {
         width: calc(100vw - 24px);
         right: 0;
     }
