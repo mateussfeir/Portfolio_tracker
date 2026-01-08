@@ -58,13 +58,13 @@ class Command(BaseCommand):
                     
                     success_count += 1
                 else:
-                    # This is the user's first time - check if 10 minutes have passed since account creation
+                    # This is the user's first time - check if 45 minutes have passed since account creation
                     user_created_time = user.date_joined
                     current_time = timezone.now()
                     time_since_creation = current_time - user_created_time
                     
-                    # Only create snapshot if more than 10 minutes have passed
-                    if time_since_creation > timedelta(minutes=10):
+                    # Only create snapshot if more than 45 minutes have passed
+                    if time_since_creation > timedelta(minutes=45):
                         net_worth = get_user_total_net_worth(user, 'USD')
                         NetWorthSnapshot.objects.create(
                             user=user, date=today,
@@ -75,7 +75,7 @@ class Command(BaseCommand):
                         )
                         success_count += 1
                     else:
-                        minutes_remaining = 10 - int(time_since_creation.total_seconds() / 60)
+                        minutes_remaining = 45 - int(time_since_creation.total_seconds() / 60)
                         self.stdout.write(
                             self.style.WARNING(f'⏳ Skipping {user.username}: First snapshot in {minutes_remaining} minutes')
                         )

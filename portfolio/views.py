@@ -1716,7 +1716,7 @@ def general(request):
             defaults={'net_worth': total_net_worth_usd}
         )
     else:
-        # This is the user's first time - check if 10 minutes have passed since account creation
+        # This is the user's first time - check if 45 minutes have passed since account creation
         from django.utils import timezone
         from datetime import timedelta
         
@@ -1724,13 +1724,13 @@ def general(request):
         first_snapshot = existing_snapshots.first()
         
         if first_snapshot is None:
-            # No snapshots exist yet - check if 10 minutes have passed since user creation
+            # No snapshots exist yet - check if 45 minutes have passed since user creation
             user_created_time = request.user.date_joined
             current_time = timezone.now()
             time_since_creation = current_time - user_created_time
             
-            # Only create snapshot if more than 10 minutes have passed
-            if time_since_creation > timedelta(minutes=10):
+            # Only create snapshot if more than 45 minutes have passed
+            if time_since_creation > timedelta(minutes=45):
                 NetWorthSnapshot.objects.create(
                     user=request.user, date=today,
                     net_worth=total_net_worth_usd
@@ -1753,7 +1753,7 @@ def general(request):
         
         if time_since_creation <= timedelta(minutes=10):
             show_new_user_message = True
-            new_user_minutes_remaining = 10 - int(time_since_creation.total_seconds() / 60)
+            new_user_minutes_remaining = 45 - int(time_since_creation.total_seconds() / 60)
 
     # Net Worth Over Time Chart
     # Get only the latest snapshot per day for smooth chart
@@ -1949,7 +1949,7 @@ def performance(request):
             defaults={'net_worth': total_net_worth_usd}
         )
     else:
-        # This is the user's first time - check if 10 minutes have passed since account creation
+        # This is the user's first time - check if 45 minutes have passed since account creation
         from django.utils import timezone
         from datetime import timedelta
         
@@ -1957,13 +1957,13 @@ def performance(request):
         first_snapshot = existing_snapshots.first()
         
         if first_snapshot is None:
-            # No snapshots exist yet - check if 10 minutes have passed since user creation
+            # No snapshots exist yet - check if 45 minutes have passed since user creation
             user_created_time = user.date_joined
             current_time = timezone.now()
             time_since_creation = current_time - user_created_time
             
-            # Only create snapshot if more than 10 minutes have passed
-            if time_since_creation > timedelta(minutes=10):
+            # Only create snapshot if more than 45 minutes have passed
+            if time_since_creation > timedelta(minutes=45):
                 NetWorthSnapshot.objects.create(
                     user=user, date=today,
                     net_worth=total_net_worth_usd

@@ -82,7 +82,7 @@ class Command(BaseCommand):
                             self.stdout.write(f'  → Would create snapshot for {current_date}')
                             user_created += 1
                     else:
-                        # This is the user's first time - check if 10 minutes have passed since account creation
+                        # This is the user's first time - check if 45 minutes have passed since account creation
                         user_created_time = user.date_joined
                         current_time = timezone.now()
                         time_since_creation = current_time - user_created_time
@@ -108,7 +108,7 @@ class Command(BaseCommand):
                                 self.stdout.write(f'  → Would create first snapshot for {current_date}')
                                 user_created += 1
                         else:
-                            minutes_remaining = 10 - int(time_since_creation.total_seconds() / 60)
+                            minutes_remaining = 45 - int(time_since_creation.total_seconds() / 60)
                             self.stdout.write(
                                 self.style.WARNING(f'  ⏳ Skipping {current_date}: First snapshot in {minutes_remaining} minutes')
                             )
