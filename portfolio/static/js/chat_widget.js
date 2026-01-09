@@ -65,15 +65,9 @@
         function getPortfolioSnapshot(range = state.currentTimeFilter) {
             // Placeholder data - replace with API call when available
             void range;
-            const fallbackPrices = {
-                BTC: 95000,
-                ETH: 3650,
-                SOL: 195,
-                CASH: 1
-            };
             const resolvedPrices = priceData && Object.keys(priceData).length
                 ? priceData
-                : fallbackPrices;
+                : {};
             return {
                 totalValue: 1331674.82,
                 allocation: [
@@ -491,9 +485,12 @@
                 }
                 case 'price':
                     if (intentResult.ticker && snapshot.prices[intentResult.ticker]) {
-                        reply = `${intentResult.ticker} price${timeframeSuffix || ''}: ${formatCurrency(snapshot.prices[intentResult.ticker])} (mock data)${multiTickerSuffix}.`;
+                        reply = `${intentResult.ticker} price${timeframeSuffix || ''}: ${formatCurrency(snapshot.prices[intentResult.ticker])}${multiTickerSuffix}.`;
                     } else {
-                        reply = `I only track ${Object.keys(snapshot.prices).join(', ')} for now.`;
+                        const knownTickers = Object.keys(snapshot.prices);
+                        reply = knownTickers.length
+                            ? `I only track ${knownTickers.join(', ')} for now.`
+                            : 'I do not have live prices yet.';
                     }
                     break;
                 case 'holdings': {
