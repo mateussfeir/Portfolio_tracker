@@ -113,24 +113,41 @@
             })}`;
         }
 
+        let typingTimer = null;
+
+        function clearTypingTimer() {
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+                typingTimer = null;
+            }
+        }
+
+        function createMessageBubble(msg) {
+            const bubble = document.createElement('div');
+            bubble.className = `assistant-message ${msg.sender}`;
+            const textSpan = document.createElement('span');
+            textSpan.className = 'assistant-message-text';
+            bubble.appendChild(textSpan);
+            if (msg.timestamp) {
+                const time = document.createElement('time');
+                const date = new Date(msg.timestamp);
+                time.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                bubble.appendChild(time);
+            }
+            return { bubble, textSpan };
+        }
+
         function renderMessages() {
             messagesEl.innerHTML = '';
             state.messages.forEach(msg => {
-                const bubble = document.createElement('div');
-                bubble.className = `assistant-message ${msg.sender}`;
-                bubble.textContent = msg.text;
-                if (msg.timestamp) {
-                    const time = document.createElement('time');
-                    const date = new Date(msg.timestamp);
-                    time.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    bubble.appendChild(time);
-                }
+                const { bubble, textSpan } = createMessageBubble(msg);
+                textSpan.textContent = msg.text;
                 messagesEl.appendChild(bubble);
             });
             messagesEl.scrollTop = messagesEl.scrollHeight;
         }
 
-        function appendMessage(sender, text) {
+        function appendMessage(sender, text, options = {}) {
             const entry = {
                 sender,
                 text,
@@ -138,13 +155,39 @@
             };
             state.messages.push(entry);
             saveHistory();
-            renderMessages();
+
+            if (options.animate && sender === 'bot') {
+                clearTypingTimer();
+                const { bubble, textSpan } = createMessageBubble(entry);
+                messagesEl.appendChild(bubble);
+                let index = 0;
+                const speedMs = Number.isFinite(options.speedMs) ? options.speedMs : 18;
+
+                const typeNext = () => {
+                    index += 1;
+                    textSpan.textContent = text.slice(0, index);
+                    messagesEl.scrollTop = messagesEl.scrollHeight;
+                    if (index < text.length) {
+                        typingTimer = setTimeout(typeNext, speedMs);
+                    } else {
+                        typingTimer = null;
+                    }
+                };
+
+                if (text.length > 0) {
+                    typeNext();
+                }
+            } else {
+                renderMessages();
+            }
+
             if (sender === 'bot' && !panel.classList.contains('open')) {
                 toggleBtn.classList.add('has-unread');
             }
         }
 
         function clearConversation() {
+            clearTypingTimer();
             state.messages = [];
             saveHistory();
             renderMessages();
@@ -153,7 +196,11 @@
 
         function initialBotGreeting() {
             if (state.messages.length === 0) {
-                appendMessage('bot', `Hey ${username}, I'm your Portfolio Assistant. Ask me about totals, allocations, or even BTC prices!`);
+                appendMessage(
+                    'bot',
+                    `Hey ${username}, I'm your Portfolio Assistant. Ask me about totals, allocations, or even BTC prices!`,
+                    { animate: true }
+                );
             } else {
                 renderMessages();
             }
@@ -478,7 +525,7 @@
                     reply = 'I can share totals, allocations, holdings, prices, or performance (e.g., "ETH price", "best asset today", "show performance").';
             }
 
-            appendMessage('bot', reply);
+            appendMessage('bot', reply, { animate: true });
         }
 
         function handleSubmit(event) {
