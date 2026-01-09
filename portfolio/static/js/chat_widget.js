@@ -17,6 +17,15 @@
         const timeframeStorageKey = 'portfolioAssistantTimeframe';
         const username = widget.dataset.username || 'there';
         const currencySymbol = widget.dataset.currencySymbol || '$';
+        let priceData = null;
+        try {
+            const rawPrices = widget.dataset.pricesJson;
+            if (rawPrices) {
+                priceData = JSON.parse(rawPrices);
+            }
+        } catch (e) {
+            priceData = null;
+        }
         let debugMode = false;
         try {
             debugMode = localStorage.getItem('pa_debug') === '1';
@@ -56,6 +65,15 @@
         function getPortfolioSnapshot(range = state.currentTimeFilter) {
             // Placeholder data - replace with API call when available
             void range;
+            const fallbackPrices = {
+                BTC: 95000,
+                ETH: 3650,
+                SOL: 195,
+                CASH: 1
+            };
+            const resolvedPrices = priceData && Object.keys(priceData).length
+                ? priceData
+                : fallbackPrices;
             return {
                 totalValue: 1331674.82,
                 allocation: [
@@ -76,12 +94,7 @@
                     { ticker: 'SOL', amount: 85.2 },
                     { ticker: 'CASH', amount: 78000 }
                 ],
-                prices: {
-                    BTC: 95000,
-                    ETH: 3650,
-                    SOL: 195,
-                    CASH: 1
-                },
+                prices: resolvedPrices,
                 pnlTotalPct: 9.4
             };
         }

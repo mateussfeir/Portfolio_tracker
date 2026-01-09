@@ -5,6 +5,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from .forms import AddAssetForm, SignUpForm
 from .models import Asset, NetWorthSnapshot
+import json
 import requests
 from decimal import Decimal, InvalidOperation
 import plotly.graph_objects as go
@@ -177,6 +178,23 @@ def get_multiple_stock_prices(tickers):
 def map_ticker(ticker):
     return COINGECKO_TICKER_MAPPING.get(ticker.lower(), ticker.lower())
 
+def build_assistant_prices(crypto_assets, crypto_prices, selected_currency):
+    assistant_prices = {}
+    for asset in crypto_assets:
+        coin_id = map_ticker(asset.ticker)
+        price_usd = crypto_prices.get(coin_id, {}).get('usd')
+        if price_usd is None:
+            continue
+        price = convert_currency(Decimal(str(price_usd)), 'USD', selected_currency)
+        assistant_prices[asset.ticker.upper()] = float(price)
+
+    btc_price_usd = crypto_prices.get('bitcoin', {}).get('usd')
+    if btc_price_usd is not None:
+        price = convert_currency(Decimal(str(btc_price_usd)), 'USD', selected_currency)
+        assistant_prices.setdefault('BTC', float(price))
+
+    return assistant_prices
+
 # Signup view
 def signup(request):
     if request.method == 'POST':
@@ -221,6 +239,7 @@ def home(request):
     tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in user_assets]
     prices = get_multiple_asset_prices(tickers)
     bitcoin_price = prices.get('bitcoin', {}).get('usd', 'N/A')
+    assistant_prices = build_assistant_prices(user_assets, prices, selected_currency)
 
     assets_with_value = []
     percent_mode = request.GET.get('percent', 'section')
@@ -448,6 +467,7 @@ def home(request):
         'assets': assets_with_value,
         'form': form,
         'bitcoin_price': bitcoin_price,  # Pass the Bitcoin price to the template
+        'assistant_prices_json': json.dumps(assistant_prices),
         'total_net_worth': total_net_worth,
         'section_net_worth': section_net_worth,
         'selected_currency': selected_currency,
@@ -1515,6 +1535,7 @@ def general(request):
     # Get prices for crypto
     crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
     crypto_prices = get_multiple_asset_prices(crypto_tickers)
+    assistant_prices = build_assistant_prices(crypto_assets, crypto_prices, selected_currency)
 
     # Calculate total crypto net worth in USD
     total_crypto_usd = sum(
@@ -1925,6 +1946,7 @@ def general(request):
         'btc_equivalent': btc_equivalent,
         'show_new_user_message': show_new_user_message,
         'new_user_minutes_remaining': new_user_minutes_remaining,
+        'assistant_prices_json': json.dumps(assistant_prices),
     })
 
 @login_required

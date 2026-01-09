@@ -8,7 +8,15 @@ class PortfolioConfig(AppConfig):
     def ready(self):
         # Only run scheduler once when the app is ready
         import os
+        import sys
         if os.environ.get('DJANGO_SETTINGS_MODULE') == 'config.settings':
+            # Avoid starting scheduler during management commands like collectstatic.
+            management_commands = {
+                'collectstatic', 'migrate', 'makemigrations', 'shell', 'createsuperuser',
+                'test', 'check', 'loaddata', 'dumpdata', 'flush'
+            }
+            if any(cmd in sys.argv for cmd in management_commands):
+                return
             try:
                 from apscheduler.schedulers.background import BackgroundScheduler
                 from django.core.management import call_command
