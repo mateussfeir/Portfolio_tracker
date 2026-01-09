@@ -12,6 +12,7 @@
         const form = document.getElementById('portfolio-assistant-form');
         const input = document.getElementById('portfolio-assistant-input');
         const sendBtn = document.getElementById('portfolio-assistant-send');
+        const clearBtn = document.getElementById('portfolio-assistant-clear');
         const storageKey = 'portfolioAssistantChatHistory';
         const timeframeStorageKey = 'portfolioAssistantTimeframe';
         const username = widget.dataset.username || 'there';
@@ -141,6 +142,13 @@
             if (sender === 'bot' && !panel.classList.contains('open')) {
                 toggleBtn.classList.add('has-unread');
             }
+        }
+
+        function clearConversation() {
+            state.messages = [];
+            saveHistory();
+            renderMessages();
+            toggleBtn.classList.remove('has-unread');
         }
 
         function initialBotGreeting() {
@@ -494,6 +502,9 @@
 
         toggleBtn.addEventListener('click', () => togglePanel());
         closeBtn.addEventListener('click', () => togglePanel(false));
+        if (clearBtn) {
+            clearBtn.addEventListener('click', clearConversation);
+        }
 
         form.addEventListener('submit', handleSubmit);
 
