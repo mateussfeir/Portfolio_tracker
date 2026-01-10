@@ -17,6 +17,30 @@
         const timeframeStorageKey = 'portfolioAssistantTimeframe';
         const username = widget.dataset.username || 'there';
         const currencySymbol = widget.dataset.currencySymbol || '$';
+
+        const TOP_G_QUOTES = [
+            // Discipline over Motivation
+            "The man who goes to the gym even when he doesn't feel like it will always beat the man who goes when he's motivated. Motivation is temporary—discipline is permanent.",
+
+            // Hard Work & Effort
+            "Hard work beats talent when talent doesn't work hard.",
+            "If you genuinely try your best all of the time, all day everyday, it's impossible to lose.",
+
+            // Reject Excuses & Take Control
+            "No one cares about your excuses, no one pities you, and the world isn't fair. Get over it.",
+            "Take control of your life and stop being lazy.",
+
+            // Mindset & Self-Belief
+            "Your mindset is your most powerful asset. Believe in yourself and your abilities and you'll overcome any obstacle.",
+            "You can become rich, you can become strong, you can take care of your loved ones and enjoy the fact that it will be very difficult.",
+
+            // Action & The Present
+            "Don't wait for the 'right time' to start pursuing your dreams. The right time is now.",
+
+            // Full Effort / Faith
+            "God is and he rewards those who want it the most."
+        ];
+
         let priceData = null;
         try {
             const rawPrices = widget.dataset.pricesJson;
@@ -26,6 +50,7 @@
         } catch (e) {
             priceData = null;
         }
+
         let debugMode = false;
         try {
             debugMode = localStorage.getItem('pa_debug') === '1';
@@ -104,6 +129,11 @@
             } catch (error) {
                 state.messages = [];
             }
+        }
+
+        function getRandomTopGQuote() {
+            const index = Math.floor(Math.random() * TOP_G_QUOTES.length);
+            return TOP_G_QUOTES[index];
         }
 
         function saveHistory() {
@@ -236,6 +266,8 @@
             }
             return message
                 .toLowerCase()
+                .replace(/net\s*worth/g, 'net worth')
+                .replace(/networth/g, 'net worth')
                 .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
                 .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
                 .replace(/[^a-z0-9\s]/g, ' ')
@@ -544,10 +576,26 @@
             if (!value) {
                 return;
             }
+
             appendMessage('user', value);
             input.value = '';
             input.style.height = 'auto';
             sendBtn.disabled = true;
+
+            const normalized = normalizeMessage(value);
+
+            // 🔥 TOP G KEYWORD HANDLER
+            // Note: normalizeMessage() converts "top_g" -> "top g", so checking "top g" is enough.
+            if (normalized === 'top g') {
+                const quote = getRandomTopGQuote();
+                appendMessage(
+                    'bot',
+                    `🔥 TOP G MODE 🔥\n\n"${quote}"`,
+                    { animate: true }
+                );
+                return;
+            }
+
             const intentResult = detectIntent(value);
             handleIntent(intentResult);
         }
