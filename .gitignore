@@ -1,33 +1,50 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.py[cod]
 *$py.class
 
+# =========================
 # Django
+# =========================
 *.log
+*.pot
+*.pyc
 local_settings.py
+.env
 db.sqlite3
 db.sqlite3-journal
+media/
 
-# Static files
+# =========================
+# Static files (generated)
+# =========================
 staticfiles/
 
-# Virtual Environment
+# =========================
+# Virtual Environments
+# =========================
 venv/
 env/
 ENV/
+.venv/
 
-# IDE
+# =========================
+# IDE / Editor
+# =========================
 .idea/
 .vscode/
 *.swp
 *.swo
 
+# =========================
 # OS generated files
+# =========================
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db db.sqlite3
+Thumbs.db
