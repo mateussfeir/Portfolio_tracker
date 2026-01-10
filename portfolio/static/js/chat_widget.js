@@ -240,11 +240,26 @@
             }
         }
 
-        // ✅ UPDATED: returns numbered quote in "best UX pattern"
         function getRandomTopGQuoteNumbered() {
             const index = Math.floor(Math.random() * TOP_G_QUOTES.length);
             return `#${index + 1}/${TOP_G_QUOTES.length} — ${TOP_G_QUOTES[index]}`;
         }
+
+        function getBitBalanceExplanation() {
+            return (
+                "BitBalance is a personal portfolio tracker designed to give you a clear overview of your entire net worth — not just crypto.\n\n" +
+                "📊 What it tracks:\n" +
+                "• Crypto assets with price updates\n" +
+                "• Stocks market assets\n" +
+                "• Manually updated assets like real estate, vehicles, or anything that doesn’t have real-time pricing\n\n" +
+                "📈 What you get:\n" +
+                "• Total net worth overview\n" +
+                "• Asset allocation across all categories\n" +
+                "• Performance tracking over time (today, 7d, 30d, all time)\n\n" +
+                "The goal is simple: one place to see everything you own, understand your financial position, and make better, less emotional decisions."
+            );
+        }
+
 
         function saveHistory() {
             localStorage.setItem(storageKey, JSON.stringify(state.messages));
@@ -585,6 +600,16 @@
                 // ignore storage failures
             }
         }
+
+        if (normalized === 'bitbalance' || normalized === 'bit balance') {
+            appendMessage(
+                'bot',
+                getBitBalanceExplanation(),
+                { animate: true }
+            );
+            return;
+        }
+
 
         function handleIntent(intentResult) {
             const activeTimeframe = intentResult.timeFilter || state.currentTimeFilter || DEFAULT_TIMEFRAME;
