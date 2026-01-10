@@ -19,26 +19,136 @@
         const currencySymbol = widget.dataset.currencySymbol || '$';
 
         const TOP_G_QUOTES = [
-            // Discipline over Motivation
+            // =========================
+            // Discipline over Motivation (Original)
+            // =========================
             "The man who goes to the gym even when he doesn't feel like it will always beat the man who goes when he's motivated. Motivation is temporary—discipline is permanent.",
 
-            // Hard Work & Effort
+            // =========================
+            // Hard Work & Effort (Original)
+            // =========================
             "Hard work beats talent when talent doesn't work hard.",
             "If you genuinely try your best all of the time, all day everyday, it's impossible to lose.",
 
-            // Reject Excuses & Take Control
+            // =========================
+            // Reject Excuses & Take Control (Original)
+            // =========================
             "No one cares about your excuses, no one pities you, and the world isn't fair. Get over it.",
             "Take control of your life and stop being lazy.",
 
-            // Mindset & Self-Belief
+            // =========================
+            // Mindset & Self-Belief (Original)
+            // =========================
             "Your mindset is your most powerful asset. Believe in yourself and your abilities and you'll overcome any obstacle.",
             "You can become rich, you can become strong, you can take care of your loved ones and enjoy the fact that it will be very difficult.",
 
-            // Action & The Present
+            // =========================
+            // Action & The Present (Original)
+            // =========================
             "Don't wait for the 'right time' to start pursuing your dreams. The right time is now.",
 
-            // Full Effort / Faith
-            "God is and he rewards those who want it the most."
+            // =========================
+            // Full Effort / Faith (Original)
+            // =========================
+            "God is and he rewards those who want it the most.",
+
+            // =========================
+            // Discipline & Consistency
+            // =========================
+            "Discipline is doing what needs to be done, even when you don’t feel like doing it.",
+            "Consistency will outperform intensity every single time.",
+            "The pain of discipline is nothing compared to the pain of regret.",
+
+            // =========================
+            // Responsibility & Ownership
+            // =========================
+            "If your life is not the way you want it, that’s on you. Fix it.",
+            "A man who takes responsibility for everything in his life is unstoppable.",
+            "No one is coming to save you. Build yourself.",
+
+            // =========================
+            // Work Ethic & Grind
+            // =========================
+            "Every hour you waste is an hour someone else is using to surpass you.",
+            "Sleep less, work more, complain never.",
+            "Comfort is the enemy of greatness.",
+
+            // =========================
+            // Mental Toughness
+            // =========================
+            "Strong men are forged in difficult times, not easy ones.",
+            "If it was easy, everyone would do it. You’re here because you’re not everyone.",
+            "Suffering is temporary. Quitting is permanent.",
+
+            // =========================
+            // Focus & Purpose
+            // =========================
+            "Focus on becoming dangerous, not comfortable.",
+            "Sharpen yourself every day — the world respects power and competence.",
+            "Obsess over progress, not opinions.",
+
+            // =========================
+            // Winning Mindset
+            // =========================
+            "Winners don’t make excuses, they make adjustments.",
+            "You don’t rise to the level of your goals — you fall to the level of your discipline.",
+            "Act like the man you want to become, and reality will follow.",
+
+            // =========================
+            // Faith, Strength & Legacy
+            // =========================
+            "God gives the hardest battles to the strongest soldiers.",
+            "Build something so strong that no one can take it from you.",
+            "Leave no doubt. When it’s over, let your results speak.",
+
+            // =========================
+            // Discipline & Standards
+            // =========================
+            "Raise your standards so high that mediocrity feels uncomfortable.",
+            "Discipline is self-respect in action.",
+            "Do what weak men refuse to do, and you’ll live how they never can.",
+
+            // =========================
+            // Responsibility & Control
+            // =========================
+            "Everything in your life is your responsibility — once you accept that, you gain power.",
+            "If you don’t control your time, someone else will.",
+            "Blame is for losers. Winners fix problems.",
+
+            // =========================
+            // Hard Work & Sacrifice
+            // =========================
+            "Success demands sacrifice. If you’re not sacrificing, you’re not serious.",
+            "While others relax, you sharpen the blade.",
+            "Every day you work hard is a day closer to freedom.",
+
+            // =========================
+            // Mental Strength
+            // =========================
+            "Pressure doesn’t break strong men — it reveals them.",
+            "Your mind quits long before your body does.",
+            "Train your mind to stay calm while others panic.",
+
+            // =========================
+            // Focus & Isolation
+            // =========================
+            "Sometimes you must walk alone to build something uncommon.",
+            "Silence, focus, execution — repeat.",
+            "Distance yourself from distractions disguised as pleasure.",
+
+            // =========================
+            // Growth & Becoming Dangerous
+            // =========================
+            "Become so capable that confidence is automatic.",
+            "Comfort makes men weak. Hard times make men unstoppable.",
+            "Build skills so valuable that opportunity chases you.",
+
+            // =========================
+            // Legacy & Results
+            // =========================
+            "Results silence critics better than arguments ever could.",
+            "Live today in a way that your future self respects.",
+            "Leave a legacy built on discipline, not excuses."
         ];
 
         let priceData = null;
@@ -88,7 +198,6 @@
         };
 
         function getPortfolioSnapshot(range = state.currentTimeFilter) {
-            // Placeholder data - replace with API call when available
             void range;
             const resolvedPrices = priceData && Object.keys(priceData).length
                 ? priceData
@@ -131,9 +240,10 @@
             }
         }
 
-        function getRandomTopGQuote() {
+        // ✅ UPDATED: returns numbered quote in "best UX pattern"
+        function getRandomTopGQuoteNumbered() {
             const index = Math.floor(Math.random() * TOP_G_QUOTES.length);
-            return TOP_G_QUOTES[index];
+            return `#${index + 1}/${TOP_G_QUOTES.length} — ${TOP_G_QUOTES[index]}`;
         }
 
         function saveHistory() {
@@ -587,10 +697,10 @@
             // 🔥 TOP G KEYWORD HANDLER
             // Note: normalizeMessage() converts "top_g" -> "top g", so checking "top g" is enough.
             if (normalized === 'top g') {
-                const quote = getRandomTopGQuote();
+                const quoteNumbered = getRandomTopGQuoteNumbered();
                 appendMessage(
                     'bot',
-                    `🔥 TOP G MODE 🔥\n\n"${quote}"`,
+                    `🔥 TOP G MODE 🔥\n\n${quoteNumbered}`,
                     { animate: true }
                 );
                 return;
