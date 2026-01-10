@@ -540,7 +540,7 @@
     <h1>Welcome, {{ username }}!</h1>
     <nav>
         <div class="nav-left">
-            <span><strong>Net Worth:</strong> <span class="sensitive-value">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span> <span class="btc-equivalent">₿{{ btc_equivalent|floatformat:3 }}</span></span>
+            <span><strong>Net Worth:</strong> <span class="sensitive-value" data-net-worth="{{ total_net_worth }}">{{ currency_symbol }}{{ total_net_worth|intcomma2 }}</span> <span class="btc-equivalent">₿{{ btc_equivalent|floatformat:3 }}</span></span>
         </div>
         
         <!-- Hamburger menu button for mobile -->

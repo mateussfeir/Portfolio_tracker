@@ -275,6 +275,44 @@
             })}`;
         }
 
+        function parseNetWorthValue(rawValue) {
+            if (rawValue === null || rawValue === undefined) {
+                return NaN;
+            }
+            if (typeof rawValue === 'number') {
+                return rawValue;
+            }
+            if (typeof rawValue === 'string') {
+                const cleaned = rawValue.replace(/[^0-9.-]/g, '');
+                return cleaned ? Number(cleaned) : NaN;
+            }
+            return NaN;
+        }
+
+        function getLiveNetWorth() {
+            const netWorthEl = document.querySelector('[data-net-worth]');
+            if (netWorthEl) {
+                const dataValue = parseNetWorthValue(netWorthEl.dataset.netWorth);
+                if (!Number.isNaN(dataValue)) {
+                    return dataValue;
+                }
+                const textValue = parseNetWorthValue(netWorthEl.textContent);
+                if (!Number.isNaN(textValue)) {
+                    return textValue;
+                }
+            }
+
+            const navFallback = document.querySelector('.nav-left .sensitive-value');
+            if (navFallback) {
+                const fallbackValue = parseNetWorthValue(navFallback.textContent);
+                if (!Number.isNaN(fallbackValue)) {
+                    return fallbackValue;
+                }
+            }
+
+            return null;
+        }
+
         let typingTimer = null;
 
         function clearTypingTimer() {
@@ -601,16 +639,6 @@
             }
         }
 
-        if (normalized === 'bitbalance' || normalized === 'bit balance') {
-            appendMessage(
-                'bot',
-                getBitBalanceExplanation(),
-                { animate: true }
-            );
-            return;
-        }
-
-
         function handleIntent(intentResult) {
             const activeTimeframe = intentResult.timeFilter || state.currentTimeFilter || DEFAULT_TIMEFRAME;
             if (intentResult.timeFilter) {
@@ -630,9 +658,13 @@
                 case 'help':
                     reply = 'Try asking things like "total value", "allocation", "best performing asset", "price of BTC", or "how much ETH do I have".';
                     break;
-                case 'total_value':
-                    reply = `Your portfolio is currently valued at ${formatCurrency(snapshot.totalValue)}${timeframeSuffix || ''}.`;
+                case 'total_value': {
+                    const liveNetWorth = getLiveNetWorth();
+                    reply = liveNetWorth !== null
+                        ? `Your portfolio is currently valued at ${formatCurrency(liveNetWorth)}${timeframeSuffix || ''}.`
+                        : 'I could not read your live net worth yet.';
                     break;
+                }
                 case 'allocation':
                     reply = `Allocation${timeframeSuffix}: ${allocationSummary(snapshot)}.`;
                     break;
@@ -726,6 +758,15 @@
                 appendMessage(
                     'bot',
                     `🔥 TOP G MODE 🔥\n\n${quoteNumbered}`,
+                    { animate: true }
+                );
+                return;
+            }
+
+            if (normalized === 'bitbalance' || normalized === 'bit balance') {
+                appendMessage(
+                    'bot',
+                    getBitBalanceExplanation(),
                     { animate: true }
                 );
                 return;
