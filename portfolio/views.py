@@ -1643,6 +1643,53 @@ def general(request):
     ]
     totals.sort(key=lambda x: float(x['value']), reverse=True)
 
+    def build_section_breakdown(assets, value_fn, label_fn=None):
+        labels = []
+        values = []
+        for asset in assets:
+            value = value_fn(asset)
+            if value is None:
+                continue
+            labels.append(label_fn(asset) if label_fn else asset.ticker)
+            values.append(float(value))
+        section_sum = sum(values)
+        breakdown = []
+        for label, value in zip(labels, values):
+            pct = (value / section_sum * 100) if section_sum > 0 else 0
+            breakdown.append({'ticker': label, 'pct': round(pct, 2)})
+        breakdown.sort(key=lambda x: x['pct'], reverse=True)
+        return breakdown
+
+    def crypto_value(asset):
+        price_usd = crypto_prices.get(map_ticker(asset.ticker), {}).get('usd')
+        if price_usd is None:
+            return None
+        price = convert_currency(Decimal(str(price_usd)), 'USD', selected_currency)
+        return price * asset.amount
+
+    def stock_value(asset):
+        price_usd = stock_prices.get(asset.ticker.upper())
+        if price_usd is None:
+            return None
+        price = convert_currency(Decimal(str(price_usd)), 'USD', selected_currency)
+        return price * asset.amount
+
+    def base_value(asset):
+        return convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
+
+    assistant_allocation = [
+        {'label': entry['type'], 'pct': round(float(entry['percent']), 2)}
+        for entry in totals
+    ]
+    assistant_segment_breakdown = {
+        'Crypto': build_section_breakdown(crypto_assets, crypto_value),
+        'Stocks': build_section_breakdown(stock_assets, stock_value),
+        'Real Estate': build_section_breakdown(real_estate_assets, base_value),
+        'Vehicles': build_section_breakdown(vehicle_assets, base_value),
+        'Cash/Fixed Income': build_section_breakdown(cash_assets, base_value),
+        'Others': build_section_breakdown(other_assets, base_value),
+    }
+
     # Build labels and values from sorted totals for charts
     chart_labels = [t['type'] for t in totals]
     chart_values = [float(t['value']) for t in totals]
@@ -1947,6 +1994,8 @@ def general(request):
         'show_new_user_message': show_new_user_message,
         'new_user_minutes_remaining': new_user_minutes_remaining,
         'assistant_prices_json': json.dumps(assistant_prices),
+        'assistant_allocation_json': json.dumps(assistant_allocation),
+        'assistant_segment_breakdown_json': json.dumps(assistant_segment_breakdown),
     })
 
 @login_required

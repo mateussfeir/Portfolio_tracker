@@ -161,6 +161,26 @@
             priceData = null;
         }
 
+        let allocationData = [];
+        try {
+            const rawAllocation = widget.dataset.allocationJson;
+            if (rawAllocation) {
+                allocationData = JSON.parse(rawAllocation);
+            }
+        } catch (e) {
+            allocationData = [];
+        }
+
+        let segmentBreakdownData = {};
+        try {
+            const rawSegmentBreakdown = widget.dataset.segmentBreakdownJson;
+            if (rawSegmentBreakdown) {
+                segmentBreakdownData = JSON.parse(rawSegmentBreakdown);
+            }
+        } catch (e) {
+            segmentBreakdownData = {};
+        }
+
         let debugMode = false;
         try {
             debugMode = localStorage.getItem('pa_debug') === '1';
@@ -204,12 +224,8 @@
                 : {};
             return {
                 totalValue: 1331674.82,
-                allocation: [
-                    { ticker: 'BTC', pct: 58 },
-                    { ticker: 'ETH', pct: 24 },
-                    { ticker: 'SOL', pct: 8 },
-                    { ticker: 'CASH', pct: 10 }
-                ],
+                allocation: allocationData,
+                segmentBreakdown: segmentBreakdownData,
                 performance: [
                     { ticker: 'BTC', pnlPct: 12.4 },
                     { ticker: 'ETH', pnlPct: -3.1 },
@@ -600,9 +616,40 @@
         }
 
         function allocationSummary(snapshot) {
-            return snapshot.allocation
-                .map(entry => `${entry.ticker}: ${entry.pct}%`)
-                .join(' • ');
+            const lines = [];
+            const allocationEntries = Array.isArray(snapshot.allocation)
+                ? snapshot.allocation
+                : [];
+            allocationEntries.forEach(entry => {
+                const label = entry.label || entry.ticker || entry.type;
+                if (label) {
+                    lines.push(`${label}: ${formatPercentValue(entry.pct)}`);
+                }
+            });
+
+            const segmentEntries = snapshot.segmentBreakdown && typeof snapshot.segmentBreakdown === 'object'
+                ? Object.entries(snapshot.segmentBreakdown)
+                : [];
+            segmentEntries
+                .filter(([, assets]) => Array.isArray(assets) && assets.length)
+                .forEach(([segment, assets]) => {
+                    if (lines.length) {
+                        lines.push('');
+                    }
+                    lines.push(`${segment}:`);
+                    assets.forEach(asset => {
+                        lines.push(`${asset.ticker}: ${formatPercentValue(asset.pct)}`);
+                    });
+                });
+
+            return lines.join('\n');
+        }
+
+        function formatPercentValue(value) {
+            if (typeof value !== 'number') {
+                return `${value}%`;
+            }
+            return `${value.toFixed(2)}%`;
         }
 
         function bestAsset(snapshot) {
@@ -666,7 +713,14 @@
                     break;
                 }
                 case 'allocation':
-                    reply = `Allocation${timeframeSuffix}: ${allocationSummary(snapshot)}.`;
+                    {
+                        const summary = allocationSummary(snapshot);
+                        if (summary) {
+                            reply = `Allocation${timeframeSuffix}\n${summary}`;
+                        } else {
+                            reply = 'I could not find allocation data yet. Open the General tab to load it.';
+                        }
+                    }
                     break;
                 case 'best_asset': {
                     const asset = bestAsset(snapshot);
