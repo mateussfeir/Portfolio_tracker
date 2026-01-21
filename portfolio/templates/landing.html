@@ -12,17 +12,20 @@
     .landing-container {
         max-width: 1100px;
         margin: 0 auto;
-        padding: 40px 20px 60px;
+        padding: 32px 20px 60px;
     }
     .hero {
         display: grid;
-        gap: 24px;
+        gap: 20px;
         align-items: center;
         text-align: center;
-        padding: 30px 20px;
+        padding: 26px 20px 20px;
         background: #121212;
         border-radius: 16px;
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+    .hero-content {
+        max-width: 640px;
     }
     .hero-badge {
         display: inline-block;
@@ -72,28 +75,32 @@
         border: 1px solid #3a3a3a;
     }
     .section {
-        margin-top: 32px;
+        margin-top: 24px;
         background: #141414;
         border-radius: 14px;
         padding: 24px;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
     }
+    .section-tight {
+        margin-top: 12px;
+    }
     .section h2 {
         margin-top: 0;
         color: #f0f0f0;
     }
-    .features-list {
+    .features-grid {
         display: grid;
-        gap: 12px;
+        gap: 10px;
         margin: 0;
         padding: 0;
         list-style: none;
     }
-    .features-list li {
-        background: #1d1d1d;
-        padding: 12px 14px;
-        border-radius: 8px;
+    .features-grid li {
+        background: #1b1b1b;
+        padding: 8px 12px;
+        border-radius: 999px;
         border: 1px solid #2b2b2b;
+        font-size: 13px;
     }
     .tech-row {
         display: flex;
@@ -107,28 +114,71 @@
         padding: 6px 12px;
         font-size: 12px;
     }
-    .screenshots {
+    .carousel {
         display: grid;
-        gap: 18px;
+        gap: 14px;
+    }
+    .carousel-viewport {
+        overflow: hidden;
+        width: 100%;
+    }
+    .carousel-track {
+        display: flex;
+        transition: transform 0.6s ease-in-out;
+        will-change: transform;
+    }
+    .carousel-slide {
+        min-width: 100%;
+        box-sizing: border-box;
+        display: flex;
     }
     .shot-card {
         background: #1d1d1d;
         border-radius: 10px;
         padding: 16px;
-        border: 1px dashed #3a3a3a;
+        border: 1px solid #2b2b2b;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        width: 100%;
+    }
+    .shot-card:hover {
+        transform: scale(1.02);
+        border-color: #3a3a3a;
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
     }
     .demo-screenshot {
         width: 100%;
-        height: auto;
+        height: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: contain;
+        background: #0f0f0f;
         border-radius: 10px;
         border: 1px solid #2b2b2b;
-        box-shadow: 0 10px 24px rgba(0, 255, 255, 0.08);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
         display: block;
     }
-    .demo-screenshot:hover {
-        transform: scale(1.01);
-        box-shadow: 0 14px 30px rgba(0, 255, 255, 0.16);
+    .carousel-caption {
+        margin: 12px 0 0;
+        color: #d9d9d9;
+        text-align: left;
+    }
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 4px;
+    }
+    .carousel-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        border: 1px solid #3a3a3a;
+        background: #1a1a1a;
+        cursor: pointer;
+        padding: 0;
+    }
+    .carousel-dot.active {
+        background: #4caf50;
+        border-color: #4caf50;
     }
     .about-actions {
         display: flex;
@@ -139,13 +189,16 @@
     @media (min-width: 900px) {
         .hero {
             text-align: left;
-            grid-template-columns: 1.2fr 0.8fr;
         }
         .hero-actions {
             justify-content: flex-start;
         }
-        .screenshots {
-            grid-template-columns: repeat(3, 1fr);
+        .features-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .screenshots-section {
+            width: 110%;
+            margin-left: -5%;
         }
     }
 </style>
@@ -154,7 +207,7 @@
 {% block content %}
 <div class="landing-container">
     <section class="hero">
-        <div>
+        <div class="hero-content">
             <span class="hero-badge">Portfolio Project - built for demonstration purposes</span>
             <h1>BitBalance — Personal Portfolio &amp; Finance Tracker</h1>
             <p>Full-stack web app built with Django, PostgreSQL, REST APIs, and charts to track assets, portfolio value, and net worth.</p>
@@ -164,15 +217,34 @@
                 <a class="btn-secondary" href="{% url 'login' %}">Login</a>
             </div>
         </div>
-        <div class="section" style="margin-top: 0;">
-            <h2>Quick Features</h2>
-            <ul class="features-list">
-                <li>Real-time valuation via external APIs</li>
-                <li>Secure authentication (Django Auth)</li>
-                <li>Interactive charts (Plotly)</li>
-                <li>Relational data modeling (PostgreSQL)</li>
-                <li>Production deployment (PythonAnywhere)</li>
-            </ul>
+    </section>
+
+    <section class="section section-tight screenshots-section">
+        <h2>Product Walkthrough</h2>
+        <div class="carousel" data-carousel>
+            <div class="carousel-viewport">
+                <div class="carousel-track">
+                    <div class="carousel-slide">
+                        <div class="shot-card">
+                            <img class="demo-screenshot" src="{% static 'images/Screenshot1.png' %}" alt="Portfolio overview and net worth composition dashboard">
+                            <p class="carousel-caption">Portfolio dashboard showing net worth, asset allocation, and performance.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="shot-card">
+                            <img class="demo-screenshot" src="{% static 'images/Screenshot2.png' %}" alt="Net worth over time chart with performance trend">
+                            <p class="carousel-caption">Holdings view with live valuations, clean filters, and sortable tables.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-slide">
+                        <div class="shot-card">
+                            <img class="demo-screenshot" src="{% static 'images/Screenshot3.png' %}" alt="Real estate positions view with valuations">
+                            <p class="carousel-caption">Net worth trends with performance snapshots over time.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-dots" role="tablist" aria-label="Product walkthrough slides"></div>
         </div>
     </section>
 
@@ -192,21 +264,14 @@
     </section>
 
     <section class="section">
-        <h2>Product Walkthrough</h2>
-        <div class="screenshots">
-            <div class="shot-card">
-                <img class="demo-screenshot" src="{% static 'images/Screenshot1.png' %}" alt="Portfolio overview and net worth composition dashboard">
-                <p>Portfolio overview dashboard with net worth and asset allocation.</p>
-            </div>
-            <div class="shot-card">
-                <img class="demo-screenshot" src="{% static 'images/Screenshot2.png' %}" alt="Net worth over time chart with performance trend">
-                <p>Holdings tables with real-time valuation and clean filtering.</p>
-            </div>
-            <div class="shot-card">
-                <img class="demo-screenshot" src="{% static 'images/Screenshot3.png' %}" alt="Real estate positions view with valuations">
-                <p>Net worth trends and performance snapshots over time.</p>
-            </div>
-        </div>
+        <h2>Quick Features</h2>
+        <ul class="features-grid">
+            <li>Real-time valuation via external APIs</li>
+            <li>Secure authentication (Django Auth)</li>
+            <li>Interactive charts (Plotly)</li>
+            <li>Relational data modeling (PostgreSQL)</li>
+            <li>Production deployment (PythonAnywhere)</li>
+        </ul>
     </section>
 
     <section class="section">
@@ -219,4 +284,181 @@
         </div>
     </section>
 </div>
+<script>
+    (function () {
+        const carousel = document.querySelector('[data-carousel]');
+        if (!carousel) {
+            return;
+        }
+
+        const track = carousel.querySelector('.carousel-track');
+        const viewport = carousel.querySelector('.carousel-viewport');
+        const dotsContainer = carousel.querySelector('.carousel-dots');
+        const slides = Array.from(track.children);
+        const slideCount = slides.length;
+        const intervalMs = 6000;
+        const transitionMs = 600;
+
+        if (slideCount === 0) {
+            return;
+        }
+
+        slides.forEach((slide) => {
+            track.appendChild(slide.cloneNode(true));
+        });
+
+        let index = 0;
+        let isHovering = false;
+        let isDragging = false;
+        let startX = 0;
+        let currentTranslate = 0;
+        let animationFrame = null;
+        let timer = null;
+
+        const setTransition = (enabled) => {
+            track.style.transition = enabled ? `transform ${transitionMs}ms ease-in-out` : 'none';
+        };
+
+        const setPosition = () => {
+            track.style.transform = `translateX(-${index * 100}%)`;
+        };
+
+        const updateDots = () => {
+            const dotIndex = ((index % slideCount) + slideCount) % slideCount;
+            dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === dotIndex);
+            });
+        };
+
+        const goTo = (newIndex) => {
+            index = newIndex;
+            setTransition(true);
+            setPosition();
+            updateDots();
+        };
+
+        const next = () => {
+            goTo(index + 1);
+        };
+
+        const prev = () => {
+            goTo(index - 1);
+        };
+
+        const startTimer = () => {
+            if (timer || slideCount < 2) {
+                return;
+            }
+            timer = setInterval(() => {
+                if (!isHovering && !isDragging) {
+                    next();
+                }
+            }, intervalMs);
+        };
+
+        const stopTimer = () => {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        };
+
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < slideCount; i += 1) {
+            const dot = document.createElement('button');
+            dot.type = 'button';
+            dot.className = 'carousel-dot';
+            dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+            dot.addEventListener('click', () => {
+                goTo(i);
+                stopTimer();
+                startTimer();
+            });
+            dotsContainer.appendChild(dot);
+        }
+
+        setTransition(false);
+        setPosition();
+        updateDots();
+        requestAnimationFrame(() => setTransition(true));
+
+        track.addEventListener('transitionend', () => {
+            if (index >= slideCount) {
+                setTransition(false);
+                index = 0;
+                setPosition();
+                updateDots();
+                requestAnimationFrame(() => setTransition(true));
+            } else if (index < 0) {
+                setTransition(false);
+                index = slideCount - 1;
+                setPosition();
+                updateDots();
+                requestAnimationFrame(() => setTransition(true));
+            }
+        });
+
+        carousel.addEventListener('mouseenter', () => {
+            isHovering = true;
+        });
+        carousel.addEventListener('mouseleave', () => {
+            isHovering = false;
+        });
+
+        const onTouchStart = (event) => {
+            if (event.touches.length !== 1) {
+                return;
+            }
+            isDragging = true;
+            startX = event.touches[0].clientX;
+            currentTranslate = -index * viewport.clientWidth;
+            setTransition(false);
+            stopTimer();
+        };
+
+        const onTouchMove = (event) => {
+            if (!isDragging) {
+                return;
+            }
+            const deltaX = event.touches[0].clientX - startX;
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            animationFrame = requestAnimationFrame(() => {
+                track.style.transform = `translateX(${currentTranslate + deltaX}px)`;
+            });
+        };
+
+        const onTouchEnd = (event) => {
+            if (!isDragging) {
+                return;
+            }
+            isDragging = false;
+            const endX = event.changedTouches[0].clientX;
+            const deltaX = endX - startX;
+            setTransition(true);
+            if (Math.abs(deltaX) > viewport.clientWidth * 0.2) {
+                if (deltaX < 0) {
+                    next();
+                } else {
+                    prev();
+                }
+            } else {
+                setPosition();
+            }
+            startTimer();
+        };
+
+        viewport.addEventListener('touchstart', onTouchStart, { passive: true });
+        viewport.addEventListener('touchmove', onTouchMove, { passive: true });
+        viewport.addEventListener('touchend', onTouchEnd);
+
+        startTimer();
+        window.addEventListener('resize', () => {
+            setTransition(false);
+            setPosition();
+            requestAnimationFrame(() => setTransition(true));
+        });
+    })();
+</script>
 {% endblock %}
