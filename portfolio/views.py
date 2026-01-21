@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from functools import wraps
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
@@ -12,7 +13,7 @@ import plotly.graph_objects as go
 from django.shortcuts import render
 import yfinance as yf
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from datetime import date
 import time
 import threading
@@ -28,6 +29,15 @@ _exchange_rate_cache = {}
 _exchange_rate_cache_time = {}
 _exchange_rate_cache_lock = threading.Lock()
 CACHE_TTL_SECONDS = 180  # 3 minutes
+
+
+def demo_readonly(view_func):
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if request.session.get("is_demo") and request.method != "GET":
+            return HttpResponseForbidden("Demo mode: changes are disabled.")
+        return view_func(request, *args, **kwargs)
+    return _wrapped
 
 def get_exchange_rates(base_currency='USD'):
     """Get exchange rates from USD to other currencies using a free API, with 3-minute cache."""
@@ -211,6 +221,7 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 @login_required
+@demo_readonly
 def home(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
@@ -480,6 +491,7 @@ def home(request):
     })
 
 @login_required
+@demo_readonly
 def delete_holding(request, pk):
     asset = get_object_or_404(Asset, pk=pk, owner=request.user)
     asset.delete()
@@ -491,6 +503,7 @@ def delete_holding(request, pk):
     return redirect('home')
 
 @login_required
+@demo_readonly
 def edit_holding(request, pk):
     asset = get_object_or_404(Asset, pk=pk, owner=request.user)
     available_currencies = {
@@ -531,6 +544,7 @@ def edit_holding(request, pk):
 
 
 @login_required
+@demo_readonly
 def stocks(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
@@ -809,6 +823,7 @@ def stocks(request):
     })
 
 @login_required
+@demo_readonly
 def real_estate(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
@@ -973,6 +988,7 @@ def real_estate(request):
     })
 
 @login_required
+@demo_readonly
 def vehicles(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
@@ -1138,6 +1154,7 @@ def vehicles(request):
     })
 
 @login_required
+@demo_readonly
 def cash(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
@@ -1319,6 +1336,7 @@ def cash(request):
     })
 
 @login_required
+@demo_readonly
 def other(request):
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
@@ -2147,6 +2165,41 @@ def performance(request):
         'currency_symbol': currency_symbol,
         'user': request.user,
         'btc_equivalent': btc_equivalent,
+    })
+
+def landing_view(request):
+    return render(request, 'landing.html')
+
+
+def demo_entry(request):
+    request.session["is_demo"] = True
+    return redirect('demo_dashboard')
+
+
+def demo_dashboard(request):
+    demo_highlights = [
+        {"label": "Net Worth", "value": "$245,400"},
+        {"label": "Portfolio Value", "value": "$182,650"},
+        {"label": "Cash & Fixed Income", "value": "$38,250"},
+        {"label": "Real Estate", "value": "$72,000"},
+    ]
+    demo_assets = [
+        {"type": "Crypto", "name": "Bitcoin", "ticker": "BTC", "value": "$48,120", "change": "+3.2%"},
+        {"type": "Crypto", "name": "Ethereum", "ticker": "ETH", "value": "$21,440", "change": "+1.1%"},
+        {"type": "Stocks", "name": "Apple", "ticker": "AAPL", "value": "$34,980", "change": "+0.6%"},
+        {"type": "Stocks", "name": "Microsoft", "ticker": "MSFT", "value": "$29,760", "change": "+0.9%"},
+        {"type": "Real Estate", "name": "Rental Condo", "ticker": "RE-1", "value": "$72,000", "change": "Stable"},
+    ]
+    demo_breakdown = [
+        {"label": "Crypto", "percent": "28%"},
+        {"label": "Stocks", "percent": "42%"},
+        {"label": "Real Estate", "percent": "20%"},
+        {"label": "Cash", "percent": "10%"},
+    ]
+    return render(request, 'demo_dashboard.html', {
+        "demo_highlights": demo_highlights,
+        "demo_assets": demo_assets,
+        "demo_breakdown": demo_breakdown,
     })
 
 def root_redirect(request):

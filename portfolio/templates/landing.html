@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}BitBalance - Landing{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: radial-gradient(circle at top, #1b1b1b 0%, #0d0d0d 55%, #050505 100%);
+        color: #e0e0e0;
+    }
+    .landing-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+    }
+    .hero {
+        display: grid;
+        gap: 24px;
+        align-items: center;
+        text-align: center;
+        padding: 30px 20px;
+        background: #121212;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+    .hero-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #1f1f1f;
+        border: 1px solid #2f2f2f;
+        font-size: 12px;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+    }
+    .hero h1 {
+        margin: 0;
+        font-size: 32px;
+        color: #ffffff;
+    }
+    .hero p {
+        margin: 0;
+        color: #cfcfcf;
+        line-height: 1.6;
+    }
+    .hero-stack {
+        font-size: 13px;
+        color: #9fd79f;
+        letter-spacing: 0.3px;
+    }
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .btn-primary, .btn-secondary {
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-primary {
+        background: #4caf50;
+        color: #ffffff;
+    }
+    .btn-secondary {
+        background: #1f1f1f;
+        color: #e0e0e0;
+        border: 1px solid #3a3a3a;
+    }
+    .section {
+        margin-top: 32px;
+        background: #141414;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+    .section h2 {
+        margin-top: 0;
+        color: #f0f0f0;
+    }
+    .features-list {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .features-list li {
+        background: #1d1d1d;
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1px solid #2b2b2b;
+    }
+    .tech-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .tech-pill {
+        background: #1f1f1f;
+        border: 1px solid #3a3a3a;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    .screenshots {
+        display: grid;
+        gap: 18px;
+    }
+    .shot-card {
+        background: #1d1d1d;
+        border-radius: 10px;
+        padding: 16px;
+        border: 1px dashed #3a3a3a;
+    }
+    .shot-placeholder {
+        height: 160px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #0e0e0e 0%, #222 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #777;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .about-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+    @media (min-width: 900px) {
+        .hero {
+            text-align: left;
+            grid-template-columns: 1.2fr 0.8fr;
+        }
+        .hero-actions {
+            justify-content: flex-start;
+        }
+        .screenshots {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="landing-container">
+    <section class="hero">
+        <div>
+            <span class="hero-badge">Portfolio Project - built for demonstration purposes</span>
+            <h1>BitBalance — Personal Portfolio &amp; Finance Tracker</h1>
+            <p>Full-stack web app built with Django, PostgreSQL, REST APIs, and charts to track assets, portfolio value, and net worth.</p>
+            <p class="hero-stack">Python · Django · DRF · PostgreSQL · Chart.js · REST APIs</p>
+            <div class="hero-actions">
+                <a class="btn-primary" href="{% url 'demo' %}">View Demo (No Login)</a>
+                <a class="btn-secondary" href="{% url 'login' %}">Login</a>
+            </div>
+        </div>
+        <div class="section" style="margin-top: 0;">
+            <h2>Quick Features</h2>
+            <ul class="features-list">
+                <li>Real-time valuation via external APIs</li>
+                <li>Secure authentication (Django Auth)</li>
+                <li>Interactive charts (Chart.js or equivalent)</li>
+                <li>Relational data modeling (PostgreSQL)</li>
+                <li>Production deployment (PythonAnywhere or current host)</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Tech Stack</h2>
+        <div class="tech-row">
+            <span class="tech-pill">Python</span>
+            <span class="tech-pill">Django</span>
+            <span class="tech-pill">Django REST Framework</span>
+            <span class="tech-pill">PostgreSQL</span>
+            <span class="tech-pill">JavaScript</span>
+            <span class="tech-pill">Chart.js</span>
+            <span class="tech-pill">REST APIs</span>
+            <span class="tech-pill">Git</span>
+            <span class="tech-pill">Linux</span>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Product Walkthrough</h2>
+        <div class="screenshots">
+            <div class="shot-card">
+                <div class="shot-placeholder">Screenshot Placeholder</div>
+                <p>Portfolio overview dashboard with net worth and asset allocation.</p>
+            </div>
+            <div class="shot-card">
+                <div class="shot-placeholder">Screenshot Placeholder</div>
+                <p>Holdings tables with real-time valuation and clean filtering.</p>
+            </div>
+            <div class="shot-card">
+                <div class="shot-placeholder">Screenshot Placeholder</div>
+                <p>Net worth trends and performance snapshots over time.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>About the Developer</h2>
+        <p>Built by Mateus Sfeir, Full-Stack Developer (Toronto).</p>
+        <div class="about-actions">
+            <a class="btn-secondary" href="https://github.com/mateussfeir" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a class="btn-secondary" href="https://www.linkedin.com/in/mateus-sfeir-b65393152/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a class="btn-secondary" href="{% url 'resume' %}">Resume</a>
+        </div>
+    </section>
+</div>
+{% endblock %}
