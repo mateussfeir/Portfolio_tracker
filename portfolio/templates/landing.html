@@ -117,17 +117,18 @@
         padding: 16px;
         border: 1px dashed #3a3a3a;
     }
-    .shot-placeholder {
-        height: 160px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #0e0e0e 0%, #222 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #777;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+    .demo-screenshot {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        border: 1px solid #2b2b2b;
+        box-shadow: 0 10px 24px rgba(0, 255, 255, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: block;
+    }
+    .demo-screenshot:hover {
+        transform: scale(1.01);
+        box-shadow: 0 14px 30px rgba(0, 255, 255, 0.16);
     }
     .about-actions {
         display: flex;
@@ -194,15 +195,15 @@
         <h2>Product Walkthrough</h2>
         <div class="screenshots">
             <div class="shot-card">
-                <div class="shot-placeholder">Screenshot Placeholder</div>
+                <img class="demo-screenshot" src="{% static 'images/Screenshot1.png' %}" alt="Portfolio overview and net worth composition dashboard">
                 <p>Portfolio overview dashboard with net worth and asset allocation.</p>
             </div>
             <div class="shot-card">
-                <div class="shot-placeholder">Screenshot Placeholder</div>
+                <img class="demo-screenshot" src="{% static 'images/Screenshot2.png' %}" alt="Net worth over time chart with performance trend">
                 <p>Holdings tables with real-time valuation and clean filtering.</p>
             </div>
             <div class="shot-card">
-                <div class="shot-placeholder">Screenshot Placeholder</div>
+                <img class="demo-screenshot" src="{% static 'images/Screenshot3.png' %}" alt="Real estate positions view with valuations">
                 <p>Net worth trends and performance snapshots over time.</p>
             </div>
         </div>
