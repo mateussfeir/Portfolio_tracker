@@ -31,6 +31,18 @@ _exchange_rate_cache_lock = threading.Lock()
 CACHE_TTL_SECONDS = 180  # 3 minutes
 
 
+def safe_decimal(value, default="0"):
+    try:
+        if value is None:
+            return Decimal(default)
+        d = value if isinstance(value, Decimal) else Decimal(str(value).strip())
+        if not d.is_finite():
+            return Decimal(default)
+        return d
+    except (InvalidOperation, ValueError, TypeError):
+        return Decimal(default)
+
+
 def demo_readonly(view_func):
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
@@ -1810,53 +1822,62 @@ def general(request):
     )
     # Convert to selected currency
     total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
+    total_stocks = safe_decimal(total_stocks)
 
     # Calculate total cash in selected currency
     total_cash = Decimal('0')
     for cash in cash_assets:
-        cash_value = convert_currency(cash.amount, cash.currency or 'USD', selected_currency)
+        cash_value = safe_decimal(convert_currency(cash.amount, cash.currency or 'USD', selected_currency))
         total_cash += cash_value
 
     # Calculate total real estate in selected currency
     total_real_estate = Decimal('0')
     for real_estate in real_estate_assets:
-        real_estate_value = convert_currency(real_estate.amount, real_estate.currency or 'USD', selected_currency)
+        real_estate_value = safe_decimal(
+            convert_currency(real_estate.amount, real_estate.currency or 'USD', selected_currency)
+        )
         total_real_estate += real_estate_value
 
     # Calculate total vehicle in selected currency
     total_vehicle = Decimal('0')
     for vehicle in vehicle_assets:
-        vehicle_value = convert_currency(vehicle.amount, vehicle.currency or 'USD', selected_currency)
+        vehicle_value = safe_decimal(convert_currency(vehicle.amount, vehicle.currency or 'USD', selected_currency))
         total_vehicle += vehicle_value
 
     # Calculate total other in selected currency
     total_other = Decimal('0')
     for other in other_assets:
-        other_value = convert_currency(other.amount, other.currency or 'USD', selected_currency)
+        other_value = safe_decimal(convert_currency(other.amount, other.currency or 'USD', selected_currency))
         total_other += other_value
 
     # Calculate the true total net worth (sum of all asset types)
+    total_crypto = safe_decimal(total_crypto)
+    total_real_estate = safe_decimal(total_real_estate)
+    total_vehicle = safe_decimal(total_vehicle)
+    total_cash = safe_decimal(total_cash)
+    total_other = safe_decimal(total_other)
     total_net_worth = total_crypto + total_stocks + total_real_estate + total_vehicle + total_cash + total_other
+    total_net_worth = safe_decimal(total_net_worth)
 
     # Pie chart data
     labels = []
     values = []
-    if total_crypto > 0:
+    if total_crypto > Decimal("0"):
         labels.append('Crypto')
         values.append(float(total_crypto))
-    if total_stocks > 0:
+    if total_stocks > Decimal("0"):
         labels.append('Stocks')
         values.append(float(total_stocks))
-    if total_real_estate > 0:
+    if total_real_estate > Decimal("0"):
         labels.append('Real Estate')
         values.append(float(total_real_estate))
-    if total_vehicle > 0:
+    if total_vehicle > Decimal("0"):
         labels.append('Vehicles')
         values.append(float(total_vehicle))
-    if total_cash > 0:
+    if total_cash > Decimal("0"):
         labels.append('Cash')
         values.append(float(total_cash))
-    if total_other > 0:
+    if total_other > Decimal("0"):
         labels.append('Others')
         values.append(float(total_other))
 
@@ -1873,20 +1894,26 @@ def general(request):
     }
 
     # Calculate percentages based on the true total net worth
-    if total_net_worth > 0:
-        crypto_percent = (total_crypto / total_net_worth) * 100
-        stocks_percent = (total_stocks / total_net_worth) * 100
-        real_estate_percent = (total_real_estate / total_net_worth) * 100
-        vehicle_percent = (total_vehicle / total_net_worth) * 100
-        cash_percent = (total_cash / total_net_worth) * 100
-        other_percent = (total_other / total_net_worth) * 100
+    crypto_percent = Decimal("0")
+    stocks_percent = Decimal("0")
+    real_estate_percent = Decimal("0")
+    vehicle_percent = Decimal("0")
+    cash_percent = Decimal("0")
+    other_percent = Decimal("0")
+    if total_net_worth > Decimal("0"):
+        crypto_percent = (total_crypto / total_net_worth) * Decimal("100")
+        stocks_percent = (total_stocks / total_net_worth) * Decimal("100")
+        real_estate_percent = (total_real_estate / total_net_worth) * Decimal("100")
+        vehicle_percent = (total_vehicle / total_net_worth) * Decimal("100")
+        cash_percent = (total_cash / total_net_worth) * Decimal("100")
+        other_percent = (total_other / total_net_worth) * Decimal("100")
     else:
-        crypto_percent = 0
-        stocks_percent = 0
-        real_estate_percent = 0
-        vehicle_percent = 0
-        cash_percent = 0
-        other_percent = 0
+        crypto_percent = Decimal("0")
+        stocks_percent = Decimal("0")
+        real_estate_percent = Decimal("0")
+        vehicle_percent = Decimal("0")
+        cash_percent = Decimal("0")
+        other_percent = Decimal("0")
     totals = [
         {'type': 'Crypto', 'url': 'home', 'value': total_crypto, 'percent': crypto_percent},
         {'type': 'Stocks', 'url': 'stocks', 'value': total_stocks, 'percent': stocks_percent},
@@ -1904,13 +1931,16 @@ def general(request):
             value = value_fn(asset)
             if value is None:
                 continue
+            value = safe_decimal(value)
             labels.append(label_fn(asset) if label_fn else asset.ticker)
-            values.append(float(value))
-        section_sum = sum(values)
+            values.append(value)
+        section_sum = safe_decimal(sum(values))
         breakdown = []
         for label, value in zip(labels, values):
-            pct = (value / section_sum * 100) if section_sum > 0 else 0
-            breakdown.append({'ticker': label, 'pct': round(pct, 2)})
+            pct = Decimal("0")
+            if section_sum > Decimal("0"):
+                pct = (value / section_sum) * Decimal("100")
+            breakdown.append({'ticker': label, 'pct': round(float(pct), 2)})
         breakdown.sort(key=lambda x: x['pct'], reverse=True)
         return breakdown
 
@@ -2583,12 +2613,6 @@ CURRENCY_SYMBOLS = {
     'AUD': 'A$',
     'VND': '₫',
 }
-
-def safe_decimal(val):
-    try:
-        return Decimal(str(val))
-    except (InvalidOperation, TypeError, ValueError):
-        return Decimal('0')
 
 def create_top5_chart_data(labels, values, percent_mode, true_total_net_worth_float):
     """
