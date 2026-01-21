@@ -16,10 +16,10 @@
     }
     .hero {
         display: grid;
-        gap: 20px;
+        gap: 16px;
         align-items: center;
         text-align: center;
-        padding: 26px 20px 20px;
+        padding: 18px 20px 12px;
         background: #121212;
         border-radius: 16px;
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
@@ -57,6 +57,39 @@
         gap: 12px;
         justify-content: center;
         flex-wrap: wrap;
+    }
+    .hero-media {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .hero-photo {
+        width: clamp(140px, 28vw, 220px);
+        height: clamp(140px, 28vw, 220px);
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #1f1f1f;
+        box-shadow: 0 0 24px rgba(79, 175, 105, 0.2), 0 10px 24px rgba(0, 0, 0, 0.4);
+        background: #0f0f0f;
+    }
+    .hero-photo-label {
+        text-align: center;
+        line-height: 1.15;
+        color: #d6d6d6;
+    }
+    .hero-photo-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: #e2e2e2;
+        margin: 0;
+    }
+    .hero-photo-role {
+        font-size: 12px;
+        color: #b5b5b5;
+        letter-spacing: 0.2px;
+        margin: 0;
     }
     .btn-primary, .btn-secondary {
         padding: 10px 18px;
@@ -188,6 +221,7 @@
     }
     @media (min-width: 900px) {
         .hero {
+            grid-template-columns: minmax(0, 1fr) auto;
             text-align: left;
         }
         .hero-actions {
@@ -215,6 +249,13 @@
             <div class="hero-actions">
                 <a class="btn-primary" href="{% url 'demo' %}">View Demo (No Login)</a>
                 <a class="btn-secondary" href="{% url 'login' %}">Login</a>
+            </div>
+        </div>
+        <div class="hero-media">
+            <img class="hero-photo" src="{% static 'images/Mateus.jpeg' %}" alt="Mateus Sfeir profile photo">
+            <div class="hero-photo-label">
+                <div class="hero-photo-name">Mateus Sfeir</div>
+                <div class="hero-photo-role">Software Developer</div>
             </div>
         </div>
     </section>
