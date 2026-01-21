@@ -240,13 +240,13 @@ def get_demo_total_net_worth(selected_currency):
     stock_prices = get_demo_stock_prices()
 
     total_crypto_usd = sum(
-        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        (safe_decimal(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0)) * asset.amount)
         for asset in crypto_assets
     )
     total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
 
     total_stocks_usd = sum(
-        (Decimal(str(stock_prices.get(asset.ticker.upper(), 0))) * asset.amount)
+        (safe_decimal(stock_prices.get(asset.ticker.upper(), 0)) * asset.amount)
         for asset in stock_assets
     )
     total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
@@ -417,6 +417,24 @@ def get_multiple_stock_prices(tickers):
                     prices[ticker] = None
     except Exception:
         prices = {ticker: None for ticker in tickers}
+
+    for ticker in tickers:
+        price = prices.get(ticker)
+        if price is None or price != price:
+            try:
+                info = yf.Ticker(ticker).fast_info
+                fallback = info.get("last_price") if info else None
+                if fallback is None:
+                    info = yf.Ticker(ticker).info
+                    fallback = info.get("regularMarketPrice") if info else None
+                if fallback is None:
+                    hist = yf.Ticker(ticker).history(period="1d")
+                    if not hist.empty and "Close" in hist:
+                        fallback = hist["Close"].iloc[-1]
+                if fallback is not None:
+                    prices[ticker] = float(fallback)
+            except Exception:
+                continue
 
     cache.set(cache_key, prices, timeout=STOCK_CACHE_TTL_SECONDS)
     return prices
@@ -1805,7 +1823,7 @@ def general(request):
 
     # Calculate total crypto net worth in USD
     total_crypto_usd = sum(
-        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        (safe_decimal(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0)) * asset.amount)
         for asset in crypto_assets
     )
     # Convert to selected currency
@@ -1817,7 +1835,7 @@ def general(request):
 
     # Calculate total stocks net worth in USD
     total_stocks_usd = sum(
-        (Decimal(str(stock_prices.get(asset.ticker.upper(), 0))) * asset.amount)
+        (safe_decimal(stock_prices.get(asset.ticker.upper(), 0)) * asset.amount)
         for asset in stock_assets
     )
     # Convert to selected currency
