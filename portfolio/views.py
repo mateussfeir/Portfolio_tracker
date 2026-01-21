@@ -100,6 +100,109 @@ DEMO_STOCK_PRICES = {
     "NVDA": 128.40,
 }
 
+DEMO_NET_WORTH_SERIES = {
+    "1M": [
+        {"date": "2025-08-01", "value": 386200},
+        {"date": "2025-08-02", "value": 387450},
+        {"date": "2025-08-03", "value": 386900},
+        {"date": "2025-08-04", "value": 388300},
+        {"date": "2025-08-05", "value": 389150},
+        {"date": "2025-08-06", "value": 388500},
+        {"date": "2025-08-07", "value": 390100},
+        {"date": "2025-08-08", "value": 389400},
+        {"date": "2025-08-09", "value": 390850},
+        {"date": "2025-08-10", "value": 391200},
+        {"date": "2025-08-11", "value": 390600},
+        {"date": "2025-08-12", "value": 392000},
+        {"date": "2025-08-13", "value": 392450},
+        {"date": "2025-08-14", "value": 391800},
+        {"date": "2025-08-15", "value": 393250},
+        {"date": "2025-08-16", "value": 392700},
+        {"date": "2025-08-17", "value": 393900},
+        {"date": "2025-08-18", "value": 394600},
+        {"date": "2025-08-19", "value": 393800},
+        {"date": "2025-08-20", "value": 395300},
+        {"date": "2025-08-21", "value": 396100},
+        {"date": "2025-08-22", "value": 395500},
+        {"date": "2025-08-23", "value": 396900},
+        {"date": "2025-08-24", "value": 396400},
+        {"date": "2025-08-25", "value": 397200},
+        {"date": "2025-08-26", "value": 397850},
+        {"date": "2025-08-27", "value": 397100},
+        {"date": "2025-08-28", "value": 398300},
+        {"date": "2025-08-29", "value": 398900},
+        {"date": "2025-08-30", "value": 399600},
+    ],
+    "3M": [
+        {"date": "2025-06-14", "value": 372500},
+        {"date": "2025-06-21", "value": 374200},
+        {"date": "2025-06-28", "value": 373000},
+        {"date": "2025-07-05", "value": 376400},
+        {"date": "2025-07-12", "value": 378100},
+        {"date": "2025-07-19", "value": 377200},
+        {"date": "2025-07-26", "value": 381000},
+        {"date": "2025-08-02", "value": 384800},
+        {"date": "2025-08-09", "value": 386900},
+        {"date": "2025-08-16", "value": 391200},
+        {"date": "2025-08-23", "value": 395700},
+        {"date": "2025-08-30", "value": 399600},
+    ],
+    "1Y": [
+        {"date": "2024-09-07", "value": 305000},
+        {"date": "2024-09-14", "value": 306200},
+        {"date": "2024-09-21", "value": 305400},
+        {"date": "2024-09-28", "value": 307100},
+        {"date": "2024-10-05", "value": 308800},
+        {"date": "2024-10-12", "value": 307900},
+        {"date": "2024-10-19", "value": 309500},
+        {"date": "2024-10-26", "value": 311200},
+        {"date": "2024-11-02", "value": 310600},
+        {"date": "2024-11-09", "value": 312400},
+        {"date": "2024-11-16", "value": 313900},
+        {"date": "2024-11-23", "value": 313100},
+        {"date": "2024-11-30", "value": 315300},
+        {"date": "2024-12-07", "value": 316800},
+        {"date": "2024-12-14", "value": 316100},
+        {"date": "2024-12-21", "value": 318200},
+        {"date": "2024-12-28", "value": 319700},
+        {"date": "2025-01-04", "value": 318900},
+        {"date": "2025-01-11", "value": 321400},
+        {"date": "2025-01-18", "value": 322800},
+        {"date": "2025-01-25", "value": 322100},
+        {"date": "2025-02-01", "value": 324600},
+        {"date": "2025-02-08", "value": 326200},
+        {"date": "2025-02-15", "value": 325400},
+        {"date": "2025-02-22", "value": 328000},
+        {"date": "2025-03-01", "value": 329500},
+        {"date": "2025-03-08", "value": 328700},
+        {"date": "2025-03-15", "value": 331200},
+        {"date": "2025-03-22", "value": 332800},
+        {"date": "2025-03-29", "value": 332100},
+        {"date": "2025-04-05", "value": 334900},
+        {"date": "2025-04-12", "value": 336300},
+        {"date": "2025-04-19", "value": 335600},
+        {"date": "2025-04-26", "value": 338400},
+        {"date": "2025-05-03", "value": 340100},
+        {"date": "2025-05-10", "value": 339300},
+        {"date": "2025-05-17", "value": 342200},
+        {"date": "2025-05-24", "value": 343800},
+        {"date": "2025-05-31", "value": 343100},
+        {"date": "2025-06-07", "value": 346000},
+        {"date": "2025-06-14", "value": 347700},
+        {"date": "2025-06-21", "value": 347000},
+        {"date": "2025-06-28", "value": 350200},
+        {"date": "2025-07-05", "value": 352400},
+        {"date": "2025-07-12", "value": 351500},
+        {"date": "2025-07-19", "value": 355100},
+        {"date": "2025-07-26", "value": 358400},
+        {"date": "2025-08-02", "value": 365000},
+        {"date": "2025-08-09", "value": 371500},
+        {"date": "2025-08-16", "value": 379200},
+        {"date": "2025-08-23", "value": 387900},
+        {"date": "2025-08-30", "value": 399600},
+    ],
+}
+
 
 def get_demo_assets(asset_type):
     return DEMO_ASSETS.get(asset_type, [])
@@ -145,39 +248,19 @@ def get_demo_total_net_worth(selected_currency):
 
 
 def get_demo_networth_series(selected_currency, selected_range='1m'):
-    today = date.today()
-    demo_points = [
-        (today - timedelta(days=210), Decimal('162000')),
-        (today - timedelta(days=180), Decimal('171500')),
-        (today - timedelta(days=150), Decimal('179200')),
-        (today - timedelta(days=120), Decimal('187800')),
-        (today - timedelta(days=90), Decimal('194500')),
-        (today - timedelta(days=60), Decimal('206400')),
-        (today - timedelta(days=30), Decimal('218200')),
-        (today, Decimal('231750')),
-    ]
+    range_lower = (selected_range or '1m').lower()
+    if range_lower in ('1m', '1w'):
+        series_key = "1M"
+    elif range_lower in ('3m', '6m'):
+        series_key = "3M"
+    else:
+        series_key = "1Y"
 
-    range_lower = (selected_range or 'all').lower()
-    if range_lower != 'all':
-        if range_lower == '1w':
-            cutoff = today - timedelta(days=7)
-        elif range_lower == '1m':
-            cutoff = today - timedelta(days=30)
-        elif range_lower == '3m':
-            cutoff = today - timedelta(days=90)
-        elif range_lower == '6m':
-            cutoff = today - timedelta(days=180)
-        elif range_lower == '1y':
-            cutoff = today - timedelta(days=365)
-        else:
-            cutoff = None
-        if cutoff:
-            demo_points = [point for point in demo_points if point[0] >= cutoff]
-
-    dates = [point[0].strftime('%Y-%m-%d') for point in demo_points]
+    series = DEMO_NET_WORTH_SERIES.get(series_key, DEMO_NET_WORTH_SERIES["1M"])
+    dates = [point["date"] for point in series]
     values = [
-        float(convert_currency(point[1], 'USD', selected_currency))
-        for point in demo_points
+        float(convert_currency(Decimal(str(point["value"])), 'USD', selected_currency))
+        for point in series
     ]
     return dates, values
 
