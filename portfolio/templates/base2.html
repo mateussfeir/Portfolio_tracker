@@ -1266,7 +1266,7 @@
               {% block percent_buttons %}{% endblock %}
               {% block table %}{% endblock %}
               {% block add_new %}
-              {% if not request.session.is_demo %}
+              {% if not is_demo %}
               <div id="add-asset-section" style="margin-top: 30px; text-align: center;">
                   <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
                   <form id="add-asset-form" method="post" style="display: none; margin-top: 10px;">

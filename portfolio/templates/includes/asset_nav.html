@@ -1,5 +1,10 @@
 {% load humanize %}
 {% load currency_filters %}
+{% if is_demo %}
+<div style="background: #1a1a1a; color: #e0e0e0; text-align: center; font-size: 12px; padding: 6px 12px; border-bottom: 1px solid #2f2f2f; letter-spacing: 0.4px;">
+    Demo Mode — data is simulated, editing is disabled
+</div>
+{% endif %}
 <header>
     <nav>
         <div class="nav-left">
@@ -24,10 +29,14 @@
             <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
             <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
             <button id="privacy-toggle-btn-mobile" type="button" class="mobile-privacy-btn">Privacy Mode: Off</button>
+            {% if is_demo %}
+            <a href="{% url 'exit_demo' %}" class="logout-link">Exit Demo</a>
+            {% else %}
             <form action="{% url 'logout' %}" method="post" class="logout-form">
                 {% csrf_token %}
                 <button type="submit" class="logout-link">Logout</button>
             </form>
+            {% endif %}
         </div>
 
         <div class="nav-right">

@@ -28,7 +28,7 @@
             <td><span class="sensitive-value">{{ asset.value|currency:currency_symbol }}</span></td>
             <td>{{ asset.percentage|floatformat:2 }}%</td>
             <td style="white-space: nowrap;">
-                {% if not request.session.is_demo %}
+                {% if not is_demo %}
                 <a href="{% url 'edit_holding' asset.id %}?next={% url 'cash' %}?currency={{ selected_currency }}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
                 <form action="{% url 'delete_holding' asset.id %}" method="post" style="display:inline;">
                     {% csrf_token %}

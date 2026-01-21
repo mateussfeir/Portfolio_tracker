@@ -34,10 +34,152 @@ CACHE_TTL_SECONDS = 180  # 3 minutes
 def demo_readonly(view_func):
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
-        if request.session.get("is_demo") and request.method != "GET":
+        if request.session.get("is_demo") and request.method not in ("GET", "HEAD", "OPTIONS"):
             return HttpResponseForbidden("Demo mode: changes are disabled.")
         return view_func(request, *args, **kwargs)
     return _wrapped
+
+
+def login_or_demo_required(view_func):
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if request.user.is_authenticated or request.session.get("is_demo"):
+            return view_func(request, *args, **kwargs)
+        return redirect('login')
+    return _wrapped
+
+
+class DemoAsset:
+    def __init__(self, asset_id, ticker, amount, currency='USD'):
+        self.id = asset_id
+        self.ticker = ticker
+        self.amount = Decimal(str(amount))
+        self.currency = currency
+
+
+DEMO_ASSETS = {
+    "crypto": [
+        DemoAsset(1, "btc", "0.85"),
+        DemoAsset(2, "eth", "6.2"),
+        DemoAsset(3, "sol", "120"),
+        DemoAsset(4, "ada", "1800"),
+    ],
+    "stock": [
+        DemoAsset(5, "AAPL", "85"),
+        DemoAsset(6, "MSFT", "42"),
+        DemoAsset(7, "NVDA", "18"),
+    ],
+    "real_estate": [
+        DemoAsset(8, "Downtown Condo", "72000", "USD"),
+        DemoAsset(9, "Rental Duplex", "98000", "USD"),
+    ],
+    "vehicle": [
+        DemoAsset(10, "Model Y", "32000", "USD"),
+        DemoAsset(11, "Motorbike", "6500", "USD"),
+    ],
+    "cash": [
+        DemoAsset(12, "CASH", "18500", "USD"),
+        DemoAsset(13, "Savings", "23000", "USD"),
+    ],
+    "other": [
+        DemoAsset(14, "Private Equity", "15000", "USD"),
+        DemoAsset(15, "Collectibles", "4200", "USD"),
+    ],
+}
+
+DEMO_CRYPTO_PRICES = {
+    "bitcoin": {"usd": 63500},
+    "ethereum": {"usd": 3200},
+    "solana": {"usd": 165},
+    "cardano": {"usd": 0.48},
+}
+
+DEMO_STOCK_PRICES = {
+    "AAPL": 190.25,
+    "MSFT": 415.10,
+    "NVDA": 128.40,
+}
+
+
+def get_demo_assets(asset_type):
+    return DEMO_ASSETS.get(asset_type, [])
+
+
+def get_demo_crypto_prices():
+    return DEMO_CRYPTO_PRICES
+
+
+def get_demo_stock_prices():
+    return DEMO_STOCK_PRICES
+
+
+def get_demo_total_net_worth(selected_currency):
+    crypto_assets = get_demo_assets("crypto")
+    stock_assets = get_demo_assets("stock")
+    real_estate_assets = get_demo_assets("real_estate")
+    vehicle_assets = get_demo_assets("vehicle")
+    cash_assets = get_demo_assets("cash")
+    other_assets = get_demo_assets("other")
+
+    crypto_prices = get_demo_crypto_prices()
+    stock_prices = get_demo_stock_prices()
+
+    total_crypto_usd = sum(
+        (Decimal(str(crypto_prices.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount)
+        for asset in crypto_assets
+    )
+    total_crypto = convert_currency(total_crypto_usd, 'USD', selected_currency)
+
+    total_stocks_usd = sum(
+        (Decimal(str(stock_prices.get(asset.ticker.upper(), 0))) * asset.amount)
+        for asset in stock_assets
+    )
+    total_stocks = convert_currency(total_stocks_usd, 'USD', selected_currency)
+
+    total_cash = sum(convert_currency(asset.amount, asset.currency or 'USD', selected_currency) for asset in cash_assets)
+    total_real_estate = sum(convert_currency(asset.amount, asset.currency or 'USD', selected_currency) for asset in real_estate_assets)
+    total_vehicle = sum(convert_currency(asset.amount, asset.currency or 'USD', selected_currency) for asset in vehicle_assets)
+    total_other = sum(convert_currency(asset.amount, asset.currency or 'USD', selected_currency) for asset in other_assets)
+
+    return total_crypto + total_stocks + total_real_estate + total_vehicle + total_cash + total_other
+
+
+def get_demo_networth_series(selected_currency, selected_range='1m'):
+    today = date.today()
+    demo_points = [
+        (today - timedelta(days=210), Decimal('162000')),
+        (today - timedelta(days=180), Decimal('171500')),
+        (today - timedelta(days=150), Decimal('179200')),
+        (today - timedelta(days=120), Decimal('187800')),
+        (today - timedelta(days=90), Decimal('194500')),
+        (today - timedelta(days=60), Decimal('206400')),
+        (today - timedelta(days=30), Decimal('218200')),
+        (today, Decimal('231750')),
+    ]
+
+    range_lower = (selected_range or 'all').lower()
+    if range_lower != 'all':
+        if range_lower == '1w':
+            cutoff = today - timedelta(days=7)
+        elif range_lower == '1m':
+            cutoff = today - timedelta(days=30)
+        elif range_lower == '3m':
+            cutoff = today - timedelta(days=90)
+        elif range_lower == '6m':
+            cutoff = today - timedelta(days=180)
+        elif range_lower == '1y':
+            cutoff = today - timedelta(days=365)
+        else:
+            cutoff = None
+        if cutoff:
+            demo_points = [point for point in demo_points if point[0] >= cutoff]
+
+    dates = [point[0].strftime('%Y-%m-%d') for point in demo_points]
+    values = [
+        float(convert_currency(point[1], 'USD', selected_currency))
+        for point in demo_points
+    ]
+    return dates, values
 
 def get_exchange_rates(base_currency='USD'):
     """Get exchange rates from USD to other currencies using a free API, with 3-minute cache."""
@@ -220,17 +362,19 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
-@login_required
+@login_or_demo_required
 @demo_readonly
 def home(request):
+    is_demo = request.session.get("is_demo", False)
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     
     # Clear cache to ensure fresh calculations including vehicles
-    cache_key = f"total_net_worth_{request.user.id}_{selected_currency}"
+    cache_user_key = "demo" if is_demo else request.user.id
+    cache_key = f"total_net_worth_{cache_user_key}_{selected_currency}"
     cache.delete(cache_key)
     
-    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
     true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
     if request.method == 'POST':
@@ -246,9 +390,9 @@ def home(request):
     else:
         form = AddAssetForm(asset_type='crypto')
 
-    user_assets = Asset.objects.filter(owner=request.user, type='crypto')
+    user_assets = get_demo_assets("crypto") if is_demo else Asset.objects.filter(owner=request.user, type='crypto')
     tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in user_assets]
-    prices = get_multiple_asset_prices(tickers)
+    prices = get_demo_crypto_prices() if is_demo else get_multiple_asset_prices(tickers)
     bitcoin_price = prices.get('bitcoin', {}).get('usd', 'N/A')
     assistant_prices = build_assistant_prices(user_assets, prices, selected_currency)
 
@@ -294,7 +438,7 @@ def home(request):
     section_net_worth = sum([float(a['value']) for a in assets_with_value if a['value'] != '-'])
 
     # Calculate BTC equivalent
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
 
     # Get available currencies for dropdown
@@ -310,7 +454,7 @@ def home(request):
     }
 
     # Prepare pie and bar charts for crypto
-    cache_key = f"bar_chart_html_{request.user.id}_{selected_currency}"
+    cache_key = f"bar_chart_html_{cache_user_key}_{selected_currency}"
     bar_chart_html = cache.get(cache_key)
     # --- Always generate pie_chart_html ---
     pie_chart_html = None
@@ -474,7 +618,7 @@ def home(request):
             bar_chart_html = None
 
     return render(request, 'home.html', {
-        'username': request.user.username,
+        'username': "Demo User" if is_demo else request.user.username,
         'assets': assets_with_value,
         'form': form,
         'bitcoin_price': bitcoin_price,  # Pass the Bitcoin price to the template
@@ -543,13 +687,14 @@ def edit_holding(request, pk):
     return render(request, 'edit_holding.html', {'form': form, 'asset': asset, 'available_currencies': available_currencies})
 
 
-@login_required
+@login_or_demo_required
 @demo_readonly
 def stocks(request):
+    is_demo = request.session.get("is_demo", False)
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     # Calculate true total net worth for navbar (all assets)
-    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
     # Calculate section (stocks) net worth for tab display
     if request.method == 'POST':
         form = AddAssetForm(request.POST, asset_type='stock')
@@ -565,11 +710,11 @@ def stocks(request):
     else:
         form = AddAssetForm(asset_type='stock')
 
-    user_assets = Asset.objects.filter(owner=request.user, type='stock')
+    user_assets = get_demo_assets("stock") if is_demo else Asset.objects.filter(owner=request.user, type='stock')
     tickers = [asset.ticker.upper() for asset in user_assets]
 
     # Fetch stock prices using the new cache function
-    prices = get_multiple_stock_prices(tickers)
+    prices = get_demo_stock_prices() if is_demo else get_multiple_stock_prices(tickers)
 
     # Calculate section net worth in USD first
     section_net_worth_usd = 0
@@ -589,20 +734,20 @@ def stocks(request):
     values = []
     percent_mode = request.GET.get('percent', 'section')
     # Calculate true total net worth (copy from general view)
-    crypto_assets_all = Asset.objects.filter(owner=request.user, type='crypto')
-    stock_assets_all = Asset.objects.filter(owner=request.user, type='stock')
-    cash_assets_all = Asset.objects.filter(owner=request.user, type='cash')
-    real_estate_assets_all = Asset.objects.filter(owner=request.user, type='real_estate')
-    vehicle_assets_all = Asset.objects.filter(owner=request.user, type='vehicle')
-    other_assets_all = Asset.objects.filter(owner=request.user, type='other')
+    crypto_assets_all = get_demo_assets("crypto") if is_demo else Asset.objects.filter(owner=request.user, type='crypto')
+    stock_assets_all = get_demo_assets("stock") if is_demo else Asset.objects.filter(owner=request.user, type='stock')
+    cash_assets_all = get_demo_assets("cash") if is_demo else Asset.objects.filter(owner=request.user, type='cash')
+    real_estate_assets_all = get_demo_assets("real_estate") if is_demo else Asset.objects.filter(owner=request.user, type='real_estate')
+    vehicle_assets_all = get_demo_assets("vehicle") if is_demo else Asset.objects.filter(owner=request.user, type='vehicle')
+    other_assets_all = get_demo_assets("other") if is_demo else Asset.objects.filter(owner=request.user, type='other')
     # Crypto
     crypto_tickers_all = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets_all]
-    crypto_prices_all = get_multiple_asset_prices(crypto_tickers_all)
+    crypto_prices_all = get_demo_crypto_prices() if is_demo else get_multiple_asset_prices(crypto_tickers_all)
     total_crypto_usd_all = sum((Decimal(str(crypto_prices_all.get(map_ticker(asset.ticker), {}).get('usd', 0))) * asset.amount) for asset in crypto_assets_all)
     total_crypto_all = convert_currency(total_crypto_usd_all, 'USD', selected_currency)
     # Stocks
     stock_tickers_all = [asset.ticker.upper() for asset in stock_assets_all]
-    stock_prices_all = get_multiple_stock_prices(stock_tickers_all)
+    stock_prices_all = get_demo_stock_prices() if is_demo else get_multiple_stock_prices(stock_tickers_all)
     total_stocks_usd_all = 0
     for asset in stock_assets_all:
         price = stock_prices_all.get(asset.ticker.upper())
@@ -804,11 +949,11 @@ def stocks(request):
     }
 
     # Calculate BTC equivalent
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
 
     return render(request, 'stocks.html', {
-        'username': request.user.username,
+        'username': "Demo User" if is_demo else request.user.username,
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,  # This is now always the true total net worth
@@ -822,12 +967,13 @@ def stocks(request):
         'btc_equivalent': btc_equivalent,
     })
 
-@login_required
+@login_or_demo_required
 @demo_readonly
 def real_estate(request):
+    is_demo = request.session.get("is_demo", False)
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
     true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
     percent_mode = request.GET.get('percent', 'section')
@@ -841,7 +987,7 @@ def real_estate(request):
             return redirect('real_estate')
     else:
         form = AddAssetForm()
-    user_assets = Asset.objects.filter(owner=request.user, type='real_estate')
+    user_assets = get_demo_assets("real_estate") if is_demo else Asset.objects.filter(owner=request.user, type='real_estate')
     assets_with_value = []
     for asset in user_assets:
         price = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
@@ -969,11 +1115,11 @@ def real_estate(request):
     }
     
     # Calculate BTC equivalent
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
     
     return render(request, 'real_estate.html', {
-        'username': request.user.username,
+        'username': "Demo User" if is_demo else request.user.username,
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
@@ -987,12 +1133,13 @@ def real_estate(request):
         'btc_equivalent': btc_equivalent,
     })
 
-@login_required
+@login_or_demo_required
 @demo_readonly
 def vehicles(request):
+    is_demo = request.session.get("is_demo", False)
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
     true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
     percent_mode = request.GET.get('percent', 'section')
@@ -1006,7 +1153,7 @@ def vehicles(request):
             return redirect('vehicles')
     else:
         form = AddAssetForm()
-    user_assets = Asset.objects.filter(owner=request.user, type='vehicle')
+    user_assets = get_demo_assets("vehicle") if is_demo else Asset.objects.filter(owner=request.user, type='vehicle')
     assets_with_value = []
     for asset in user_assets:
         price = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
@@ -1135,11 +1282,11 @@ def vehicles(request):
     }
     
     # Calculate BTC equivalent
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
     
     return render(request, 'vehicles.html', {
-        'username': request.user.username,
+        'username': "Demo User" if is_demo else request.user.username,
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
@@ -1153,12 +1300,13 @@ def vehicles(request):
         'btc_equivalent': btc_equivalent,
     })
 
-@login_required
+@login_or_demo_required
 @demo_readonly
 def cash(request):
+    is_demo = request.session.get("is_demo", False)
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
     true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
     percent_mode = request.GET.get('percent', 'section')
@@ -1172,7 +1320,7 @@ def cash(request):
             return redirect('cash')
     else:
         form = AddAssetForm()
-    user_assets = Asset.objects.filter(owner=request.user, type='cash')
+    user_assets = get_demo_assets("cash") if is_demo else Asset.objects.filter(owner=request.user, type='cash')
     assets_with_value = []
     for asset in user_assets:
         price = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
@@ -1317,11 +1465,11 @@ def cash(request):
     }
     
     # Calculate BTC equivalent
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
     
     return render(request, 'cash.html', {
-        'username': request.user.username,
+        'username': "Demo User" if is_demo else request.user.username,
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
@@ -1335,12 +1483,13 @@ def cash(request):
         'btc_equivalent': btc_equivalent,
     })
 
-@login_required
+@login_or_demo_required
 @demo_readonly
 def other(request):
+    is_demo = request.session.get("is_demo", False)
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
-    total_net_worth = get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
     true_total_net_worth = total_net_worth
     true_total_net_worth_float = float(true_total_net_worth)
     percent_mode = request.GET.get('percent', 'section')
@@ -1354,7 +1503,7 @@ def other(request):
             return redirect('other')
     else:
         form = AddAssetForm()
-    user_assets = Asset.objects.filter(owner=request.user, type='other')
+    user_assets = get_demo_assets("other") if is_demo else Asset.objects.filter(owner=request.user, type='other')
     assets_with_value = []
     for asset in user_assets:
         price = convert_currency(asset.amount, asset.currency or 'USD', selected_currency)
@@ -1483,11 +1632,11 @@ def other(request):
     }
     
     # Calculate BTC equivalent
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
     
     return render(request, 'other.html', {
-        'username': request.user.username,
+        'username': "Demo User" if is_demo else request.user.username,
         'assets': assets_with_value,
         'form': form,
         'total_net_worth': total_net_worth,
@@ -1501,7 +1650,10 @@ def other(request):
         'btc_equivalent': btc_equivalent,
     })
 
+@login_or_demo_required
+@demo_readonly
 def general(request):
+    is_demo = request.session.get("is_demo", False)
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
     selected_range = request.GET.get('range', '1m')
@@ -1510,11 +1662,12 @@ def general(request):
     cash_currencies = ['USD', 'CAD', 'BRL', 'KRW', 'INR', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF']
 
     # Clear cache to ensure fresh calculations including vehicles
-    cache_key = f"total_net_worth_{request.user.id}_{selected_currency}"
+    cache_user_key = "demo" if is_demo else request.user.id
+    cache_key = f"total_net_worth_{cache_user_key}_{selected_currency}"
     cache.delete(cache_key)
 
     # Handle cash form submission
-    if request.method == 'POST' and request.POST.get('form_type') == 'add_cash':
+    if not is_demo and request.method == 'POST' and request.POST.get('form_type') == 'add_cash':
         amount = request.POST.get('amount')
         currency = request.POST.get('currency')
         if amount and currency:
@@ -1528,7 +1681,7 @@ def general(request):
             return redirect(f"{request.path}?currency={selected_currency}")
 
     # Handle other asset form submission
-    if request.method == 'POST' and request.POST.get('form_type') == 'add_other':
+    if not is_demo and request.method == 'POST' and request.POST.get('form_type') == 'add_other':
         name = request.POST.get('name')
         amount = request.POST.get('amount')
         currency = request.POST.get('currency')
@@ -1543,16 +1696,16 @@ def general(request):
             return redirect(f"{request.path}?currency={selected_currency}")
 
     # Get all user assets by type
-    crypto_assets = Asset.objects.filter(owner=request.user, type='crypto')
-    stock_assets = Asset.objects.filter(owner=request.user, type='stock')
-    cash_assets = Asset.objects.filter(owner=request.user, type='cash')
-    real_estate_assets = Asset.objects.filter(owner=request.user, type='real_estate')
-    vehicle_assets = Asset.objects.filter(owner=request.user, type='vehicle')
-    other_assets = Asset.objects.filter(owner=request.user, type='other')
+    crypto_assets = get_demo_assets("crypto") if is_demo else Asset.objects.filter(owner=request.user, type='crypto')
+    stock_assets = get_demo_assets("stock") if is_demo else Asset.objects.filter(owner=request.user, type='stock')
+    cash_assets = get_demo_assets("cash") if is_demo else Asset.objects.filter(owner=request.user, type='cash')
+    real_estate_assets = get_demo_assets("real_estate") if is_demo else Asset.objects.filter(owner=request.user, type='real_estate')
+    vehicle_assets = get_demo_assets("vehicle") if is_demo else Asset.objects.filter(owner=request.user, type='vehicle')
+    other_assets = get_demo_assets("other") if is_demo else Asset.objects.filter(owner=request.user, type='other')
 
     # Get prices for crypto
     crypto_tickers = ['bitcoin'] + [map_ticker(asset.ticker) for asset in crypto_assets]
-    crypto_prices = get_multiple_asset_prices(crypto_tickers)
+    crypto_prices = get_demo_crypto_prices() if is_demo else get_multiple_asset_prices(crypto_tickers)
     assistant_prices = build_assistant_prices(crypto_assets, crypto_prices, selected_currency)
 
     # Calculate total crypto net worth in USD
@@ -1565,7 +1718,7 @@ def general(request):
 
     # Get prices for stocks
     stock_tickers = [asset.ticker.upper() for asset in stock_assets]
-    stock_prices = get_multiple_stock_prices(stock_tickers)
+    stock_prices = get_demo_stock_prices() if is_demo else get_multiple_stock_prices(stock_tickers)
 
     # Calculate total stocks net worth in USD
     total_stocks_usd = sum(
@@ -1791,105 +1944,110 @@ def general(request):
 
     # Save snapshot in USD for consistency with daily command
     today = date.today()
-    total_net_worth_usd = get_user_total_net_worth(request.user, 'USD')
-    
-    # Check if this is the user's first snapshot
-    existing_snapshots = NetWorthSnapshot.objects.filter(user=request.user)
-    if existing_snapshots.exists():
-        # User has snapshots, create today's snapshot normally
-        NetWorthSnapshot.objects.get_or_create(
-            user=request.user, date=today,
-            defaults={'net_worth': total_net_worth_usd}
-        )
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
+
+    if is_demo:
+        show_new_user_message = False
+        new_user_minutes_remaining = 0
+        dates, values = get_demo_networth_series(selected_currency, selected_range)
     else:
-        # This is the user's first time - check if 45 minutes have passed since account creation
-        from django.utils import timezone
-        from datetime import timedelta
+        # Check if this is the user's first snapshot
+        existing_snapshots = NetWorthSnapshot.objects.filter(user=request.user)
+        if existing_snapshots.exists():
+            # User has snapshots, create today's snapshot normally
+            NetWorthSnapshot.objects.get_or_create(
+                user=request.user, date=today,
+                defaults={'net_worth': total_net_worth_usd}
+            )
+        else:
+            # This is the user's first time - check if 45 minutes have passed since account creation
+            from django.utils import timezone
+            from datetime import timedelta
+            
+            # Get the user's first snapshot (which should be the only one if it exists)
+            first_snapshot = existing_snapshots.first()
+            
+            if first_snapshot is None:
+                # No snapshots exist yet - check if 45 minutes have passed since user creation
+                user_created_time = request.user.date_joined
+                current_time = timezone.now()
+                time_since_creation = current_time - user_created_time
+                
+                # Only create snapshot if more than 45 minutes have passed
+                if time_since_creation > timedelta(minutes=45):
+                    NetWorthSnapshot.objects.create(
+                        user=request.user, date=today,
+                        net_worth=total_net_worth_usd
+                    )
+
+        # Check if user is new and show appropriate message
+        show_new_user_message = False
+        new_user_minutes_remaining = 0
         
-        # Get the user's first snapshot (which should be the only one if it exists)
-        first_snapshot = existing_snapshots.first()
-        
-        if first_snapshot is None:
-            # No snapshots exist yet - check if 45 minutes have passed since user creation
+        if not NetWorthSnapshot.objects.filter(user=request.user).exists():
+            from django.utils import timezone
+            from datetime import timedelta
+            
             user_created_time = request.user.date_joined
             current_time = timezone.now()
             time_since_creation = current_time - user_created_time
             
-            # Only create snapshot if more than 45 minutes have passed
-            if time_since_creation > timedelta(minutes=45):
-                NetWorthSnapshot.objects.create(
-                    user=request.user, date=today,
-                    net_worth=total_net_worth_usd
-                )
+            if time_since_creation <= timedelta(minutes=10):
+                show_new_user_message = True
+                new_user_minutes_remaining = 45 - int(time_since_creation.total_seconds() / 60)
+
+        # Net Worth Over Time Chart
+        # Get only the latest snapshot per day for smooth chart
+        from django.db.models import Max
+        from django.db.models.functions import TruncDate
+        
+        # Get the latest snapshot ID for each day
+        latest_snapshot_ids = (
+            NetWorthSnapshot.objects
+            .filter(user=request.user)
+            .values('date')
+            .annotate(latest_id=Max('id'))
+            .values_list('latest_id', flat=True)
+        )
+        
+        # Get the actual snapshots using those IDs
+        snapshots = NetWorthSnapshot.objects.filter(
+            id__in=latest_snapshot_ids
+        ).order_by('date')
+        
+        # Apply date filtering based on selected_range
+        if selected_range != 'all' and snapshots.exists():
+            from datetime import timedelta
+            from django.utils import timezone
+            
+            # Use timezone-aware today
+            today = timezone.now().date()
+            
+            # Handle both lowercase and uppercase range values
+            range_lower = selected_range.lower()
+            
+            if range_lower == '1w':
+                start_date = today - timedelta(days=7)
+            elif range_lower == '1m':
+                start_date = today - timedelta(days=30)
+            elif range_lower == '3m':
+                start_date = today - timedelta(days=90)
+            elif range_lower == '6m':
+                start_date = today - timedelta(days=180)
+            elif range_lower == '1y':
+                start_date = today - timedelta(days=365)
+            else:
+                start_date = None
+                
+            if start_date:
+                # Filter snapshots to only include those from start_date onwards
+                snapshots = snapshots.filter(date__gte=start_date)
+        
+        dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
+        values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
 
     # Calculate BTC equivalent
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
-
-    # Check if user is new and show appropriate message
-    show_new_user_message = False
-    new_user_minutes_remaining = 0
-    
-    if not NetWorthSnapshot.objects.filter(user=request.user).exists():
-        from django.utils import timezone
-        from datetime import timedelta
-        
-        user_created_time = request.user.date_joined
-        current_time = timezone.now()
-        time_since_creation = current_time - user_created_time
-        
-        if time_since_creation <= timedelta(minutes=10):
-            show_new_user_message = True
-            new_user_minutes_remaining = 45 - int(time_since_creation.total_seconds() / 60)
-
-    # Net Worth Over Time Chart
-    # Get only the latest snapshot per day for smooth chart
-    from django.db.models import Max
-    from django.db.models.functions import TruncDate
-    
-    # Get the latest snapshot ID for each day
-    latest_snapshot_ids = (
-        NetWorthSnapshot.objects
-        .filter(user=request.user)
-        .values('date')
-        .annotate(latest_id=Max('id'))
-        .values_list('latest_id', flat=True)
-    )
-    
-    # Get the actual snapshots using those IDs
-    snapshots = NetWorthSnapshot.objects.filter(
-        id__in=latest_snapshot_ids
-    ).order_by('date')
-    
-    # Apply date filtering based on selected_range
-    if selected_range != 'all' and snapshots.exists():
-        from datetime import timedelta
-        from django.utils import timezone
-        
-        # Use timezone-aware today
-        today = timezone.now().date()
-        
-        # Handle both lowercase and uppercase range values
-        range_lower = selected_range.lower()
-        
-        if range_lower == '1w':
-            start_date = today - timedelta(days=7)
-        elif range_lower == '1m':
-            start_date = today - timedelta(days=30)
-        elif range_lower == '3m':
-            start_date = today - timedelta(days=90)
-        elif range_lower == '6m':
-            start_date = today - timedelta(days=180)
-        elif range_lower == '1y':
-            start_date = today - timedelta(days=365)
-        else:
-            start_date = None
-            
-        if start_date:
-            # Filter snapshots to only include those from start_date onwards
-            snapshots = snapshots.filter(date__gte=start_date)
-    
-    dates = [snap.date.strftime('%Y-%m-%d') for snap in snapshots]
-    values = [float(convert_currency(snap.net_worth, 'USD', selected_currency)) for snap in snapshots]
     
     # Calculate performance metrics
     performance_info = ""
@@ -1994,7 +2152,7 @@ def general(request):
             networth_line_chart = None
 
     return render(request, 'general.html', {
-        'username': request.user.username,
+        'username': "Demo User" if is_demo else request.user.username,
         'totals': totals,
         'total_net_worth': total_net_worth,
         'pie_chart': pie_chart_html,
@@ -2016,12 +2174,80 @@ def general(request):
         'assistant_segment_breakdown_json': json.dumps(assistant_segment_breakdown),
     })
 
-@login_required
+@login_or_demo_required
+@demo_readonly
 def performance(request):
+    is_demo = request.session.get("is_demo", False)
     user = request.user
     today = date.today()
     selected_currency = request.GET.get('currency', 'USD')
     currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
+
+    if is_demo:
+        dates, values = get_demo_networth_series(selected_currency, 'all')
+        total_net_worth_usd = get_demo_total_net_worth('USD')
+        btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+        performance_info = ""
+        if len(values) >= 2:
+            first_value = values[0]
+            last_value = values[-1]
+            difference = last_value - first_value
+            percentage_change = (difference / first_value) * 100 if first_value != 0 else 0
+            sign = "+" if difference >= 0 else ""
+            formatted_difference = f"{sign}{difference:,.0f}"
+            performance_info = f": {formatted_difference}{currency_symbol} ({percentage_change:+.1f}%)"
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=dates, y=values, mode='lines+markers', name='Net Worth'))
+        fig.update_layout(
+            title=f"Net Worth Over Time{performance_info}",
+            xaxis_title="Date",
+            yaxis_title=f"Net Worth ({currency_symbol})",
+            paper_bgcolor="#121212",
+            plot_bgcolor="#121212",
+            font=dict(color="#e0e0e0"),
+            autosize=True,
+            height=400,
+            margin=dict(t=50, b=80, l=60, r=20),
+            xaxis=dict(
+                tickangle=0,
+                tickmode='auto',
+                nticks=min(8, len(dates)),
+                tickformat='%b %d',
+                tickfont=dict(size=10),
+            ),
+            yaxis=dict(
+                tickfont=dict(size=10),
+                tickformat=',',
+            ),
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1,
+                font=dict(size=10)
+            )
+        )
+
+        chart_html = fig.to_html(
+            full_html=False,
+            config={
+                "responsive": True,
+                "displayModeBar": True,
+                "displaylogo": False
+            }
+        )
+
+        return render(request, 'performance.html', {
+            'chart': chart_html,
+            'snapshots': [],
+            'selected_currency': selected_currency,
+            'currency_symbol': currency_symbol,
+            'user': request.user,
+            'btc_equivalent': btc_equivalent,
+        })
 
     # --- Calculate current net worth (reuse logic from general) ---
     total_net_worth = get_user_total_net_worth(user, selected_currency)
@@ -2173,34 +2399,12 @@ def landing_view(request):
 
 def demo_entry(request):
     request.session["is_demo"] = True
-    return redirect('demo_dashboard')
+    return redirect('general')
 
 
-def demo_dashboard(request):
-    demo_highlights = [
-        {"label": "Net Worth", "value": "$245,400"},
-        {"label": "Portfolio Value", "value": "$182,650"},
-        {"label": "Cash & Fixed Income", "value": "$38,250"},
-        {"label": "Real Estate", "value": "$72,000"},
-    ]
-    demo_assets = [
-        {"type": "Crypto", "name": "Bitcoin", "ticker": "BTC", "value": "$48,120", "change": "+3.2%"},
-        {"type": "Crypto", "name": "Ethereum", "ticker": "ETH", "value": "$21,440", "change": "+1.1%"},
-        {"type": "Stocks", "name": "Apple", "ticker": "AAPL", "value": "$34,980", "change": "+0.6%"},
-        {"type": "Stocks", "name": "Microsoft", "ticker": "MSFT", "value": "$29,760", "change": "+0.9%"},
-        {"type": "Real Estate", "name": "Rental Condo", "ticker": "RE-1", "value": "$72,000", "change": "Stable"},
-    ]
-    demo_breakdown = [
-        {"label": "Crypto", "percent": "28%"},
-        {"label": "Stocks", "percent": "42%"},
-        {"label": "Real Estate", "percent": "20%"},
-        {"label": "Cash", "percent": "10%"},
-    ]
-    return render(request, 'demo_dashboard.html', {
-        "demo_highlights": demo_highlights,
-        "demo_assets": demo_assets,
-        "demo_breakdown": demo_breakdown,
-    })
+def exit_demo(request):
+    request.session.pop("is_demo", None)
+    return redirect('landing')
 
 def root_redirect(request):
     if request.user.is_authenticated:
