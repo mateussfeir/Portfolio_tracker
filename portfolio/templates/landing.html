@@ -39,8 +39,30 @@
     }
     .hero h1 {
         margin: 0;
-        font-size: 32px;
         color: #ffffff;
+        line-height: 1.05;
+    }
+    .hero-title,
+    .hero-title-sub {
+        display: block;
+    }
+    .hero-title {
+        font-size: 48px;
+        font-weight: 700;
+    }
+    .hero-title-sub {
+        font-size: 30px;
+        font-weight: 500;
+        margin-top: 2px;
+        white-space: nowrap;
+    }
+    @media (max-width: 600px) {
+        .hero-title {
+            font-size: 36px;
+        }
+        .hero-title-sub {
+            font-size: 22px;
+        }
     }
     .hero p {
         margin: 0;
@@ -264,7 +286,10 @@
 <div class="landing-container">
     <section class="hero">
         <div class="hero-content">
-            <h1>BitBalance — Personal Portfolio &amp; Finance Tracker</h1>
+            <h1>
+                <span class="hero-title">BitBalance</span>
+                <span class="hero-title-sub">Your Personal Portfolio &amp; Finance Tracker</span>
+            </h1>
             <p>Track your net worth across stocks, crypto, illiquid assets, and cash with live pricing and historical insights.</p>
             <p class="hero-stack">Python · Django · DRF · PostgreSQL · Chart.js · REST APIs</p>
             <div class="hero-actions">
