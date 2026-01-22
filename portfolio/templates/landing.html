@@ -19,7 +19,7 @@
         gap: 12px;
         align-items: center;
         text-align: center;
-        padding: 12px 20px 10px;
+        padding: 12px 20px 6px;
         background: #121212;
         border-radius: 16px;
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
@@ -51,6 +51,11 @@
         font-size: 13px;
         color: #9fd79f;
         letter-spacing: 0.3px;
+    }
+    .hero-credibility {
+        margin: 6px 0 0;
+        font-size: 12px;
+        color: #9a9a9a;
     }
     .hero-actions {
         display: flex;
@@ -115,22 +120,28 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
     }
     .section-tight {
-        margin-top: 8px;
+        margin-top: 0;
     }
     .section h2 {
         margin-top: 0;
         color: #f0f0f0;
     }
     .screenshots-section {
-        padding-top: 16px;
-        padding-bottom: 16px;
+        padding-top: 2px;
+        padding-bottom: 10px;
     }
     .screenshots-section h2 {
-        margin-bottom: 10px;
+        margin: 0 0 4px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #2b2b2b;
+        text-align: center;
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
     }
     .screenshots-section .carousel {
         margin-top: 0;
-        gap: 10px;
+        gap: 8px;
     }
     .features-grid {
         display: grid;
@@ -179,7 +190,7 @@
     .shot-card {
         background: #1d1d1d;
         border-radius: 10px;
-        padding: 16px;
+        padding: 10px;
         border: 1px solid #2b2b2b;
         transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         width: 100%;
@@ -253,14 +264,14 @@
 <div class="landing-container">
     <section class="hero">
         <div class="hero-content">
-            <span class="hero-badge">Portfolio Project - built for demonstration purposes</span>
             <h1>BitBalance — Personal Portfolio &amp; Finance Tracker</h1>
-            <p>Full-stack web app built with Django, PostgreSQL, REST APIs, and charts to track assets, portfolio value, and net worth.</p>
+            <p>Track your net worth across stocks, crypto, illiquid assets, and cash with live pricing and historical insights.</p>
             <p class="hero-stack">Python · Django · DRF · PostgreSQL · Chart.js · REST APIs</p>
             <div class="hero-actions">
                 <a class="btn-primary" href="{% url 'demo' %}">View Demo (No Login)</a>
-                <a class="btn-secondary" href="{% url 'login' %}">Login</a>
+                <a class="btn-secondary" href="{% url 'login' %}">Sign in / Sign up</a>
             </div>
+            <p class="hero-credibility">Built as a full-stack portfolio project to demonstrate real-world finance data handling.</p>
         </div>
         <div class="hero-media">
             <img class="hero-photo" src="{% static 'images/Mateus.jpeg' %}" alt="Mateus Sfeir profile photo">
