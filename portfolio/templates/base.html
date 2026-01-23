@@ -18,6 +18,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/chat_widget.css' %}">
     <style>
         /* Base navigation styles */
+        html {
+            scroll-behavior: smooth;
+        }
         nav {
             background-color: #1a1a1a;
             padding: 8px 20px;
@@ -167,22 +170,6 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% block main_nav %}
-    <nav>
-        <!-- Hamburger menu button for mobile -->
-        <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
-        
-        <div class="nav-links" id="navLinks">
-            <a href="{% url 'landing' %}">Home</a>
-            <a href="{% url 'demo' %}">Demo</a>
-            <a href="{% url 'projects' %}">Projects</a>
-            <a href="{% url 'resume' %}">Resume</a>
-            <a href="https://github.com/mateussfeir" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href="https://www.linkedin.com/in/mateus-sfeir-b65393152/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            <a href="{% url 'login' %}">Login</a>
-        </div>
-    </nav>
-    {% endblock %}
 
     <div>
         {% block content %}

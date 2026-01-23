@@ -292,6 +292,9 @@
         flex-wrap: wrap;
         margin-top: 12px;
     }
+    .scroll-target {
+        scroll-margin-top: 90px;
+    }
     @media (min-width: 900px) {
         .hero {
             grid-template-columns: minmax(0, 1fr) auto;
@@ -420,13 +423,14 @@
         </ul>
     </section>
 
-    <section class="section">
-        <h2>About the Developer</h2>
+    <section class="section scroll-target" id="contact">
+        <h2>Contact</h2>
         <p>Built by Mateus Sfeir, Full-Stack Developer (Toronto).</p>
         <div class="about-actions">
             <a class="btn-secondary" href="https://github.com/mateussfeir" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a class="btn-secondary" href="https://www.linkedin.com/in/mateus-sfeir-b65393152/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a class="btn-secondary" href="{% url 'resume' %}">Resume</a>
+            <a class="btn-secondary" href="mailto:mateussfeir@hotmail.com">Email me</a>
         </div>
     </section>
 </div>
