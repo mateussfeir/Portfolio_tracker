@@ -14,6 +14,7 @@
 </header>
 <div class="container">
     <div class="login-form">
+        <a class="back-link" href="{% url 'landing' %}">← Back to Home</a>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
