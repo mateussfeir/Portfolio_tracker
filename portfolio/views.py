@@ -1992,20 +1992,32 @@ def general(request):
         'Others': build_section_breakdown(other_assets, base_value),
     }
 
-    # Build labels and values from sorted totals for charts
-    chart_labels = [t['type'] for t in totals]
-    chart_values = [float(t['value']) for t in totals]
-    chart_percentages = [t['percent'] for t in totals]  # Use the same percentages as the table
+    # Build labels and values from sorted totals for charts (exclude zero/null values)
+    chart_items = []
+    for entry in totals:
+        value = entry.get('value')
+        percent = entry.get('percent')
+        if value is None or percent is None:
+            continue
+        if safe_decimal(value) <= Decimal("0"):
+            continue
+        if safe_decimal(percent) <= Decimal("0"):
+            continue
+        chart_items.append(entry)
+    chart_labels = [t['type'] for t in chart_items]
+    chart_values = [float(t['value']) for t in chart_items]
+    chart_percentages = [float(t['percent']) for t in chart_items]  # Use the same percentages as the table
     if chart_labels and chart_values:
         # Futuristic color palette with neon-like colors
-        futuristic_colors = [
-            '#0080ff',  # Electric Blue - for Real Estate
-            '#ff6b00',  # Neon Orange - for Vehicles  
-            '#00ff88',  # Neon Green - for Stocks
-            '#ff00ff',  # Magenta - for Crypto
-            '#00ff88',  # Neon Green - for Cash/Fixed Income
-            '#ffff00'   # Neon Yellow - for Others
-        ]
+        color_by_label = {
+            'Real Estate': '#0080ff',       # Electric Blue
+            'Vehicles': '#ff6b00',          # Neon Orange
+            'Stocks': '#00ff88',            # Neon Green
+            'Crypto': '#ff00ff',            # Magenta
+            'Cash/Fixed Income': '#00ff88', # Neon Green
+            'Others': '#ffff00',            # Neon Yellow
+        }
+        futuristic_colors = [color_by_label.get(label, '#00ffff') for label in chart_labels]
         
         # Create mobile-friendly labels (break Cash/Fixed Income into two lines)
         mobile_labels = []
