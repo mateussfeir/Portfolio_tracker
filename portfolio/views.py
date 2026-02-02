@@ -2032,12 +2032,12 @@ def general(request):
             labels=mobile_labels, 
             values=chart_percentages,  # Use percentages instead of raw values
             textinfo='label+percent',
-            texttemplate='<b style="color:#ffffff; text-shadow: 0 0 10px #00ffff;">%{label}</b><br><span style="color:#00ffff; font-size:14px; text-shadow: 0 0 8px #00ffff;">%{value:.0f}%</span>',
+            texttemplate='<b>%{label}</b><br>%{value:.0f}%',
             textposition='outside',
             showlegend=False,
             hole=0.6,  # Larger hole for futuristic look
-            textfont=dict(size=12, color='white', family='Courier New, monospace'),
-            hovertemplate='<b style="color:#ffffff;">%{label}</b><br><span style="color:#00ffff;">%{value:.0f}%</span><extra></extra>',
+            textfont=dict(size=12, color='#00ffff', family='Courier New, monospace'),
+            hovertemplate='<b>%{label}</b><br>%{value:.0f}%<extra></extra>',
             marker=dict(
                 colors=futuristic_colors,
                 line=dict(
