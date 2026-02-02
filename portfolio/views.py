@@ -2010,12 +2010,12 @@ def general(request):
     if chart_labels and chart_values:
         # Futuristic color palette with neon-like colors
         color_by_label = {
-            'Real Estate': '#0080ff',       # Electric Blue
-            'Vehicles': '#ff6b00',          # Neon Orange
-            'Stocks': '#00ff88',            # Neon Green
-            'Crypto': '#ff00ff',            # Magenta
-            'Cash/Fixed Income': '#00ff88', # Neon Green
-            'Others': '#ffff00',            # Neon Yellow
+            'Cash/Fixed Income': '#3FAE7F',  # Muted emerald green
+            'Real Estate': '#8E9398',        # Neutral slate grey
+            'Stocks': '#C94A4A',             # Muted brick red
+            'Crypto': '#E38B29',             # Burnt orange / amber
+            'Vehicles': '#8FCFA9',           # Desaturated light green
+            'Others': '#D6C45A',             # Soft mustard yellow
         }
         futuristic_colors = [color_by_label.get(label, '#00ffff') for label in chart_labels]
         
