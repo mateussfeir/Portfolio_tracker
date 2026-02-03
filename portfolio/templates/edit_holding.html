@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,7 +73,7 @@
             <label for="id_ticker">Name:</label>
             <input type="text" name="ticker" id="id_ticker" value="{{ form.ticker.value }}" required>
             <label for="id_amount">Amount:</label>
-            <input type="number" name="amount" id="id_amount" step="0.00000001" min="0" value="{{ form.amount.value|floatformat:2 }}" required>
+            <input type="number" name="amount" id="id_amount" step="0.00000001" min="0" value="{% if asset.type == 'crypto' %}{{ form.amount.value|crypto_amount }}{% else %}{{ form.amount.value|floatformat:2 }}{% endif %}" required>
             <label for="id_currency">Currency:</label>
             <select name="currency" id="id_currency" required>
                 {% for code, name in available_currencies.items %}

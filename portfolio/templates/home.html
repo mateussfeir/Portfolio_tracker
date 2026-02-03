@@ -1,6 +1,7 @@
 {% extends "base2.html" %}
 {% load humanize %}
 {% load currency_filters %}
+{% load custom_filters %}
 {% block section_title %}Crypto{% endblock %}
 {% block positions_title %}Your Crypto Positions{% endblock %}
 {% block table_positions_title %}Your Crypto Positions{% endblock %}
@@ -23,7 +24,7 @@
         {% for asset in assets %}
         <tr>
             <td>{{ asset.ticker }}</td>
-            <td><span class="sensitive-value">{{ asset.amount|floatformat:2 }}</span></td>
+            <td><span class="sensitive-value">{{ asset.amount|crypto_amount }}</span></td>
             <td>
                 {% if asset.price %}
                     {{ asset.price|currency:currency_symbol }}
