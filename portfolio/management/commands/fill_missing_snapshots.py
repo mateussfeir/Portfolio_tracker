@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from portfolio.models import NetWorthSnapshot
 from portfolio.views import get_user_total_net_worth
-from datetime import date, timedelta
+from datetime import timedelta
 from django.utils import timezone
 
 class Command(BaseCommand):
@@ -28,7 +28,7 @@ class Command(BaseCommand):
         else:
             users = User.objects.all()
         
-        end_date = date.today()
+        end_date = timezone.localdate()
         start_date = end_date - timedelta(days=days_back)
         
         self.stdout.write(f'Checking for missing snapshots from {start_date} to {end_date}')
@@ -57,62 +57,25 @@ class Command(BaseCommand):
             
             while current_date <= end_date:
                 if current_date not in existing_dates:
-                    # Check if this is the user's first snapshot
-                    existing_snapshots = NetWorthSnapshot.objects.filter(user=user)
-                    
-                    if existing_snapshots.exists():
-                        # User has snapshots, create missing one
-                        if not dry_run:
-                            try:
-                                net_worth = get_user_total_net_worth(user, 'USD')
-                                NetWorthSnapshot.objects.create(
-                                    user=user,
-                                    date=current_date,
-                                    net_worth=net_worth
-                                )
-                                self.stdout.write(
-                                    self.style.SUCCESS(f'  ✓ Created snapshot for {current_date}: ${net_worth:,.2f}')
-                                )
-                                user_created += 1
-                            except Exception as e:
-                                self.stdout.write(
-                                    self.style.ERROR(f'  ✗ Error creating snapshot for {current_date}: {e}')
-                                )
-                        else:
-                            self.stdout.write(f'  → Would create snapshot for {current_date}')
-                            user_created += 1
-                    else:
-                        # This is the user's first time - check if 45 minutes have passed since account creation
-                        user_created_time = user.date_joined
-                        current_time = timezone.now()
-                        time_since_creation = current_time - user_created_time
-                        
-                        if time_since_creation > timedelta(minutes=10):
-                            if not dry_run:
-                                try:
-                                    net_worth = get_user_total_net_worth(user, 'USD')
-                                    NetWorthSnapshot.objects.create(
-                                        user=user,
-                                        date=current_date,
-                                        net_worth=net_worth
-                                    )
-                                    self.stdout.write(
-                                        self.style.SUCCESS(f'  ✓ Created first snapshot for {current_date}: ${net_worth:,.2f}')
-                                    )
-                                    user_created += 1
-                                except Exception as e:
-                                    self.stdout.write(
-                                        self.style.ERROR(f'  ✗ Error creating first snapshot for {current_date}: {e}')
-                                    )
-                            else:
-                                self.stdout.write(f'  → Would create first snapshot for {current_date}')
-                                user_created += 1
-                        else:
-                            minutes_remaining = 45 - int(time_since_creation.total_seconds() / 60)
-                            self.stdout.write(
-                                self.style.WARNING(f'  ⏳ Skipping {current_date}: First snapshot in {minutes_remaining} minutes')
+                    if not dry_run:
+                        try:
+                            net_worth = get_user_total_net_worth(user, 'USD')
+                            NetWorthSnapshot.objects.create(
+                                user=user,
+                                date=current_date,
+                                net_worth=net_worth
                             )
-                            user_skipped += 1
+                            self.stdout.write(
+                                self.style.SUCCESS(f'  ✓ Created snapshot for {current_date}: ${net_worth:,.2f}')
+                            )
+                            user_created += 1
+                        except Exception as e:
+                            self.stdout.write(
+                                self.style.ERROR(f'  ✗ Error creating snapshot for {current_date}: {e}')
+                            )
+                    else:
+                        self.stdout.write(f'  → Would create snapshot for {current_date}')
+                        user_created += 1
                 else:
                     user_skipped += 1
                 

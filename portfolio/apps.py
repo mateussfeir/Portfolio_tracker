@@ -26,7 +26,7 @@ class PortfolioConfig(AppConfig):
                 if not hasattr(self, '_scheduler_started'):
                     scheduler = BackgroundScheduler()
                     scheduler.add_job(
-                        lambda: call_command('daily_networth_snapshot'),
+                        lambda: call_command('take_daily_snapshot'),
                         'cron',
                         hour=0,  # Run at midnight
                         minute=0,  # Run at midnight

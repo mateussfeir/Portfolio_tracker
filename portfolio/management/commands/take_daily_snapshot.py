@@ -16,9 +16,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         today = timezone.localdate()
-        user_ids = Asset.objects.values_list("owner_id", flat=True).distinct()
         User = get_user_model()
-        users = User.objects.filter(id__in=user_ids)
+        users = User.objects.filter(is_active=True)
 
         self.stdout.write(
             f"Taking daily snapshots for {users.count()} user(s) on {today}"

@@ -37,27 +37,12 @@ class Command(BaseCommand):
                 # Check if snapshot already exists for today
                 existing_snapshot = NetWorthSnapshot.objects.filter(user=user, date=today).first()
                 
-                if existing_snapshot and not force:
+                if existing_snapshot:
                     self.stdout.write(f'  → Snapshot already exists: ${existing_snapshot.net_worth:,.2f}')
+                    if force:
+                        self.stdout.write(self.style.WARNING('  → Force update is disabled (read-only command)'))
                 else:
-                    if existing_snapshot and force:
-                        old_value = existing_snapshot.net_worth
-                        existing_snapshot.net_worth = net_worth
-                        existing_snapshot.save()
-                        self.stdout.write(
-                            self.style.SUCCESS(f'  → Updated snapshot: ${old_value:,.2f} → ${net_worth:,.2f}')
-                        )
-                    else:
-                        snapshot, created = NetWorthSnapshot.objects.get_or_create(
-                            user=user, date=today,
-                            defaults={'net_worth': net_worth}
-                        )
-                        if created:
-                            self.stdout.write(
-                                self.style.SUCCESS(f'  → Created new snapshot: ${net_worth:,.2f}')
-                            )
-                        else:
-                            self.stdout.write(f'  → Snapshot already exists: ${snapshot.net_worth:,.2f}')
+                    self.stdout.write('  → No snapshot found for today (read-only command)')
                             
             except Exception as e:
                 self.stdout.write(

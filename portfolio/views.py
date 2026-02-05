@@ -2085,7 +2085,7 @@ def general(request):
         pie_chart_html = None
         bar_chart_html = None
 
-    # Save snapshot in USD for consistency with daily command
+    # Compute net worth in USD for consistency with daily command
     today = date.today()
     total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
 
@@ -2094,34 +2094,7 @@ def general(request):
         new_user_minutes_remaining = 0
         dates, values = get_demo_networth_series(selected_currency, selected_range)
     else:
-        # Check if this is the user's first snapshot
         existing_snapshots = NetWorthSnapshot.objects.filter(user=request.user)
-        if existing_snapshots.exists():
-            # User has snapshots, create today's snapshot normally
-            NetWorthSnapshot.objects.get_or_create(
-                user=request.user, date=today,
-                defaults={'net_worth': total_net_worth_usd}
-            )
-        else:
-            # This is the user's first time - check if 45 minutes have passed since account creation
-            from django.utils import timezone
-            from datetime import timedelta
-            
-            # Get the user's first snapshot (which should be the only one if it exists)
-            first_snapshot = existing_snapshots.first()
-            
-            if first_snapshot is None:
-                # No snapshots exist yet - check if 45 minutes have passed since user creation
-                user_created_time = request.user.date_joined
-                current_time = timezone.now()
-                time_since_creation = current_time - user_created_time
-                
-                # Only create snapshot if more than 45 minutes have passed
-                if time_since_creation > timedelta(minutes=45):
-                    NetWorthSnapshot.objects.create(
-                        user=request.user, date=today,
-                        net_worth=total_net_worth_usd
-                    )
 
         # Check if user is new and show appropriate message
         show_new_user_message = False
@@ -2394,38 +2367,8 @@ def performance(request):
 
     # --- Calculate current net worth (reuse logic from general) ---
     total_net_worth = get_user_total_net_worth(user, selected_currency)
-    # --- Save snapshot if not already saved today ---
-    # Always save snapshot in USD for consistency with daily command
+    # --- Net worth in USD (used for charts) ---
     total_net_worth_usd = get_user_total_net_worth(user, 'USD')
-    
-    # Check if this is the user's first snapshot
-    existing_snapshots = NetWorthSnapshot.objects.filter(user=user)
-    if existing_snapshots.exists():
-        # User has snapshots, create today's snapshot normally
-        NetWorthSnapshot.objects.get_or_create(
-            user=user, date=today,
-            defaults={'net_worth': total_net_worth_usd}
-        )
-    else:
-        # This is the user's first time - check if 45 minutes have passed since account creation
-        from django.utils import timezone
-        from datetime import timedelta
-        
-        # Get the user's first snapshot (which should be the only one if it exists)
-        first_snapshot = existing_snapshots.first()
-        
-        if first_snapshot is None:
-            # No snapshots exist yet - check if 45 minutes have passed since user creation
-            user_created_time = user.date_joined
-            current_time = timezone.now()
-            time_since_creation = current_time - user_created_time
-            
-            # Only create snapshot if more than 45 minutes have passed
-            if time_since_creation > timedelta(minutes=45):
-                NetWorthSnapshot.objects.create(
-                    user=user, date=today,
-                    net_worth=total_net_worth_usd
-                )
 
     # Calculate BTC equivalent
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
