@@ -1,0 +1,58 @@
+{% extends "base2.html" %}
+{% load currency_filters %}
+
+{% block section_title %}Stocks BR{% endblock %}
+{% block page_title %}YOUR BRAZILIAN STOCK POSITIONS{% endblock %}
+{% block positions_title %}YOUR BRAZILIAN STOCK POSITIONS{% endblock %}
+{% block table_positions_title %}YOUR BRAZILIAN STOCK POSITIONS{% endblock %}
+{% block table_title %}Stock Composition{% endblock %}
+
+{% block percent_buttons %}{% endblock %}
+{% block table %}
+{% if stock_data %}
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Amount</th>
+            <th>Price (BRL)</th>
+            <th>Value (BRL)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in stock_data %}
+        <tr>
+            <td>{{ stock.symbol }}</td>
+            <td><span class="sensitive-value">{{ stock.amount|floatformat:2 }}</span></td>
+            <td>
+                {% if stock.price_brl != None %}
+                    R$ {{ stock.price_brl|floatformat:2 }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if stock.value_brl != None %}
+                    <span class="sensitive-value">R$ {{ stock.value_brl|floatformat:2 }}</span>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<p>You have no stock positions yet.</p>
+{% endif %}
+{% endblock %}
+{% block add_new %}{% endblock %}
+{% block chart %}
+  <div id="pie-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+      <p style="color: #aaa;">No chart data available.</p>
+  </div>
+  <div id="bar-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;"></div>
+{% endblock %}
+{% block networth_over_time_card %}{% endblock %}

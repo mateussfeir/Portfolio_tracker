@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from .forms import AddAssetForm, SignUpForm
-from .models import Asset, NetWorthSnapshot
+from .models import Asset, BrazilStock, NetWorthSnapshot
 import json
 import requests
 from decimal import Decimal, InvalidOperation
@@ -23,6 +23,7 @@ import re
 from datetime import timedelta
 from django.db.models import Max
 from django.db.models.functions import TruncDate
+from .services.br_stock_service import get_br_stock_price
 
 # Currency conversion function
 _exchange_rate_cache = {}
@@ -1078,6 +1079,52 @@ def stocks(request):
         'bar_chart': bar_chart_html,
         'percent_mode': percent_mode,
         'btc_equivalent': btc_equivalent,
+    })
+
+
+@login_or_demo_required
+def stocks_br_view(request):
+    is_demo = request.session.get("is_demo", False)
+    selected_currency = request.GET.get('currency', 'USD')
+    currency_symbol = CURRENCY_SYMBOLS.get(selected_currency, selected_currency)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
+    total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
+    btc_equivalent = get_btc_equivalent(total_net_worth_usd)
+    positions = BrazilStock.objects.filter(user=request.user) if request.user.is_authenticated else BrazilStock.objects.none()
+    stock_data = []
+    for position in positions:
+        price_brl = get_br_stock_price(position.symbol)
+        amount = safe_decimal(position.amount)
+        price_decimal = safe_decimal(price_brl) if price_brl is not None else None
+        value_brl = amount * price_decimal if price_decimal is not None else None
+        stock_data.append({
+            'symbol': position.symbol,
+            'amount': position.amount,
+            'price_brl': price_brl,
+            'value_brl': value_brl,
+        })
+    available_currencies = {
+        'USD': 'US Dollar',
+        'CAD': 'Canadian Dollar',
+        'BRL': 'Brazilian Real',
+        'KRW': 'Korean Won',
+        'EUR': 'Euro',
+        'JPY': 'Japanese Yen',
+        'AUD': 'Australian Dollar',
+        'VND': 'Vietnamese Dong',
+    }
+
+    return render(request, "stocks_br.html", {
+        'username': "Demo User" if is_demo else request.user.username,
+        'is_demo': is_demo,
+        'selected_currency': selected_currency,
+        'currency_symbol': currency_symbol,
+        'available_currencies': available_currencies,
+        'total_net_worth': total_net_worth,
+        'section_net_worth': '',
+        'btc_equivalent': btc_equivalent,
+        'positions': positions,
+        'stock_data': stock_data,
     })
 
 @login_or_demo_required

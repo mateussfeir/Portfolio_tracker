@@ -20,6 +20,17 @@ class Asset(models.Model):
     def __str__(self):
         return f"{self.ticker} ({self.amount})"
 
+
+class BrazilStock(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    symbol = models.CharField(max_length=10)
+    amount = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.symbol} ({self.amount})"
+
+
 class NetWorthSnapshot(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()

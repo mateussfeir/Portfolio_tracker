@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Asset, NetWorthSnapshot
+from .models import Asset, BrazilStock, NetWorthSnapshot
 
 admin.site.register(Asset)
+admin.site.register(BrazilStock)
 
 class NetWorthSnapshotAdmin(admin.ModelAdmin):
     list_display = ('user', 'net_worth', 'date', 'created_at')
