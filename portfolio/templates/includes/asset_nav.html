@@ -19,7 +19,7 @@
         <!-- Hamburger menu button for mobile -->
         <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
 
-        <div class="nav-center" id="navLinks">
+        <div class="nav-center nav-links" id="navLinks">
             <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
             <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
             <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
@@ -29,15 +29,6 @@
             <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
             <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
             <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
-            <button id="privacy-toggle-btn-mobile" type="button" class="mobile-privacy-btn">Privacy Mode: Off</button>
-            {% if is_demo %}
-            <a href="{% url 'exit_demo' %}" class="logout-link">Exit Demo</a>
-            {% else %}
-            <form action="{% url 'logout' %}" method="post" class="logout-form">
-                {% csrf_token %}
-                <button type="submit" class="logout-link">Logout</button>
-            </form>
-            {% endif %}
         </div>
 
         <div class="nav-right">
@@ -47,6 +38,14 @@
                 {% endfor %}
             </select>
             <button id="privacy-toggle-btn" type="button">Privacy Mode: Off</button>
+            {% if is_demo %}
+            <a href="{% url 'exit_demo' %}" class="logout-link">Exit Demo</a>
+            {% else %}
+            <form action="{% url 'logout' %}" method="post" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-link">Logout</button>
+            </form>
+            {% endif %}
         </div>
     </nav>
 </header>

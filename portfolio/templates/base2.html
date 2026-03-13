@@ -690,8 +690,8 @@
             color: #66bb6a;
         }
         
-        /* Mobile responsive styles */
-        @media (max-width: 768px) {
+        /* Tablet/mobile responsive styles */
+        @media (max-width: 1024px) {
             .hamburger {
                 display: block;
                 order: 3;
@@ -791,82 +791,16 @@
                 border-bottom: none;
             }
             
-            /* Style logout button in dropdown */
-            .nav-center .logout-form {
-                margin: 0 auto;
-                padding: 0;
-                width: 100%;
-                max-width: 320px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            
-            .nav-center .logout-link {
-                background-color: transparent;
-                color: #4caf50;
-                border: none;
-                border-radius: 8px;
-                padding: 24px 20px;
-                width: 100%;
-                max-width: 320px;
-                font-size: 18px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                margin: 0 auto;
-                box-shadow: none;
-                display: block;
-                text-align: center;
-                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
-            }
-            
-            .nav-center .logout-link:hover {
-                background-color: rgba(139, 0, 0, 0.1);
-                color: #8b0000;
-                transform: translateX(5px);
-                box-shadow: 0 2px 8px rgba(139, 0, 0, 0.2);
-            }
-            
-            /* Style mobile privacy button in dropdown */
-            .mobile-privacy-btn {
-                background-color: transparent;
-                color: #4caf50;
-                border: none;
-                border-radius: 8px;
-                padding: 24px 20px;
-                width: 100%;
-                max-width: 320px;
-                font-size: 18px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                margin: 0 auto;
-                box-shadow: none;
-                display: block;
-                text-align: center;
-                border-bottom: 1px solid rgba(76, 175, 80, 0.2);
-            }
-            
-            .mobile-privacy-btn:hover {
-                background-color: rgba(76, 175, 80, 0.1);
-                color: #66bb6a;
-                transform: translateX(5px);
-                box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
-            }
-            
-            /* Hide desktop privacy button on mobile */
-            #privacy-toggle-btn {
-                display: none;
-            }
-            
             .nav-right {
                 order: 2;
                 justify-content: flex-end;
+                align-items: center;
+                gap: 8px;
                 margin-bottom: 0 !important;
                 width: auto;
                 flex-shrink: 0;
                 margin-left: auto;
+                flex-wrap: wrap;
             }
             
 
@@ -901,7 +835,7 @@
             }
             
             /* Hide close button on desktop */
-            @media (min-width: 769px) {
+            @media (min-width: 1025px) {
                 .close-menu-btn {
                     display: none !important;
                     visibility: hidden !important;
@@ -912,8 +846,8 @@
                 }
             }
             
-            /* Hide Bitcoin equivalent on mobile */
-            @media (max-width: 768px) {
+            /* Hide Bitcoin equivalent on smaller screens */
+            @media (max-width: 1024px) {
                 .btc-equivalent {
                     display: none !important;
                 }
@@ -995,8 +929,8 @@
             }
         }
         
-        /* Hide mobile privacy button on desktop */
-        @media (min-width: 769px) {
+        /* Hide mobile-only controls on desktop */
+        @media (min-width: 1025px) {
             #privacy-toggle-btn-mobile {
                 display: none !important;
             }
@@ -1018,7 +952,7 @@
         }
         
         /* Ensure nav-center is visible on desktop */
-        @media (min-width: 769px) {
+        @media (min-width: 1025px) {
             .nav-center {
                 display: flex !important;
             }
@@ -1132,6 +1066,11 @@
           overflow: visible !important;
           min-width: 0;
         }
+
+        .nav-links {
+          display: flex;
+          gap: 8px;
+        }
         
         /* Futuristic nav link styling */
         .nav-center a {
@@ -1220,6 +1159,12 @@
           flex-shrink: 0 !important;
           min-width: 0;
           padding-right: 8px !important;
+        }
+
+        .nav-right .logout-form {
+          display: flex;
+          align-items: center;
+          margin-left: 0;
         }
         
         select,
@@ -1542,6 +1487,18 @@
             document.body.style.width = '';
         }
     }
+
+    function closeMenuIfDesktop() {
+        if (window.innerWidth > 1024) {
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks) {
+                navLinks.classList.remove('active');
+            }
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+        }
+    }
     
     // Close mobile menu when clicking outside
     document.addEventListener('DOMContentLoaded', function() {
@@ -1566,6 +1523,8 @@
                 }
             }
         });
+
+        window.addEventListener('resize', closeMenuIfDesktop);
         
     });
     
