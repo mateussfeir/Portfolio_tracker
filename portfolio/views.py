@@ -4,7 +4,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
-from .forms import AddAssetForm, SignUpForm
+from .forms import AddAssetForm, AddBrazilStockForm, SignUpForm
 from .models import Asset, BrazilStock, NetWorthSnapshot
 import json
 import requests
@@ -23,7 +23,7 @@ import re
 from datetime import timedelta
 from django.db.models import Max
 from django.db.models.functions import TruncDate
-from .services.br_stock_service import get_br_stock_price
+from .services.br_stock_service import get_br_stock_prices
 
 # Currency conversion function
 _exchange_rate_cache = {}
@@ -801,6 +801,38 @@ def edit_holding(request, pk):
     return render(request, 'edit_holding.html', {'form': form, 'asset': asset, 'available_currencies': available_currencies})
 
 
+@login_required
+@demo_readonly
+def delete_brazil_stock(request, pk):
+    stock = get_object_or_404(BrazilStock, pk=pk, user=request.user)
+    stock.delete()
+    messages.success(request, "Brazilian stock deleted successfully.")
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    return redirect('stocks_br')
+
+
+@login_required
+@demo_readonly
+def edit_brazil_stock(request, pk):
+    stock = get_object_or_404(BrazilStock, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = AddBrazilStockForm(request.POST)
+        if form.is_valid():
+            stock.symbol = form.cleaned_data['symbol'].upper()
+            stock.amount = form.cleaned_data['amount']
+            stock.save()
+            messages.success(request, "Brazilian stock updated successfully.")
+            return redirect('stocks_br')
+    else:
+        form = AddBrazilStockForm(initial={
+            'symbol': stock.symbol,
+            'amount': stock.amount,
+        })
+    return render(request, 'edit_brazil_stock.html', {'form': form, 'stock': stock})
+
+
 @login_or_demo_required
 @demo_readonly
 def stocks(request):
@@ -1091,18 +1123,33 @@ def stocks_br_view(request):
     total_net_worth_usd = get_demo_total_net_worth('USD') if is_demo else get_user_total_net_worth(request.user, 'USD')
     btc_equivalent = get_btc_equivalent(total_net_worth_usd)
     positions = BrazilStock.objects.filter(user=request.user) if request.user.is_authenticated else BrazilStock.objects.none()
+    br_prices = get_br_stock_prices([position.symbol for position in positions])
+    form = AddBrazilStockForm()
     stock_data = []
     for position in positions:
-        price_brl = get_br_stock_price(position.symbol)
+        price_brl = br_prices.get((position.symbol or "").strip().upper())
         amount = safe_decimal(position.amount)
         price_decimal = safe_decimal(price_brl) if price_brl is not None else None
         value_brl = amount * price_decimal if price_decimal is not None else None
         stock_data.append({
+            'id': position.id,
             'symbol': position.symbol,
             'amount': position.amount,
             'price_brl': price_brl,
             'value_brl': value_brl,
         })
+    total_value_brl = sum((stock['value_brl'] or Decimal('0')) for stock in stock_data)
+    section_net_worth_brl = total_value_brl
+    for stock in stock_data:
+        price_decimal = safe_decimal(stock['price_brl']) if stock['price_brl'] is not None else None
+        value_brl = stock['value_brl']
+        stock['price_display'] = convert_currency(price_decimal, 'BRL', selected_currency) if price_decimal is not None else None
+        stock['value_display'] = convert_currency(value_brl, 'BRL', selected_currency) if value_brl is not None else None
+        if total_value_brl > 0 and value_brl is not None:
+            stock['asset_percent'] = (value_brl / total_value_brl) * Decimal('100')
+        else:
+            stock['asset_percent'] = Decimal('0')
+    section_net_worth = convert_currency(section_net_worth_brl, 'BRL', selected_currency)
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -1117,15 +1164,40 @@ def stocks_br_view(request):
     return render(request, "stocks_br.html", {
         'username': "Demo User" if is_demo else request.user.username,
         'is_demo': is_demo,
+        'form': form,
         'selected_currency': selected_currency,
         'currency_symbol': currency_symbol,
         'available_currencies': available_currencies,
         'total_net_worth': total_net_worth,
-        'section_net_worth': '',
+        'section_net_worth': section_net_worth,
         'btc_equivalent': btc_equivalent,
         'positions': positions,
         'stock_data': stock_data,
     })
+
+
+@login_or_demo_required
+@demo_readonly
+def add_brazil_stock(request):
+    if request.method != 'POST':
+        return redirect('stocks_br')
+
+    form = AddBrazilStockForm(request.POST)
+    selected_currency = request.POST.get('currency', 'USD')
+
+    if form.is_valid():
+        BrazilStock.objects.create(
+            user=request.user,
+            symbol=form.cleaned_data['symbol'].upper(),
+            amount=form.cleaned_data['amount'],
+        )
+    else:
+        messages.error(request, "Failed to add Brazilian stock. Please check your inputs.")
+
+    redirect_url = reverse('stocks_br')
+    if selected_currency:
+        redirect_url = f"{redirect_url}?currency={selected_currency}"
+    return redirect(redirect_url)
 
 @login_or_demo_required
 @demo_readonly

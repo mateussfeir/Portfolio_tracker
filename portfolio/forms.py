@@ -37,3 +37,13 @@ class AddAssetForm(forms.ModelForm):
         # Remove currency field for crypto and stock
         if asset_type in ['crypto', 'stock']:
             self.fields.pop('currency', None)
+
+
+class AddBrazilStockForm(forms.Form):
+    symbol = forms.CharField(
+        max_length=10,
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. PETR4'})
+    )
+    amount = forms.FloatField(
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g. 100'})
+    )

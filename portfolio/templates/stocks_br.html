@@ -14,10 +14,12 @@
 <table>
     <thead>
         <tr>
-            <th>Symbol</th>
+            <th>Ticker</th>
             <th>Amount</th>
-            <th>Price (BRL)</th>
-            <th>Value (BRL)</th>
+            <th>Price</th>
+            <th>Value</th>
+            <th>Asset (%)</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -26,17 +28,29 @@
             <td>{{ stock.symbol }}</td>
             <td><span class="sensitive-value">{{ stock.amount|floatformat:2 }}</span></td>
             <td>
-                {% if stock.price_brl != None %}
-                    R$ {{ stock.price_brl|floatformat:2 }}
+                {% if stock.price_display != None %}
+                    {{ stock.price_display|currency:currency_symbol }}
                 {% else %}
                     -
                 {% endif %}
             </td>
             <td>
-                {% if stock.value_brl != None %}
-                    <span class="sensitive-value">R$ {{ stock.value_brl|floatformat:2 }}</span>
+                {% if stock.value_display != None %}
+                    <span class="sensitive-value">{{ stock.value_display|currency:currency_symbol }}</span>
                 {% else %}
                     -
+                {% endif %}
+            </td>
+            <td>{{ stock.asset_percent|floatformat:2 }}%</td>
+            <td style="white-space: nowrap;">
+                {% if not is_demo %}
+                <a href="{% url 'edit_brazil_stock' stock.id %}" style="background: #2196f3; color: white; border: none; border-radius: 4px; padding: 4px 8px; text-decoration: none; margin-right: 4px;">Edit</a>
+                <form action="{% url 'delete_brazil_stock' stock.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">X</button>
+                </form>
+                {% else %}
+                <span style="color: #777;">Read-only</span>
                 {% endif %}
             </td>
         </tr>
@@ -48,7 +62,20 @@
 <p>You have no stock positions yet.</p>
 {% endif %}
 {% endblock %}
-{% block add_new %}{% endblock %}
+{% block add_new %}
+{% if not is_demo %}
+<div id="add-asset-section" style="margin-top: 30px; text-align: center;">
+    <button id="show-add-form-btn" type="button" style="margin-bottom: 10px; background: #4caf50; color: white; font-weight: bold;">Add New</button>
+    <form id="add-asset-form" method="post" action="{% url 'add_brazil_stock' %}" style="display: none; margin-top: 10px;">
+        {% csrf_token %}
+        <input type="hidden" name="currency" value="{{ selected_currency }}">
+        {{ form.as_p }}
+        <button type="submit">Add Position</button>
+        <button type="button" id="cancel-add-form-btn" style="margin-left: 10px; background: #aaa; color: #222;">Cancel</button>
+    </form>
+</div>
+{% endif %}
+{% endblock %}
 {% block chart %}
   <div id="pie-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
       <p style="color: #aaa;">No chart data available.</p>
