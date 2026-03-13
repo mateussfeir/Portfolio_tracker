@@ -78,8 +78,79 @@
 {% endblock %}
 {% block chart %}
   <div id="pie-chart-div" style="display: block; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
-      <p style="color: #aaa;">No chart data available.</p>
+      {% if pie_chart %}
+          {{ pie_chart|safe }}
+      {% else %}
+          <p style="color: #aaa;">No chart data available.</p>
+      {% endif %}
   </div>
-  <div id="bar-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;"></div>
+  <div id="bar-chart-div" style="display: none; margin:0; padding:0; width:100%; min-height: 200px; height: auto;">
+      {% if bar_chart %}
+          {{ bar_chart|safe }}
+      {% endif %}
+  </div>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          function resizeCharts() {
+              if (typeof Plotly !== 'undefined') {
+                  const plotElements = document.querySelectorAll('.js-plotly-plot');
+                  plotElements.forEach(function(element) {
+                      if (element && element.layout) {
+                          Plotly.Plots.resize(element);
+                      }
+                  });
+              }
+          }
+
+          function showAndResizeCharts() {
+              const chartContainers = document.querySelectorAll('#pie-chart-div, #bar-chart-div');
+              chartContainers.forEach(function(container) {
+                  if (container) {
+                      container.style.visibility = 'visible';
+                      container.style.opacity = '1';
+                  }
+              });
+
+              setTimeout(resizeCharts, 100);
+              setTimeout(resizeCharts, 300);
+              setTimeout(resizeCharts, 500);
+          }
+
+          const chartContainers = document.querySelectorAll('#pie-chart-div, #bar-chart-div');
+          chartContainers.forEach(function(container) {
+              if (container) {
+                  container.style.visibility = 'hidden';
+                  container.style.opacity = '0';
+                  container.style.transition = 'opacity 0.3s ease-in-out';
+              }
+          });
+
+          window.addEventListener('load', function() {
+              setTimeout(showAndResizeCharts, 200);
+          });
+
+          setTimeout(showAndResizeCharts, 1000);
+
+          window.addEventListener('resize', function() {
+              setTimeout(resizeCharts, 100);
+          });
+
+          if ('IntersectionObserver' in window) {
+              const observer = new IntersectionObserver(function(entries) {
+                  entries.forEach(function(entry) {
+                      if (entry.isIntersecting) {
+                          setTimeout(resizeCharts, 100);
+                      }
+                  });
+              }, { threshold: 0.1 });
+
+              chartContainers.forEach(function(container) {
+                  if (container) {
+                      observer.observe(container);
+                  }
+              });
+          }
+      });
+  </script>
 {% endblock %}
 {% block networth_over_time_card %}{% endblock %}

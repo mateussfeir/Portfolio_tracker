@@ -1150,6 +1150,102 @@ def stocks_br_view(request):
         else:
             stock['asset_percent'] = Decimal('0')
     section_net_worth = convert_currency(section_net_worth_brl, 'BRL', selected_currency)
+    chart_labels = [stock['symbol'] for stock in stock_data if stock['value_brl'] is not None]
+    chart_values = [float(stock['value_brl']) for stock in stock_data if stock['value_brl'] is not None]
+
+    if chart_labels and chart_values:
+        pie_values = [float(stock['asset_percent']) for stock in stock_data if stock['value_brl'] is not None]
+        fig_pie = go.Figure(data=[go.Pie(
+            labels=chart_labels,
+            values=pie_values,
+            textinfo='label+percent',
+            texttemplate='%{label}<br>%{value:.0f}%',
+            textposition='outside',
+            showlegend=False,
+            hole=0.6,
+            textfont=dict(size=12, color='white'),
+            hovertemplate='%{label}<br>%{value:.0f}%<extra></extra>'
+        )])
+        fig_pie.update_layout(
+            title=dict(
+                text="<span style='color:#00ffff; font-family:Courier New, monospace; font-size:16px; text-shadow: 0 0 12px #00ffff;'>STOCK PORTFOLIO DISTRIBUTION</span>",
+                x=0.5,
+                xanchor='center',
+                font=dict(color="#00ffff")
+            ),
+            margin=dict(t=20, b=20, l=10, r=10),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(
+                domain=[0.05, 0.95],
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            yaxis=dict(
+                domain=[0.05, 0.95],
+                showgrid=False,
+                showticklabels=False,
+                zeroline=False,
+                showline=False,
+            ),
+            showlegend=False,
+            autosize=True,
+            height=400,
+        )
+        pie_chart_html = fig_pie.to_html(full_html=False)
+
+        bar_segments = []
+        colors = ["#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#e91e63"]
+        for i, (label, percent) in enumerate(zip(chart_labels, pie_values)):
+            bar_segments.append(go.Bar(
+                x=[percent],
+                y=[""],
+                name=label,
+                orientation='h',
+                marker=dict(color=colors[i % len(colors)]),
+                text=[f"{label}\n{percent:.1f}%"],
+                textposition='inside',
+                insidetextanchor='middle',
+                hovertemplate=f"{label}: {{x:.2f}}%<extra></extra>",
+            ))
+        fig_bar = go.Figure(data=bar_segments)
+        fig_bar.update_layout(
+            barmode='stack',
+            title='Portfolio Distribution (stacked bar)',
+            margin=dict(t=50, b=0, l=0, r=0),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#e0e0e0"),
+            xaxis=dict(title=None, range=[0, 100], ticksuffix='%', ticklen=4, tickwidth=1),
+            yaxis=dict(
+                tickfont=dict(size=11, color='#cccccc'),
+                tickformat=',',
+                tickwidth=1,
+                ticklen=4,
+                tickcolor='#333333',
+                showgrid=True,
+                gridcolor='rgba(255,255,255,0.1)',
+                gridwidth=1,
+                zeroline=False,
+                showline=True,
+                linecolor='rgba(255,255,255,0.2)',
+                linewidth=1,
+                side='left',
+                automargin=True,
+                range=[-0.5, 0.5]
+            ),
+            showlegend=False,
+            legend=dict(orientation="h", x=0.5, y=-0.35, xanchor="center"),
+            height=200,
+            autosize=True
+        )
+        bar_chart_html = fig_bar.to_html(full_html=False, config={"responsive": True, "displayModeBar": False})
+    else:
+        pie_chart_html = None
+        bar_chart_html = None
+
     available_currencies = {
         'USD': 'US Dollar',
         'CAD': 'Canadian Dollar',
@@ -1173,6 +1269,10 @@ def stocks_br_view(request):
         'btc_equivalent': btc_equivalent,
         'positions': positions,
         'stock_data': stock_data,
+        'chart_labels': chart_labels,
+        'chart_values': chart_values,
+        'pie_chart': pie_chart_html,
+        'bar_chart': bar_chart_html,
     })
 
 
@@ -1893,11 +1993,6 @@ def general(request):
     show_other_form = request.GET.get('show_other_form') == '1'
     cash_currencies = ['USD', 'CAD', 'BRL', 'KRW', 'INR', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF']
 
-    # Clear cache to ensure fresh calculations including vehicles
-    cache_user_key = "demo" if is_demo else request.user.id
-    cache_key = f"total_net_worth_{cache_user_key}_{selected_currency}"
-    cache.delete(cache_key)
-
     # Handle cash form submission
     if not is_demo and request.method == 'POST' and request.POST.get('form_type') == 'add_cash':
         amount = request.POST.get('amount')
@@ -1987,13 +2082,15 @@ def general(request):
         other_value = safe_decimal(convert_currency(other.amount, other.currency or 'USD', selected_currency))
         total_other += other_value
 
-    # Calculate the true total net worth (sum of all asset types)
+    # Calculate the local total used for the General page allocation breakdown.
     total_crypto = safe_decimal(total_crypto)
     total_real_estate = safe_decimal(total_real_estate)
     total_vehicle = safe_decimal(total_vehicle)
     total_cash = safe_decimal(total_cash)
     total_other = safe_decimal(total_other)
-    total_net_worth = total_crypto + total_stocks + total_real_estate + total_vehicle + total_cash + total_other
+    breakdown_total_net_worth = total_crypto + total_stocks + total_real_estate + total_vehicle + total_cash + total_other
+    breakdown_total_net_worth = safe_decimal(breakdown_total_net_worth)
+    total_net_worth = get_demo_total_net_worth(selected_currency) if is_demo else get_user_total_net_worth(request.user, selected_currency)
     total_net_worth = safe_decimal(total_net_worth)
 
     # Pie chart data
@@ -2037,13 +2134,13 @@ def general(request):
     vehicle_percent = Decimal("0")
     cash_percent = Decimal("0")
     other_percent = Decimal("0")
-    if total_net_worth > Decimal("0"):
-        crypto_percent = (total_crypto / total_net_worth) * Decimal("100")
-        stocks_percent = (total_stocks / total_net_worth) * Decimal("100")
-        real_estate_percent = (total_real_estate / total_net_worth) * Decimal("100")
-        vehicle_percent = (total_vehicle / total_net_worth) * Decimal("100")
-        cash_percent = (total_cash / total_net_worth) * Decimal("100")
-        other_percent = (total_other / total_net_worth) * Decimal("100")
+    if breakdown_total_net_worth > Decimal("0"):
+        crypto_percent = (total_crypto / breakdown_total_net_worth) * Decimal("100")
+        stocks_percent = (total_stocks / breakdown_total_net_worth) * Decimal("100")
+        real_estate_percent = (total_real_estate / breakdown_total_net_worth) * Decimal("100")
+        vehicle_percent = (total_vehicle / breakdown_total_net_worth) * Decimal("100")
+        cash_percent = (total_cash / breakdown_total_net_worth) * Decimal("100")
+        other_percent = (total_other / breakdown_total_net_worth) * Decimal("100")
     else:
         crypto_percent = Decimal("0")
         stocks_percent = Decimal("0")
@@ -2766,7 +2863,7 @@ def get_user_total_net_worth(user, selected_currency):
     if cached is not None:
         return cached
     from decimal import Decimal
-    from .models import Asset
+    from .models import Asset, BrazilStock
     # --- Always sum in USD first ---
     # Crypto
     crypto_assets = Asset.objects.filter(owner=user, type='crypto')
@@ -2784,6 +2881,15 @@ def get_user_total_net_worth(user, selected_currency):
         safe_decimal(stock_prices.get(asset.ticker.upper(), 0)) * asset.amount
         for asset in stock_assets
     )
+    # Brazilian Stocks
+    br_stocks = BrazilStock.objects.filter(user=user)
+    br_symbols = [stock.symbol.upper() for stock in br_stocks]
+    br_prices = get_br_stock_prices(br_symbols)
+    total_br_stocks_brl = sum(
+        safe_decimal(br_prices.get(stock.symbol.upper(), 0)) * safe_decimal(stock.amount)
+        for stock in br_stocks
+    )
+    total_br_stocks_usd = convert_currency(total_br_stocks_brl, 'BRL', 'USD')
     # Cash
     cash_assets = Asset.objects.filter(owner=user, type='cash')
     total_cash_usd = sum(convert_currency(cash.amount, cash.currency or 'USD', 'USD') for cash in cash_assets)
@@ -2797,7 +2903,7 @@ def get_user_total_net_worth(user, selected_currency):
     other_assets = Asset.objects.filter(owner=user, type='other')
     total_other_usd = sum(convert_currency(o.amount, o.currency or 'USD', 'USD') for o in other_assets)
     # Sum all in USD
-    total_net_worth_usd = total_crypto_usd + total_stocks_usd + total_real_estate_usd + total_cash_usd + total_vehicle_usd + total_other_usd
+    total_net_worth_usd = total_crypto_usd + total_stocks_usd + total_br_stocks_usd + total_real_estate_usd + total_cash_usd + total_vehicle_usd + total_other_usd
     # Convert to selected currency
     total_net_worth = convert_currency(total_net_worth_usd, 'USD', selected_currency)
     cache.set(cache_key, total_net_worth, timeout=180)
