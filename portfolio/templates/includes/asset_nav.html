@@ -8,10 +8,10 @@
 <header>
     <nav>
         <div class="nav-left">
-            <span><strong>{{ username }}</strong></span>
-            <span>
-                <strong>Net Worth:</strong>
-                <span class="sensitive-value" data-net-worth="{{ total_net_worth }}">{{ total_net_worth|currency:currency_symbol }}</span>
+            <span class="nav-identity"><strong>{{ username }}</strong></span>
+            <span class="nav-net-worth">
+                <strong class="nav-net-worth-label">Net Worth:</strong>
+                <span class="sensitive-value nav-net-worth-value" data-net-worth="{{ total_net_worth }}">{{ total_net_worth|currency:currency_symbol }}</span>
                 <span class="btc-equivalent">₿{{ btc_equivalent|floatformat:3 }}</span>
             </span>
         </div>
@@ -30,20 +30,30 @@
             <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
             <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
             <div class="mobile-menu-actions">
-                <select id="currency-selector-mobile" onchange="changeCurrency(this.value)" aria-label="Select currency">
-                    {% for code, name in available_currencies.items %}
-                        <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
-                    {% endfor %}
-                </select>
-                <button id="privacy-toggle-btn-mobile" type="button">Privacy Mode: Off</button>
-                {% if is_demo %}
-                <a href="{% url 'exit_demo' %}" class="logout-link">Exit Demo</a>
-                {% else %}
-                <form action="{% url 'logout' %}" method="post" class="logout-form mobile-logout-form">
-                    {% csrf_token %}
-                    <button type="submit" class="logout-link">Logout</button>
-                </form>
-                {% endif %}
+                <div class="mobile-menu-actions-header">Quick Actions</div>
+                <div class="mobile-menu-action-row">
+                    <label class="mobile-menu-action-label" for="currency-selector-mobile">Currency</label>
+                    <select id="currency-selector-mobile" onchange="changeCurrency(this.value)" aria-label="Select currency">
+                        {% for code, name in available_currencies.items %}
+                            <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mobile-menu-action-row">
+                    <span class="mobile-menu-action-label">Privacy</span>
+                    <button id="privacy-toggle-btn-mobile" type="button">Privacy Mode: Off</button>
+                </div>
+                <div class="mobile-menu-action-row">
+                    <span class="mobile-menu-action-label">Session</span>
+                    {% if is_demo %}
+                    <a href="{% url 'exit_demo' %}" class="logout-link">Exit Demo</a>
+                    {% else %}
+                    <form action="{% url 'logout' %}" method="post" class="logout-form mobile-logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-link">Logout</button>
+                    </form>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
