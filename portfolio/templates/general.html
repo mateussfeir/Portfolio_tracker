@@ -2202,17 +2202,18 @@
         }
     });
     
-    // Hamburger menu toggle function
-    function toggleMenu() {
+    function setMenuOpen(isOpen) {
         const navLinks = document.getElementById('navLinks');
         const hamburger = document.querySelector('.hamburger');
-        const isActive = navLinks.classList.toggle('active');
-        if (hamburger) {
-            hamburger.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+        if (!navLinks) {
+            return;
         }
-        
-        // Prevent body scroll when menu is open
-        if (isActive) {
+        navLinks.classList.toggle('active', isOpen);
+        if (hamburger) {
+            hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        if (isOpen) {
             document.body.style.overflow = 'hidden';
             document.body.style.position = 'fixed';
             document.body.style.width = '100%';
@@ -2223,18 +2224,17 @@
         }
     }
 
-    function closeMenu() {
+    // Hamburger menu toggle function
+    function toggleMenu() {
         const navLinks = document.getElementById('navLinks');
-        const hamburger = document.querySelector('.hamburger');
-        if (navLinks) {
-            navLinks.classList.remove('active');
+        if (!navLinks) {
+            return;
         }
-        if (hamburger) {
-            hamburger.setAttribute('aria-expanded', 'false');
-        }
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
+        setMenuOpen(!navLinks.classList.contains('active'));
+    }
+
+    function closeMenu() {
+        setMenuOpen(false);
     }
 
     function closeMenuIfDesktop() {
@@ -2245,9 +2245,14 @@
     
     // Close mobile menu when clicking outside
     document.addEventListener('DOMContentLoaded', function() {
+        closeMenu();
+
         document.addEventListener('click', function(event) {
             const navLinks = document.getElementById('navLinks');
             const hamburger = document.querySelector('.hamburger');
+            if (!navLinks || !hamburger) {
+                return;
+            }
             
             // Close menu if clicking outside of nav and hamburger
             if (navLinks.classList.contains('active') && 
@@ -2263,8 +2268,11 @@
         
         // Add escape key functionality to close menu
         document.addEventListener('keydown', function(event) {
+            const navLinks = document.getElementById('navLinks');
+            if (!navLinks) {
+                return;
+            }
             if (event.key === 'Escape') {
-                const navLinks = document.getElementById('navLinks');
                 if (navLinks.classList.contains('active')) {
                     closeMenu();
                 }
@@ -2274,6 +2282,8 @@
         window.addEventListener('resize', closeMenuIfDesktop);
         
     });
+
+    window.addEventListener('pageshow', closeMenu);
 </script>
 {% include "includes/chat_widget.html" %}
 <script src="{% static 'js/chat_widget.js' %}"></script>
