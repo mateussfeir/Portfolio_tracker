@@ -967,6 +967,19 @@
                 display: block;
                 order: 3;
                 margin-left: auto;
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                min-height: 32px;
+                padding: 0;
+                border-radius: 9px;
+                font-size: 17px;
+                line-height: 1;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                align-self: center;
+                box-shadow: 0 0 10px rgba(0, 255, 255, 0.16);
             }
             
             nav {
@@ -974,9 +987,10 @@
                 flex-wrap: wrap;
                 align-items: center;
                 justify-content: space-between;
-                padding: 10px 20px !important;
+                padding: 7px 16px !important;
                 width: 100%;
                 box-sizing: border-box;
+                min-height: 0;
             }
             
             .nav-left {
@@ -992,6 +1006,7 @@
                 margin-right: 10px;
                 white-space: nowrap;
                 padding-right: 6px !important;
+                line-height: 1.1;
             }
 
             .nav-left .nav-identity,
@@ -1005,6 +1020,7 @@
                 flex: 0 1 auto;
                 font-size: 0.86rem;
                 letter-spacing: 0.02em;
+                line-height: 1.05;
             }
 
             .nav-left .nav-net-worth {
@@ -1012,6 +1028,7 @@
                 gap: 4px;
                 overflow: hidden;
                 font-size: 0.82rem;
+                line-height: 1.05;
             }
 
             .nav-left .nav-net-worth-label {
@@ -1028,6 +1045,7 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 font-size: 0.9rem;
+                line-height: 1.05;
             }
             
             .nav-center {
@@ -1261,7 +1279,7 @@
 
             @media (max-width: 480px) {
                 nav {
-                    padding: 10px 14px !important;
+                    padding: 6px 12px !important;
                 }
 
                 .nav-left {
@@ -1283,6 +1301,15 @@
 
                 .nav-left .nav-net-worth-value {
                     font-size: 0.83rem;
+                }
+
+                .hamburger {
+                    width: 29px;
+                    height: 29px;
+                    min-width: 29px;
+                    min-height: 29px;
+                    font-size: 15px;
+                    border-radius: 8px;
                 }
             }
 
