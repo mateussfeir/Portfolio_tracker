@@ -141,6 +141,15 @@ header {
     .nav-center.active {
         display: flex !important;
     }
+
+    .nav-right {
+        display: none !important;
+    }
+
+    .nav-left {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
     
     /* Ensure hamburger button is visible on mobile */
     .hamburger {
@@ -683,4 +692,3 @@ div {
 .performance-negative {
     color: #f44336 !important;
 }
-

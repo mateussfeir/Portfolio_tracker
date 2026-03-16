@@ -173,7 +173,7 @@
         .nav-right {
             justify-content: flex-end;
         }
-        @media (max-width: 800px) {
+        @media (max-width: 768px) {
             nav {
                 flex-direction: column;
                 align-items: center;
@@ -203,7 +203,7 @@
             justify-content: flex-end;
             flex-wrap: wrap;
         }
-        @media (max-width: 800px) {
+        @media (max-width: 768px) {
             nav {
                 flex-direction: column;
                 align-items: stretch;
@@ -229,7 +229,8 @@
           color: white;
           transform: scale(1.05);
         }
-        #currency-selector {
+        #currency-selector,
+        #currency-selector-mobile {
             background: #222a;
             color: var(--nav-accent-color);
             border: 1px solid var(--nav-accent-color);
@@ -690,8 +691,12 @@
             color: #66bb6a;
         }
         
-        /* Tablet/mobile responsive styles */
-        @media (max-width: 1024px) {
+        .mobile-menu-actions {
+            display: none;
+        }
+
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
             .hamburger {
                 display: block;
                 order: 3;
@@ -715,7 +720,10 @@
             .nav-left {
                 order: 1;
                 flex: 1;
+                flex-direction: column;
                 justify-content: flex-start;
+                align-items: flex-start;
+                gap: 4px;
                 margin-bottom: 0 !important;
                 min-width: 0;
                 overflow: hidden;
@@ -742,7 +750,7 @@
                 align-items: center !important;
                 backdrop-filter: blur(10px) !important;
             }
-            
+
             .nav-center.active {
                 display: flex !important;
                 position: fixed !important;
@@ -758,7 +766,37 @@
                 overflow-y: auto !important;
                 z-index: 9999 !important;
             }
-            
+
+            .mobile-menu-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                width: 100%;
+                max-width: 320px;
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid rgba(76, 175, 80, 0.25);
+            }
+
+            .mobile-menu-actions #currency-selector-mobile,
+            .mobile-menu-actions #privacy-toggle-btn-mobile,
+            .mobile-menu-actions .logout-link,
+            .mobile-menu-actions .mobile-logout-form {
+                width: 100%;
+            }
+
+            .mobile-menu-actions .mobile-logout-form {
+                display: flex;
+                margin: 0;
+            }
+
+            .mobile-menu-actions .logout-link,
+            .mobile-menu-actions #privacy-toggle-btn-mobile,
+            .mobile-menu-actions #currency-selector-mobile {
+                justify-content: center;
+                text-align: center;
+            }
+
             .nav-center a {
                 padding: 24px 20px;
                 text-align: center;
@@ -792,15 +830,7 @@
             }
             
             .nav-right {
-                order: 2;
-                justify-content: flex-end;
-                align-items: center;
-                gap: 8px;
-                margin-bottom: 0 !important;
-                width: auto;
-                flex-shrink: 0;
-                margin-left: auto;
-                flex-wrap: wrap;
+                display: none !important;
             }
             
 
@@ -835,7 +865,7 @@
             }
             
             /* Hide close button on desktop */
-            @media (min-width: 1025px) {
+            @media (min-width: 769px) {
                 .close-menu-btn {
                     display: none !important;
                     visibility: hidden !important;
@@ -847,7 +877,7 @@
             }
             
             /* Hide Bitcoin equivalent on smaller screens */
-            @media (max-width: 1024px) {
+            @media (max-width: 768px) {
                 .btc-equivalent {
                     display: none !important;
                 }
@@ -930,7 +960,7 @@
         }
         
         /* Hide mobile-only controls on desktop */
-        @media (min-width: 1025px) {
+        @media (min-width: 769px) {
             #privacy-toggle-btn-mobile {
                 display: none !important;
             }
@@ -952,7 +982,7 @@
         }
         
         /* Ensure nav-center is visible on desktop */
-        @media (min-width: 1025px) {
+        @media (min-width: 769px) {
             .nav-center {
                 display: flex !important;
             }
@@ -1121,7 +1151,9 @@
         
         /* Futuristic button styling */
         #currency-selector,
+        #currency-selector-mobile,
         #privacy-toggle-btn,
+        #privacy-toggle-btn-mobile,
         .logout-link {
           background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%) !important;
           color: var(--nav-accent-color, #00ffff) !important;
@@ -1140,7 +1172,9 @@
         }
         
         #currency-selector:hover,
+        #currency-selector-mobile:hover,
         #privacy-toggle-btn:hover,
+        #privacy-toggle-btn-mobile:hover,
         .logout-link:hover {
           box-shadow: 0 0 25px rgba(0, 255, 255, 0.5) !important;
           transform: scale(1.05) !important;
@@ -1148,7 +1182,9 @@
         }
         
         #currency-selector:focus,
-        #privacy-toggle-btn:focus {
+        #currency-selector-mobile:focus,
+        #privacy-toggle-btn:focus,
+        #privacy-toggle-btn-mobile:focus {
           outline: none !important;
           box-shadow: 0 0 30px rgba(0, 255, 255, 0.7) !important;
         }
@@ -1179,15 +1215,17 @@
         }
         
         /* Ensure privacy button is never clipped */
-        #privacy-toggle-btn {
+        #privacy-toggle-btn,
+        #privacy-toggle-btn-mobile {
             flex-shrink: 0 !important;
             white-space: nowrap !important;
             overflow: visible !important;
             min-width: max-content !important;
         }
-        
+
         /* Ensure currency selector is never clipped */
-        #currency-selector {
+        #currency-selector,
+        #currency-selector-mobile {
             flex-shrink: 0 !important;
             overflow: visible !important;
         }
@@ -1474,7 +1512,11 @@
     // Hamburger menu toggle function
     function toggleMenu() {
         const navLinks = document.getElementById('navLinks');
+        const hamburger = document.querySelector('.hamburger');
         const isActive = navLinks.classList.toggle('active');
+        if (hamburger) {
+            hamburger.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+        }
         
         // Prevent body scroll when menu is open
         if (isActive) {
@@ -1488,15 +1530,23 @@
         }
     }
 
+    function closeMenu() {
+        const navLinks = document.getElementById('navLinks');
+        const hamburger = document.querySelector('.hamburger');
+        if (navLinks) {
+            navLinks.classList.remove('active');
+        }
+        if (hamburger) {
+            hamburger.setAttribute('aria-expanded', 'false');
+        }
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+    }
+
     function closeMenuIfDesktop() {
-        if (window.innerWidth > 1024) {
-            const navLinks = document.getElementById('navLinks');
-            if (navLinks) {
-                navLinks.classList.remove('active');
-            }
-            document.body.style.overflow = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
+        if (window.innerWidth > 768) {
+            closeMenu();
         }
     }
     
@@ -1510,8 +1560,12 @@
             if (navLinks.classList.contains('active') && 
                 !navLinks.contains(event.target) && 
                 !hamburger.contains(event.target)) {
-                navLinks.classList.remove('active');
+                closeMenu();
             }
+        });
+
+        document.querySelectorAll('#navLinks a').forEach(function(link) {
+            link.addEventListener('click', closeMenu);
         });
         
         // Add escape key functionality to close menu
@@ -1519,7 +1573,7 @@
             if (event.key === 'Escape') {
                 const navLinks = document.getElementById('navLinks');
                 if (navLinks.classList.contains('active')) {
-                    navLinks.classList.remove('active');
+                    closeMenu();
                 }
             }
         });

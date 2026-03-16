@@ -17,7 +17,7 @@
         </div>
 
         <!-- Hamburger menu button for mobile -->
-        <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu">☰</button>
+        <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu" aria-controls="navLinks" aria-expanded="false">☰</button>
 
         <div class="nav-center nav-links" id="navLinks">
             <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
@@ -29,9 +29,25 @@
             <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
             <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
             <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+            <div class="mobile-menu-actions">
+                <select id="currency-selector-mobile" onchange="changeCurrency(this.value)" aria-label="Select currency">
+                    {% for code, name in available_currencies.items %}
+                        <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
+                    {% endfor %}
+                </select>
+                <button id="privacy-toggle-btn-mobile" type="button">Privacy Mode: Off</button>
+                {% if is_demo %}
+                <a href="{% url 'exit_demo' %}" class="logout-link">Exit Demo</a>
+                {% else %}
+                <form action="{% url 'logout' %}" method="post" class="logout-form mobile-logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-link">Logout</button>
+                </form>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="nav-right">
+        <div class="nav-right desktop-controls">
             <select id="currency-selector" onchange="changeCurrency(this.value)">
                 {% for code, name in available_currencies.items %}
                     <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
