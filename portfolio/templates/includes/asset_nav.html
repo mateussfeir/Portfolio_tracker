@@ -20,15 +20,15 @@
         <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu" aria-controls="navLinks" aria-expanded="false">☰</button>
 
         <div class="nav-center nav-links" id="navLinks">
-            <button class="close-menu-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
-            <a href="{% url 'general' %}?currency={{ selected_currency }}">General</a>
-            <a href="{% url 'home' %}?currency={{ selected_currency }}">Crypto</a>
-            <a href="{% url 'stocks' %}?currency={{ selected_currency }}">Stocks</a>
-            <a href="{% url 'stocks_br' %}?currency={{ selected_currency }}">STOCKS BR</a>
-            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}">Real Estate</a>
-            <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
-            <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
-            <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+            <button class="close-menu-btn" onclick="closeMenu()" aria-label="Close menu">✕</button>
+            <a href="{% url 'general' %}?currency={{ selected_currency }}" onclick="closeMenu()">General</a>
+            <a href="{% url 'home' %}?currency={{ selected_currency }}" onclick="closeMenu()">Crypto</a>
+            <a href="{% url 'stocks' %}?currency={{ selected_currency }}" onclick="closeMenu()">Stocks</a>
+            <a href="{% url 'stocks_br' %}?currency={{ selected_currency }}" onclick="closeMenu()">STOCKS BR</a>
+            <a href="{% url 'real_estate' %}?currency={{ selected_currency }}" onclick="closeMenu()">Real Estate</a>
+            <a href="{% url 'vehicles' %}?currency={{ selected_currency }}" onclick="closeMenu()">Vehicles</a>
+            <a href="{% url 'cash' %}?currency={{ selected_currency }}" onclick="closeMenu()">Cash/Fixed Income</a>
+            <a href="{% url 'other' %}?currency={{ selected_currency }}" onclick="closeMenu()">Others</a>
             <div class="mobile-menu-divider" aria-hidden="true"></div>
             <div class="mobile-menu-actions">
                 <select id="currency-selector-mobile" class="mobile-menu-button mobile-menu-select" onchange="changeCurrency(this.value)" aria-label="Select currency">
