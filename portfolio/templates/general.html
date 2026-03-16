@@ -999,11 +999,11 @@
                 flex-direction: row;
                 justify-content: flex-start;
                 align-items: center;
-                gap: 10px;
+                gap: 11px;
                 margin-bottom: 0 !important;
                 min-width: 0;
                 overflow: visible !important;
-                margin-right: 10px;
+                margin-right: 8px;
                 white-space: nowrap;
                 padding-right: 6px !important;
                 line-height: 1.1;
@@ -1018,25 +1018,28 @@
 
             .nav-left .nav-identity {
                 flex: 0 1 auto;
-                font-size: 0.86rem;
-                letter-spacing: 0.02em;
+                font-size: clamp(0.9rem, 2.55vw, 1rem);
+                letter-spacing: 0.015em;
                 line-height: 1.05;
+                color: rgba(196, 255, 255, 0.94);
             }
 
             .nav-left .nav-net-worth {
                 flex: 1 1 auto;
-                gap: 4px;
+                gap: 5px;
                 overflow: hidden;
-                font-size: 0.82rem;
+                font-size: clamp(0.84rem, 2.35vw, 0.94rem);
                 line-height: 1.05;
+                min-width: 0;
             }
 
             .nav-left .nav-net-worth-label {
                 flex-shrink: 0;
-                font-size: 0.75rem;
-                opacity: 0.88;
+                font-size: clamp(0.72rem, 2.05vw, 0.8rem);
+                opacity: 0.92;
                 text-transform: uppercase;
-                letter-spacing: 0.08em;
+                letter-spacing: 0.09em;
+                color: rgba(192, 255, 255, 0.78);
             }
 
             .nav-left .nav-net-worth-value {
@@ -1044,8 +1047,11 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-                font-size: 0.9rem;
+                font-size: clamp(1rem, 2.95vw, 1.1rem);
                 line-height: 1.05;
+                font-weight: 700;
+                color: #c6ffff;
+                text-shadow: 0 0 10px rgba(0, 255, 255, 0.32);
             }
             
             .nav-center {
@@ -1283,24 +1289,8 @@
                 }
 
                 .nav-left {
-                    gap: 8px;
-                    margin-right: 8px;
-                }
-
-                .nav-left .nav-identity {
-                    font-size: 0.8rem;
-                }
-
-                .nav-left .nav-net-worth {
-                    font-size: 0.76rem;
-                }
-
-                .nav-left .nav-net-worth-label {
-                    font-size: 0.7rem;
-                }
-
-                .nav-left .nav-net-worth-value {
-                    font-size: 0.83rem;
+                    gap: 9px;
+                    margin-right: 6px;
                 }
 
                 .hamburger {
