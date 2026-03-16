@@ -1214,32 +1214,31 @@
 
             
             /* Close menu button */
-            .close-menu-btn {
+            .menu-close {
                 position: absolute;
-                top: 30px;
-                right: 30px;
-                background: rgba(0, 0, 0, 0.8);
-                border: 2px solid #4caf50;
-                border-radius: 50%;
-                color: #4caf50;
-                font-size: 20px;
+                top: 16px;
+                right: 18px;
+                background: none;
+                border: none;
+                color: #00ffff;
+                font-size: 22px;
                 cursor: pointer;
-                padding: 12px;
-                width: 44px;
-                height: 44px;
+                padding: 2px;
+                width: auto;
+                height: auto;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 transition: all 0.3s ease;
                 z-index: 10002;
-                backdrop-filter: blur(10px);
+                line-height: 1;
+                text-shadow: 0 0 10px rgba(0, 255, 255, 0.75);
             }
             
-            .close-menu-btn:hover {
-                background-color: #4caf50;
-                color: #000;
-                transform: scale(1.1);
-                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+            .menu-close:hover {
+                color: #9dfdff;
+                transform: scale(1.08);
+                text-shadow: 0 0 14px rgba(0, 255, 255, 0.95);
             }
             
             /* Hide Bitcoin equivalent on smaller screens */
@@ -1271,7 +1270,7 @@
 
             /* Hide close button on desktop */
             @media (min-width: 769px) {
-                .close-menu-btn {
+                .menu-close {
                     display: none !important;
                     visibility: hidden !important;
                     opacity: 0 !important;
