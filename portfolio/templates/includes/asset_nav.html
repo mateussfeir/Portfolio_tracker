@@ -20,7 +20,7 @@
         <button class="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation menu" aria-controls="navLinks" aria-expanded="false">☰</button>
 
         <div class="nav-center nav-links" id="navLinks">
-            <button class="menu-close" id="menuCloseBtn" onclick="closeMenu()" aria-label="Close menu">✕</button>
+            <button class="menu-close mobile-menu-close" id="menuCloseBtn" onclick="closeMenu()" aria-label="Close menu">✕</button>
             <a href="{% url 'general' %}?currency={{ selected_currency }}" onclick="closeMenu()">General</a>
             <a href="{% url 'home' %}?currency={{ selected_currency }}" onclick="closeMenu()">Crypto</a>
             <a href="{% url 'stocks' %}?currency={{ selected_currency }}" onclick="closeMenu()">Stocks</a>

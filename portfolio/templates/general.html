@@ -1226,13 +1226,17 @@
                 padding: 2px;
                 width: auto;
                 height: auto;
-                display: flex;
+                display: none;
                 align-items: center;
                 justify-content: center;
                 transition: all 0.3s ease;
                 z-index: 10002;
                 line-height: 1;
                 text-shadow: 0 0 10px rgba(0, 255, 255, 0.75);
+            }
+
+            .nav-center.active .menu-close {
+                display: flex !important;
             }
             
             .menu-close:hover {
@@ -1269,8 +1273,8 @@
             }
 
             /* Hide close button on desktop */
-            @media (min-width: 769px) {
-                .menu-close {
+            @media (min-width: 768px) {
+                .mobile-menu-close {
                     display: none !important;
                     visibility: hidden !important;
                     opacity: 0 !important;
@@ -1409,7 +1413,8 @@
             }
             
             /* Hide close button on desktop */
-            .close-menu-btn {
+            .close-menu-btn,
+            .mobile-menu-close {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
