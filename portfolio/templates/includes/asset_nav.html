@@ -29,31 +29,22 @@
             <a href="{% url 'vehicles' %}?currency={{ selected_currency }}">Vehicles</a>
             <a href="{% url 'cash' %}?currency={{ selected_currency }}">Cash/Fixed Income</a>
             <a href="{% url 'other' %}?currency={{ selected_currency }}">Others</a>
+            <div class="mobile-menu-divider" aria-hidden="true"></div>
             <div class="mobile-menu-actions">
-                <div class="mobile-menu-actions-header">Quick Actions</div>
-                <div class="mobile-menu-action-row">
-                    <label class="mobile-menu-action-label" for="currency-selector-mobile">Currency</label>
-                    <select id="currency-selector-mobile" onchange="changeCurrency(this.value)" aria-label="Select currency">
-                        {% for code, name in available_currencies.items %}
-                            <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mobile-menu-action-row">
-                    <span class="mobile-menu-action-label">Privacy</span>
-                    <button id="privacy-toggle-btn-mobile" type="button">Privacy Mode: Off</button>
-                </div>
-                <div class="mobile-menu-action-row">
-                    <span class="mobile-menu-action-label">Session</span>
-                    {% if is_demo %}
-                    <a href="{% url 'exit_demo' %}" class="logout-link">Exit Demo</a>
-                    {% else %}
-                    <form action="{% url 'logout' %}" method="post" class="logout-form mobile-logout-form">
-                        {% csrf_token %}
-                        <button type="submit" class="logout-link">Logout</button>
-                    </form>
-                    {% endif %}
-                </div>
+                <select id="currency-selector-mobile" class="mobile-menu-button mobile-menu-select" onchange="changeCurrency(this.value)" aria-label="Select currency">
+                    {% for code, name in available_currencies.items %}
+                        <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code }}</option>
+                    {% endfor %}
+                </select>
+                <button id="privacy-toggle-btn-mobile" class="mobile-menu-button" type="button">Privacy Mode: Off</button>
+                {% if is_demo %}
+                <a href="{% url 'exit_demo' %}" class="logout-link mobile-menu-button">Exit Demo</a>
+                {% else %}
+                <form action="{% url 'logout' %}" method="post" class="logout-form mobile-logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-link mobile-menu-button">Logout</button>
+                </form>
+                {% endif %}
             </div>
         </div>
 
